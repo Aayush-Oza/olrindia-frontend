@@ -6,9 +6,7 @@
   "message" consistently everywhere instead of generic errors.
   ============================================================ */
 
-// Change this when you deploy - keep matching the CORS origins in app.py
-const API_BASE = "http://localhost:5000";
-//const API_BASE = "https://olrindia.duckdns.org/api";
+const API_BASE = "https://olrindia.com/api";
 /**
 * Makes a request to the backend.
 * Always sends credentials so the HttpOnly JWT cookies are included.
