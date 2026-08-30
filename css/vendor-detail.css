@@ -1,0 +1,357 @@
+/* ══════════════════════════════════════════════════════════════
+   VENDOR DETAIL PAGE
+   ══════════════════════════════════════════════════════════════ */
+.admin-detail-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+
+.admin-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: var(--font-display);
+  color: var(--c-ink-soft);
+  margin-bottom: 18px;
+  text-decoration: none;
+}
+
+.admin-back-link:hover {
+  color: var(--c-blue);
+  text-decoration: none;
+}
+
+/* ── Section titles (Strike History / Live Products) ─────────── */
+.admin-section-title {
+  font-size: 16px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--c-ink);
+  margin: 32px 0 14px;
+}
+
+/* ── Vendor info card ──────────────────────────────────────────── */
+.admin-vendor-info-card {
+  background: #fff;
+  border: 1px solid var(--c-border-soft);
+  border-radius: var(--r-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-vendor-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.admin-vendor-photo {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #f0f2f7;
+}
+
+.admin-vendor-photo-placeholder {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--grad-brand);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  flex-shrink: 0;
+}
+
+.admin-vendor-header h1 {
+  font-size: 20px;
+  margin-bottom: 2px;
+}
+
+.admin-vendor-header small {
+  font-size: 13px;
+  color: var(--c-ink-faint);
+  font-weight: 500;
+}
+
+.admin-vendor-bio {
+  font-size: 13.5px;
+  color: var(--c-ink-soft);
+  line-height: 1.5;
+  padding: 12px 14px;
+  background: var(--c-bg);
+  border-radius: var(--r-md);
+  margin-bottom: 18px;
+}
+
+/* ── Field grid ────────────────────────────────────────────────── */
+.admin-vendor-fields {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--c-border-soft);
+}
+
+.admin-vendor-fields>div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-vendor-fields label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--c-ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.admin-vendor-fields span {
+  font-size: 13.5px;
+  color: var(--c-ink);
+  font-weight: 600;
+  word-break: break-word;
+}
+
+/* ── Actions ───────────────────────────────────────────────────── */
+.admin-vendor-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--c-border-soft);
+}
+
+.admin-vendor-actions .admin-action-btn {
+  margin-right: 0;
+  padding: 9px 18px;
+  font-size: 13px;
+}
+
+/* ── Strike history ────────────────────────────────────────────── */
+.admin-strikes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-strike-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: #fff;
+  border: 1px solid var(--c-border-soft);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+}
+
+.admin-strike-row .admin-badge {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.admin-strike-row strong {
+  font-size: 13.5px;
+  color: var(--c-ink);
+  display: block;
+}
+
+.admin-strike-row p {
+  font-size: 13px;
+  color: var(--c-ink-soft);
+  margin: 4px 0;
+  line-height: 1.4;
+}
+
+.admin-strike-row small {
+  font-size: 11.5px;
+  color: var(--c-ink-faint);
+}
+
+/* ── Product cards grid ───────────────────────────────────────── */
+.admin-product-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+}
+
+.admin-product-card {
+  display: block;
+  background: #fff;
+  border: 1px solid var(--c-border-soft);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: all var(--t-fast) var(--ease);
+}
+
+.admin-product-card:hover {
+  border-color: var(--c-blue);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+.admin-product-card img {
+  width: 100%;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  background: #f0f2f7;
+  display: block;
+}
+
+.admin-product-card-noimg {
+  width: 100%;
+  aspect-ratio: 1/1;
+  background: #f0f2f7;
+}
+
+.admin-product-card-body {
+  padding: 10px 12px;
+}
+
+.admin-product-card-body strong {
+  display: block;
+  font-size: 13px;
+  color: var(--c-ink);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-product-card-body small {
+  font-size: 11.5px;
+  color: var(--c-ink-faint);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE - vendor detail page
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width:768px) {
+  .admin-vendor-fields {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .admin-product-cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+}
+
+@media (max-width:480px) {
+  .admin-detail-page {
+    padding: 16px 12px 48px;
+  }
+
+  .admin-vendor-info-card {
+    padding: 16px;
+  }
+
+  .admin-vendor-header {
+    gap: 12px;
+  }
+
+  .admin-vendor-photo,
+  .admin-vendor-photo-placeholder {
+    width: 52px;
+    height: 52px;
+  }
+
+  .admin-vendor-header h1 {
+    font-size: 17px;
+  }
+
+  .admin-vendor-fields {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 14px;
+  }
+
+  .admin-vendor-actions {
+    flex-direction: column;
+  }
+
+  .admin-vendor-actions .admin-action-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .admin-strike-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .admin-product-cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+  }
+
+  .admin-section-title {
+    font-size: 15px;
+    margin: 24px 0 12px;
+  }
+}
+
+@media (max-width:480px) {
+  .admin-detail-page {
+    padding: 16px 12px 48px;
+  }
+
+  .admin-vendor-info-card {
+    padding: 16px;
+  }
+
+  .admin-vendor-header {
+    gap: 12px;
+  }
+
+  .admin-vendor-photo,
+  .admin-vendor-photo-placeholder {
+    width: 52px;
+    height: 52px;
+  }
+
+  .admin-vendor-header h1 {
+    font-size: 17px;
+  }
+
+  .admin-vendor-fields {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .admin-vendor-actions {
+    flex-direction: column;
+  }
+
+  .admin-vendor-actions .admin-action-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .admin-strike-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .admin-product-cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+  }
+
+  .admin-section-title {
+    font-size: 15px;
+    margin: 24px 0 12px;
+  }
+}

@@ -1,0 +1,70 @@
+/* ============================================================
+   OLR INDIA - DESIGN TOKENS
+   ============================================================ */
+
+:root {
+  /* Brand colors */
+  --c-orange: #FF8500;
+  --c-orange-deep: #F54617;
+  --c-blue: #0873E7;
+  --c-blue-deep: #0F4283;
+  --c-green: #039266;
+  --c-green-deep: #02764D;
+
+  /* Brand gradients */
+  --grad-orange: linear-gradient(135deg, var(--c-orange) 0%, var(--c-orange-deep) 100%);
+  --grad-blue: linear-gradient(160deg, var(--c-blue) 0%, var(--c-blue-deep) 100%);
+  --grad-green: linear-gradient(135deg, var(--c-green) 0%, var(--c-green-deep) 100%);
+  --grad-brand: linear-gradient(145deg, #FF8500 0%, #0873E7 55%, #039266 100%);
+
+  /* Neutrals */
+  --c-ink: #181A1B;
+  --c-ink-soft: #555B61;
+  --c-ink-faint: #8A9097;
+  --c-bg: #FAFAF8;
+  --c-surface: #FFFFFF;
+  --c-border: #E6E5E1;
+  --c-border-soft: #F0EFEC;
+
+  /* Status */
+  --c-error: #D8351F;
+  --c-error-bg: #FDEDEA;
+  --c-success: #0E8A4F;
+  --c-success-bg: #E9F8F0;
+  --c-orange-deep-text: #B33200;
+  --c-blue-banner: #EAF3FF;
+  --c-blue-banner-border: #BDD7FF;
+  --c-blue-banner-text: #0F4283;
+
+  /* Typography */
+  --font-display: 'Poppins', 'Segoe UI', sans-serif;
+  --font-body: 'Inter', 'Segoe UI', sans-serif;
+
+  /* Spacing */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+  --sp-8: 64px;
+
+  /* Radius */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+  --r-pill: 999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(24, 26, 27, 0.08);
+  --shadow-md: 0 6px 20px rgba(24, 26, 27, 0.10);
+  --shadow-lg: 0 20px 60px rgba(24, 26, 27, 0.18);
+  --shadow-card: 0 8px 40px rgba(8, 115, 231, 0.10), 0 2px 8px rgba(24, 26, 27, 0.08);
+
+  /* Motion */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --t-fast: 150ms;
+  --t-med: 250ms;
+}

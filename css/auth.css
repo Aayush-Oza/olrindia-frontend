@@ -1,0 +1,423 @@
+/* ============================================================
+   OLR INDIA - AUTH PAGES
+   Full-page gradient background, centered floating card.
+   All auth pages (login, signup, forgot, reset, verify) use this.
+   ============================================================ */
+
+/* ── Full page gradient background ──────────────────────── */
+.auth-screen {
+  min-height: 100vh;
+  background: linear-gradient(145deg, #FF8500 0%, #0873E7 55%, #039266 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-6) var(--sp-4);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Decorative blobs */
+.auth-screen::before {
+  content: '';
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  top: -180px;
+  right: -120px;
+  pointer-events: none;
+}
+
+.auth-screen::after {
+  content: '';
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  bottom: -100px;
+  left: -80px;
+  pointer-events: none;
+}
+
+/* ── The floating white card ─────────────────────────────── */
+.auth-card {
+  background: var(--c-surface);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-card);
+  width: 100%;
+  max-width: 440px;
+  padding: var(--sp-6) var(--sp-6);
+  position: relative;
+  z-index: 1;
+  animation: card-in 0.3s var(--ease);
+}
+
+.auth-card.wide {
+  max-width: 540px;
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Logo badge at top of card ───────────────────────────── */
+.auth-logo-badge {
+  display: flex;
+  /* was inline-flex */
+  align-items: center;
+  justify-content: center;
+  /* center it nicely */
+  gap: 0;
+  background: transparent;
+  /* REMOVE the green pill */
+  border-radius: 0;
+  padding: 0;
+  margin-bottom: var(--sp-5);
+}
+
+.auth-logo-badge img {
+  width: auto;
+  /* was 34px fixed - was squishing it */
+  height: 70px;
+  /* tall enough for full logo with INDIA text */
+  border-radius: 0;
+  /* was 50% - was making circle crop */
+  object-fit: contain;
+  background: transparent;
+  padding: 0;
+}
+
+.auth-logo-badge span {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
+  display: none;
+  /* hide the text, just show the logo */
+}
+
+/* ── Card header ─────────────────────────────────────────── */
+.auth-form-header {
+  margin-bottom: var(--sp-5);
+}
+
+.auth-form-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.auth-form-header p {
+  font-size: 13.5px;
+  margin-bottom: 0;
+  color: var(--c-ink-faint);
+}
+
+/* ── Google Sign-In button ───────────────────────────────── */
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px var(--sp-5);
+  background: var(--c-surface);
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--r-md);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--c-ink);
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-google:hover {
+  background: var(--c-bg);
+  border-color: #C0BFBB;
+  box-shadow: var(--shadow-md);
+}
+
+.btn-google:active {
+  transform: translateY(0);
+}
+
+.btn-google:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-google svg {
+  flex-shrink: 0;
+}
+
+/* ── OR divider ──────────────────────────────────────────── */
+.auth-or {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin: var(--sp-4) 0;
+  color: var(--c-ink-faint);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.auth-or::before,
+.auth-or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--c-border);
+}
+
+/* ── Google prefill banner ───────────────────────────────── */
+.google-prefill-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  background: var(--c-blue-banner);
+  border: 1px solid var(--c-blue-banner-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-3) var(--sp-4);
+  margin-bottom: var(--sp-4);
+  font-size: 13px;
+  color: var(--c-blue-banner-text);
+  line-height: 1.4;
+}
+
+.google-prefill-banner svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── Card footer link ────────────────────────────────────── */
+.auth-form-footer {
+  text-align: center;
+  margin-top: var(--sp-4);
+  font-size: 13px;
+  color: var(--c-ink-faint);
+}
+
+/* ── Trust row at bottom of card ─────────────────────────── */
+.auth-trust-row {
+  display: flex;
+  justify-content: center;
+  gap: var(--sp-4);
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--c-border-soft);
+}
+
+.auth-trust-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--c-ink-faint);
+}
+
+.auth-trust-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--grad-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 8px;
+  color: #fff;
+}
+
+/* ── Section labels inside long forms (vendor signup) ────── */
+.auth-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--c-ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 14px;
+  margin-top: var(--sp-2);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .auth-screen {
+    padding: var(--sp-4) var(--sp-3);
+  }
+
+  .auth-card {
+    padding: var(--sp-5) var(--sp-4);
+    border-radius: var(--r-lg);
+  }
+
+  .auth-card.wide {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-form-header h1 {
+    font-size: 22px;
+  }
+
+  .auth-logo-badge img {
+    height: 54px;
+    /* slightly smaller on mobile but still clear */
+  }
+
+  .field-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .auth-trust-row {
+    gap: var(--sp-3);
+  }
+
+  .auth-trust-item {
+    font-size: 11px;
+  }
+}
+
+/* ── Landing page (kept for index.html) ──────────────────── */
+.landing-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-5) 0;
+}
+
+.landing-header img {
+  height: 56px;
+  /* was 38px - too small */
+  width: auto;
+}
+
+.landing-hero {
+  text-align: center;
+  padding: var(--sp-8) 0 var(--sp-7);
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.landing-hero h1 {
+  font-size: 40px;
+  margin-bottom: var(--sp-3);
+}
+
+.landing-hero p {
+  font-size: 16px;
+}
+
+.role-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-5);
+  max-width: 760px;
+  margin: var(--sp-6) auto 0;
+  padding-bottom: var(--sp-8);
+}
+
+.role-card {
+  background: var(--c-surface);
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-6) var(--sp-5);
+  text-align: left;
+  text-decoration: none;
+  transition: all var(--t-fast) var(--ease);
+  display: block;
+}
+
+.role-card:hover {
+  text-decoration: none;
+  border-color: var(--c-blue);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
+}
+
+.role-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--sp-4);
+  color: #fff;
+}
+
+.role-card.is-user .role-card-icon {
+  background: var(--grad-blue);
+}
+
+.role-card.is-vendor .role-card-icon {
+  background: var(--grad-orange);
+}
+
+.role-card h3 {
+  color: var(--c-ink);
+  margin-bottom: var(--sp-2);
+}
+
+.role-card p {
+  font-size: 13.5px;
+  margin-bottom: var(--sp-3);
+}
+
+.role-card-cta {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--c-blue-deep);
+}
+
+@media (max-width: 768px) {
+  .landing-hero {
+    padding: var(--sp-7) 0 var(--sp-6);
+  }
+
+  .landing-hero h1 {
+    font-size: 30px;
+  }
+
+  .role-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.auth-browse-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 8px 18px;
+  border-radius: var(--r-pill);
+  border: 1.5px solid var(--c-border);
+  background: var(--c-bg);
+  color: var(--c-ink-soft);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-display);
+  text-decoration: none;
+  transition: all var(--t-fast) var(--ease);
+}
+
+.auth-browse-link:hover {
+  border-color: var(--c-blue);
+  color: var(--c-blue);
+  background: #EAF3FF;
+}

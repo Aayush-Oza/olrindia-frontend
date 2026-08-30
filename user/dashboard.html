@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Account - OLR India</title>
+  <link rel="icon" href="../assets/favicon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../css/variables.css?v=2">
+  <link rel="stylesheet" href="../css/base.css?v=2">
+  <link rel="stylesheet" href="../css/components.css?v=2">
+  <link rel="stylesheet" href="../css/user-dashboard.css?v=19">
+  <link rel="stylesheet" href="../css/chat.css?v=7">
+  <link rel="stylesheet" href="../css/legal.css?v=7">
+  <link rel="stylesheet" href="../css/footer.css?v=4">
+</head>
+
+<body>
+  <div id="dashRoot">
+
+    <!-- ── NAVBAR ─────────────────────────────────────────────── -->
+    <nav class="dash-nav">
+      <div class="dash-nav-inner">
+
+        <a class="dash-nav-logo" href="dashboard.html">
+          <img src="../assets/logo.png?v=3" alt="OLR India">
+        </a>
+
+        <!-- Desktop tabs -->
+        <div class="dash-nav-links">
+          <button class="nav-link active" data-tab="browse">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+              <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+              <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+              <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+            </svg>
+            Browse
+          </button>
+          <button class="nav-link" data-tab="wishlist">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"
+                stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            </svg>
+            Wishlist
+            <span class="nav-badge" id="wishlistCount" style="display:none;"></span>
+          </button>
+          <button class="nav-link" data-tab="chat">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"
+                stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            </svg>
+            Chat
+            <span class="nav-badge" id="chatUnreadCount" style="display:none;"></span>
+          </button>
+          <button class="nav-link" data-tab="profile">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <path d="M4 21v-1a7 7 0 0 1 14 0v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+              <circle cx="11" cy="7" r="4" stroke="currentColor" stroke-width="1.8" />
+            </svg>
+            Profile
+          </button>
+          <button class="nav-link" data-tab="privacy">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4Z" stroke="currentColor"
+                stroke-width="1.8" />
+            </svg>
+            Privacy
+          </button>
+          <button class="nav-link" data-tab="terms">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <path d="M6 2h9l5 5v15H6V2Z" stroke="currentColor" stroke-width="1.8" />
+            </svg>
+            Terms
+          </button>
+        </div>
+
+        <!-- Desktop right -->
+        <div class="dash-nav-right">
+          <div class="dash-nav-user">
+            <div class="nav-avatar" id="navUserAvatar"></div>
+            <span class="name" id="navUserName"></span>
+          </div>
+          <button class="nav-btn nav-btn-ghost" id="logoutBtn">Log out</button>
+        </div>
+
+        <!-- Hamburger -->
+        <button class="nav-hamburger" id="hamburgerBtn" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+
+      <!-- Mobile menu -->
+      <div class="nav-mobile-menu" id="mobileMenu">
+        <div class="mobile-user-row">
+          <div class="nav-avatar" id="navUserAvatarMobile"></div>
+          <span id="navUserNameMobile"></span>
+        </div>
+        <button class="mobile-nav-link active" data-tab="browse">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+            <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+            <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+            <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+          </svg>
+          Browse
+        </button>
+        <button class="mobile-nav-link" data-tab="wishlist">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"
+              stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+          </svg>
+          Wishlist
+          <span class="nav-badge" id="wishlistCountMobile" style="display:none;"></span>
+        </button>
+        <button class="mobile-nav-link" data-tab="chat">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"
+              stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+          </svg>
+          Chat
+          <span class="nav-badge" id="chatUnreadCountMobile" style="display:none;"></span>
+        </button>
+        <button class="mobile-nav-link" data-tab="profile">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M4 21v-1a7 7 0 0 1 14 0v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            <circle cx="11" cy="7" r="4" stroke="currentColor" stroke-width="1.8" />
+          </svg>
+          Profile
+        </button>
+        <button class="nav-link" data-tab="privacy">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4Z" stroke="currentColor" stroke-width="1.8" />
+          </svg>
+          Privacy
+        </button>
+        <button class="nav-link" data-tab="terms">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path d="M6 2h9l5 5v15H6V2Z" stroke="currentColor" stroke-width="1.8" />
+          </svg>
+          Terms
+        </button>
+        <button class="nav-btn nav-btn-ghost" id="logoutBtnMobile"
+          style="width:100%;justify-content:center;margin-top:4px;">Log out</button>
+      </div>
+    </nav>
+
+    <!-- ── ALL PANELS INSIDE ONE WRAPPER ──────────────────────── -->
+    <div class="dash-page">
+
+      <!-- ── CHAT PANEL ─────────────────────────────────────────── -->
+      <div class="dash-panel" id="panel-chat">
+        <div class="chat-overlay chat-embedded" id="chatOverlay">
+          <div class="chat-list-view" id="chatListView">
+            <div class="chat-list-body" id="chatListBody">
+              <div class="chat-empty-state">
+                <div class="icon">💬</div>
+                <h3>No conversations yet</h3>
+                <p>Your chats will show up here.</p>
+              </div>
+            </div>
+          </div>
+          <div class="chat-thread-view" id="chatThreadView">
+            <div class="chat-thread-header">
+              <button class="chat-back-btn" onclick="backToChatList()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" />
+                </svg>
+              </button>
+              <div class="chat-thread-avatar" id="chatThreadAvatar"></div>
+              <div class="chat-thread-info">
+                <div class="chat-thread-name" id="chatThreadName"></div>
+                <div class="chat-thread-status" id="chatThreadStatus"></div>
+              </div>
+            </div>
+            <div class="chat-thread-body" id="chatThreadBody"></div>
+            <div class="chat-thread-input-bar">
+              <input type="text" class="chat-input" id="chatInput" placeholder="Type a message…" maxlength="1000"
+                autocomplete="off">
+              <button class="chat-send-btn" id="chatSendBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7Z" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── BROWSE PANEL ────────────────────────────────────────── -->
+      <div class="dash-panel active" id="panel-browse">
+
+        <!-- Filter row -->
+        <div class="filter-row">
+          <div class="filter-row-inner">
+            <div class="nav-search">
+              <svg class="nav-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8" />
+                <path d="m16.5 16.5 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+              </svg>
+              <input type="text" id="searchInput" placeholder="Search products…" autocomplete="off">
+            </div>
+            <button class="filter-main-btn" id="filterBtn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                <path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+              </svg>
+              Filters
+              <span class="filter-count-badge" id="filterCountBadge" style="display:none;">0</span>
+            </button>
+          </div>
+          <div class="active-filters" id="activeFilters"></div>
+        </div>
+
+        <!-- Filter sheet -->
+        <div class="filter-overlay" id="filterOverlay" onclick="closeFilterSheet()"></div>
+        <div class="filter-sheet" id="filterSheet">
+          <div class="filter-sheet-head">
+            <span>Filters</span>
+            <button class="filter-sheet-close" onclick="closeFilterSheet()">✕</button>
+          </div>
+          <div class="filter-sheet-body">
+            <div class="filter-group">
+              <div class="filter-group-label">Category</div>
+              <select class="filter-select" id="filterCategory">
+                <option value="">All categories</option>
+                <option value="Construction Equipment">Construction Equipment</option>
+                <option value="Hotel & Resorts">Hotel & Resorts</option>
+                <option value="Camping">Camping</option>
+                <option value="Furniture">Furniture</option>
+                <option value="Electrical Tools">Electrical Tools</option>
+                <option value="Home Appliances">Home Appliances</option>
+                <option value="Fashion">Fashion</option>
+                <option value="Events & Weddings">Events & Weddings</option>
+                <option value="Commercial Vehicles">Commercial Vehicles</option>
+                <option value="Passenger Vehicles">Passenger Vehicles</option>
+                <option value="Agricultural Equipment">Agricultural Equipment</option>
+                <option value="Warehouse">Warehouse</option>
+                <option value="Properties">Properties</option>
+                <option value="Bikes">Bikes</option>
+                <option value="Industrial Equipment">Industrial Equipment</option>
+                <option value="Machineries">Machineries</option>
+                <option value="Tools & tackles">Tools & tackles</option>
+                <option value="Medical equipments">Medical equipments</option>
+                <option value="Cargo & Shipping">Cargo & Shipping</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <div class="filter-group-label">City / Location</div>
+              <div class="filter-location-row">
+                <input class="filter-input" type="text" id="filterCity" placeholder="e.g. Mumbai, Delhi…">
+                <button class="filter-locate-btn" id="filterLocateBtn" title="Use my location">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z"
+                      stroke="currentColor" stroke-width="1.8" />
+                    <circle cx="12" cy="9" r="2.5" stroke="currentColor" stroke-width="1.8" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="filter-group">
+              <div class="filter-group-label">Price per</div>
+              <div class="price-type-toggle">
+                <button class="price-type-btn" data-type="hour">Hour</button>
+                <button class="price-type-btn" data-type="km">Km</button>
+                <button class="price-type-btn" data-type="day">Day</button>
+                <button class="price-type-btn" data-type="month">Month</button>
+              </div>
+            </div>
+            <div class="filter-group">
+              <div class="filter-group-label">Price range (₹)</div>
+              <div class="filter-price-row">
+                <input class="filter-input" type="number" id="filterPriceMin" placeholder="Min" min="0">
+                <span class="filter-price-sep">–</span>
+                <input class="filter-input" type="number" id="filterPriceMax" placeholder="Max" min="0">
+              </div>
+              <div class="filter-price-hint" id="filterPriceHint">Enter a min or max to filter by price.</div>
+            </div>
+          </div>
+          <div class="filter-sheet-foot">
+            <button class="filter-clear-btn" id="filterClearBtn">Clear all</button>
+            <button class="btn btn-primary" id="filterApplyBtn" style="flex:1;padding:12px;">Apply</button>
+          </div>
+        </div>
+
+        <!-- Page body -->
+        <div class="page-body">
+          <div class="section-head">
+            <h2 id="productsTitle">All products</h2>
+            <span class="products-count" id="productsCount"></span>
+          </div>
+          <div class="product-grid" id="productGrid">
+            <div class="grid-loading">
+              <div class="grid-spinner"></div>
+              <span>Loading products…</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── WISHLIST PANEL ──────────────────────────────────────── -->
+      <div class="dash-panel" id="panel-wishlist">
+        <div class="panel-head">
+          <h2>My Wishlist</h2>
+        </div>
+        <div id="wishlistContent">
+          <div class="empty-state">
+            <div class="empty-state-icon">🤍</div>
+            <h3>Your wishlist is empty</h3>
+            <p>Tap ♡ on any product to save it here.</p>
+            <button class="btn btn-primary" onclick="switchTab('browse')"
+              style="width:auto;padding:10px 24px;display:inline-flex;margin-top:8px;">Browse products</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PROFILE PANEL ───────────────────────────────────────── -->
+      <div class="dash-panel" id="panel-profile">
+        <div class="panel-head">
+          <h2>My Profile</h2>
+        </div>
+        <div class="profile-card">
+          <div class="profile-avatar-row">
+            <div class="profile-avatar-left">
+              <div class="profile-avatar-upload-wrap">
+                <div class="profile-avatar-big" id="profileAvatar"></div>
+                <img class="profile-avatar-img" id="profileAvatarImg" style="display:none;" alt="Profile photo">
+                <button type="button" class="profile-avatar-edit-btn" id="profileAvatarEditBtn" title="Change photo">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" stroke="currentColor"
+                      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </button>
+              </div>
+              <input type="file" id="profilePhotoInput" accept="image/*" style="display:none;">
+              <button type="button" class="profile-avatar-remove-btn" id="profileAvatarRemoveBtn"
+                style="display:none;">Remove photo</button>
+            </div>
+            <div class="profile-avatar-info">
+              <h3 id="profileName"></h3>
+              <p id="profileEmail"></p>
+            </div>
+          </div>
+          <div class="profile-section-label">Account (cannot be changed)</div>
+          <div class="profile-locked-row">
+            <div class="profile-locked-field">
+              <div class="profile-locked-label">Email</div>
+              <div class="profile-locked-value" id="infoEmail"></div>
+              <div class="profile-locked-note">Contact support to change</div>
+            </div>
+          </div>
+          <div class="profile-section-label">Personal details</div>
+          <form id="profileForm" novalidate>
+            <div class="field">
+              <label class="label" for="editName">Full name</label>
+              <input class="input" type="text" id="editName" name="name" autocomplete="name"
+                placeholder="Your full name">
+            </div>
+            <div class="field">
+              <label class="label" for="editMobile">Mobile number</label>
+              <input class="input" type="tel" id="editMobile" name="mobile" autocomplete="tel" maxlength="10"
+                placeholder="10-digit mobile number">
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label class="label" for="editPincode">Pincode</label>
+                <input class="input" type="text" id="editPincode" name="pincode" autocomplete="postal-code"
+                  placeholder="6-digit pincode" maxlength="6">
+                <div class="field-hint pincode-status"></div>
+              </div>
+              <div class="field">
+                <label class="label" for="editArea">Area</label>
+                <input class="input" type="text" id="editArea" name="area" autocomplete="address-line2"
+                  placeholder="Area / locality">
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label class="label" for="editCity">City</label>
+                <input class="input" type="text" id="editCity" name="city" autocomplete="address-level2"
+                  placeholder="City">
+              </div>
+              <div class="field">
+                <label class="label" for="editState">State</label>
+                <input class="input" type="text" id="editState" name="state" autocomplete="address-level1"
+                  placeholder="State">
+              </div>
+            </div>
+            <div class="profile-save-row">
+              <button type="submit" class="btn btn-primary">
+                <span class="btn-label">Save changes</span>
+                <span class="spinner"></span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ── PRIVACY PANEL ───────────────────────────────────────── -->
+      <div class="dash-panel" id="panel-privacy">
+        <!-- Content -->
+        <div class="legal-wrap">
+          <div class="legal-card">
+
+            <p>OLR India ("we", "our", or "us") operates the platform available at <a
+                href="https://olrindia.duckdns.org" target="_blank" rel="noopener">olrindia.duckdns.org</a>. This
+              Privacy Policy explains how we collect, use, and protect your information.</p>
+
+            <h2>Information We Collect</h2>
+            <ul>
+              <li>Name and email address (via registration or Google Sign-In)</li>
+              <li>Mobile number and address details (optional, provided by you)</li>
+              <li>Location data (only if you grant permission)</li>
+            </ul>
+
+            <h2>How We Use Your Information</h2>
+            <ul>
+              <li>To create and manage your account</li>
+              <li>To connect customers with local vendors</li>
+              <li>To send account-related emails (verification, password reset)</li>
+              <li>To improve our platform and services</li>
+            </ul>
+
+            <h2>Google Sign-In</h2>
+            <p>If you sign in with Google, we receive your name, email, and profile picture from Google. We do not
+              access any other Google account data.</p>
+
+            <h2>Data Security</h2>
+            <p>We use industry-standard security measures including encrypted passwords, HttpOnly cookies, and HTTPS to
+              protect your data.</p>
+
+            <h2>Third-Party Services</h2>
+            <p>We use Firebase (Google) for authentication and Resend for transactional emails. These services have
+              their own privacy policies.</p>
+
+            <h2>Your Rights</h2>
+            <p>You may request deletion or export of your personal data at any time by contacting us at <a
+                href="mailto:support@olrindia.com">support@olrindia.com</a>.</p>
+
+            <h2>Contact</h2>
+            <p>For any privacy-related questions, email us at <a
+                href="mailto:support@olrindia.com">support@olrindia.com</a>.</p>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TERMS PANEL ─────────────────────────────────────────── -->
+      <div class="dash-panel" id="panel-terms">
+        <!-- Content -->
+        <div class="legal-wrap">
+          <div class="legal-card">
+
+            <p>By using OLR India ("Platform"), you agree to these Terms. Please read them carefully.</p>
+
+            <h2>1. About OLR India</h2>
+            <p>OLR India is a rental marketplace that connects customers looking to rent products with local vendors. We
+              are a platform only -we do not own, rent, or sell any products listed.</p>
+
+            <h2>2. User Accounts</h2>
+            <ul>
+              <li>You must provide accurate information when registering.</li>
+              <li>You are responsible for keeping your account credentials secure.</li>
+              <li>You must be at least 18 years old to use this platform.</li>
+            </ul>
+
+            <h2>3. Vendor Responsibilities</h2>
+            <ul>
+              <li>Vendors are responsible for the accuracy of their listings.</li>
+              <li>Vendors must honour rental agreements made through the platform.</li>
+              <li>OLR India is not liable for disputes between customers and vendors.</li>
+            </ul>
+
+            <h2>4. Prohibited Use</h2>
+            <ul>
+              <li>You may not use the platform for illegal activities.</li>
+              <li>You may not post false, misleading, or fraudulent listings.</li>
+              <li>You may not harass or harm other users.</li>
+            </ul>
+
+            <h2>5. Intellectual Property</h2>
+            <p>All content, logos, and design on OLR India are owned by OLR India. You may not copy or reuse them
+              without permission.</p>
+
+            <h2>6. Limitation of Liability</h2>
+            <p>OLR India is not liable for any damages arising from use of the platform, rental transactions, or
+              disputes between users and vendors.</p>
+
+            <h2>7. Changes to Terms</h2>
+            <p>We may update these terms at any time. Continued use of the platform after changes means you accept the
+              updated terms.</p>
+
+            <h2>8. Contact</h2>
+            <p>For questions about these terms, email us at <a
+                href="mailto:support@olrindia.com">support@olrindia.com</a>.</p>
+
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end .dash-page -->
+  </div><!-- end #dashRoot -->
+
+  <!-- Google Translate -->
+  <div id="google_translate_element" style="display:none;"></div>
+  <script>
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,hi,bn,te,mr,ta,gu,kn,ml,pa,or,as,ur,ne,mai,sa,sd,sat,doi,bho,tcy',
+        autoDisplay: false,
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+      }, 'google_translate_element');
+    }
+  </script>
+  <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+  <footer class="site-footer">
+    <div class="footer-cols">
+      <div>
+        <div class="footer-col-title">Company</div>
+        <a href="../about.html" class="footer-col-link">About Us</a>
+        <a href="../terms.html" class="footer-col-link">Terms & Conditions</a>
+        <a href="../privacy.html" class="footer-col-link">Privacy Policy</a>
+      </div>
+      <div>
+        <div class="footer-col-title">Follow Us</div>
+        <a href="https://instagram.com/olrindia" target="_blank" rel="noopener" class="footer-social-item">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.8" />
+            <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8" />
+            <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
+          </svg>
+          Instagram
+        </a>
+        <a href="https://facebook.com/olrindia" target="_blank" rel="noopener" class="footer-social-item">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" stroke="currentColor"
+              stroke-width="1.8" stroke-linejoin="round" />
+          </svg>
+          Facebook
+        </a>
+      </div>
+      <div>
+        <div class="footer-col-title">Contact</div>
+        <a href="mailto:support@olrindia.com" class="footer-contact-item">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor"
+              stroke-width="1.8" />
+            <path d="m22 6-10 7L2 6" stroke="currentColor" stroke-width="1.8" />
+          </svg>
+          support@olrindia.com
+        </a>
+        <a href="tel:+919999999999" class="footer-contact-item">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.14 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.05 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 5.93 5.93l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16v.92h1z"
+              stroke="currentColor" stroke-width="1.8" />
+          </svg>
+          +91 99999 99999
+        </a>
+      </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="footer-bottom">
+      <div class="footer-bottom-top">
+        <a class="footer-logo" href="../index.html">
+          <img src="../assets/logo.png?v=3" alt="OLR India">
+        </a>
+        <select class="footer-lang-select" id="footerLangSelect">
+          <option value="en">🌐 English</option>
+          <option value="hi">हिंदी (Hindi)</option>
+          <option value="bn">বাংলা (Bengali)</option>
+          <option value="te">తెలుగు (Telugu)</option>
+          <option value="mr">मराठी (Marathi)</option>
+          <option value="ta">தமிழ் (Tamil)</option>
+          <option value="gu">ગુજરાતી (Gujarati)</option>
+          <option value="kn">ಕನ್ನಡ (Kannada)</option>
+          <option value="ml">മലയാളം (Malayalam)</option>
+          <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+          <option value="or">ଓଡ଼ିଆ (Odia)</option>
+          <option value="as">অসমীয়া (Assamese)</option>
+          <option value="ur">اردو (Urdu)</option>
+          <option value="ne">नेपाली (Nepali)</option>
+          <option value="mai">मैथिली (Maithili)</option>
+          <option value="sa">संस्कृत (Sanskrit)</option>
+          <option value="sd">سنڌي (Sindhi)</option>
+          <option value="sat">ᱥᱟᱱᱛᱟᱲᱤ (Santali)</option>
+          <option value="doi">डोगरी (Dogri)</option>
+          <option value="bho">भोजपुरी (Bhojpuri)</option>
+          <option value="tcy">ತುಳು (Tulu)</option>
+        </select>
+      </div>
+      <div class="footer-copyright">© 2026 OLR India. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <div id="toast-container"></div>
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal-box">
+      <h3 class="modal-title" id="confirmTitle"></h3>
+      <p class="modal-text" id="confirmText"></p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="confirmCancel"></button>
+        <button class="btn btn-primary" id="confirmOk"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/footer.js?v=7"></script>
+  <script type="module" src="../js/firebase-config.js?v=2"></script>
+  <script src="../js/api.js?v=4"></script>
+  <script src="../js/ui.js?v=1"></script>
+  <script src="../js/helpers.js?v=2"></script>
+  <script src="../js/chat.js?v=2"></script>
+  <script src="../js/chat-ui.js?v=5"></script>
+  <script src="../js/user-auth.js?v=3"></script>
+  <script src="../js/user-dashboard.js?v=24"></script>
+</body>
+
+</html>

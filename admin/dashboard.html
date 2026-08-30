@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - OLR India</title>
+  <link rel="icon" href="../assets/favicon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../css/variables.css?v=2">
+  <link rel="stylesheet" href="../css/base.css?v=2">
+  <link rel="stylesheet" href="../css/components.css?v=2">
+  <link rel="stylesheet" href="../css/admin-dashboard.css?v=4">
+</head>
+
+<body>
+  <div id="dashRoot">
+
+    <!-- ── NAVBAR ─────────────────────────────────────────────── -->
+    <nav class="dash-nav">
+      <div class="dash-nav-inner">
+        <a class="dash-nav-logo" href="../index.html">
+          <img src="../assets/logo.png?v=3" alt="OLR India">
+        </a>
+        <div class="dash-nav-links">
+          <button class="nav-link active" data-tab="overview">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+              <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+              <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+              <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+            </svg>
+            Overview
+          </button>
+          <button class="nav-link" data-tab="products">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <path d="M21 8v13H3V8M1 3h22v5H1V3ZM10 12h4" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            Products
+            <span class="nav-badge" id="pendingBadge" style="display:none;"></span>
+          </button>
+          <button class="nav-link" data-tab="users">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <path d="M4 21v-1a7 7 0 0 1 14 0v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+              <circle cx="11" cy="7" r="4" stroke="currentColor" stroke-width="1.8" />
+            </svg>
+            Users
+          </button>
+          <button class="nav-link" data-tab="vendors">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <path d="M3 9.5 12 3l9 6.5M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5" stroke="currentColor"
+                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            Vendors
+          </button>
+        </div>
+        <div class="dash-nav-right">
+          <div class="dash-nav-user">
+            <div class="nav-avatar" id="navAdminAvatar"></div>
+            <span class="name" id="navAdminName"></span>
+          </div>
+          <button class="nav-btn nav-btn-ghost" id="logoutBtn">Log out</button>
+        </div>
+        <button class="nav-hamburger" id="hamburgerBtn" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+      <div class="nav-mobile-menu" id="mobileMenu">
+        <button class="mobile-nav-link active" data-tab="overview">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path d="M3 9.5 12 3l9 6.5M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5" stroke="currentColor"
+              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          Overview</button>
+        <button class="mobile-nav-link" data-tab="products">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path d="M21 8v13H3V8M1 3h22v5H1V3ZM10 12h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+          Products
+        </button>
+        <button class="mobile-nav-link" data-tab="users">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path d="M4 21v-1a7 7 0 0 1 14 0v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            <circle cx="11" cy="7" r="4" stroke="currentColor" stroke-width="1.8" />
+          </svg>
+          Users
+        </button>
+        <button class="mobile-nav-link" data-tab="vendors">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path d="M3 9.5 12 3l9 6.5M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5" stroke="currentColor"
+              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          Vendors
+        </button>
+        <button class="nav-btn nav-btn-ghost" id="logoutBtnMobile"
+          style="width:100%;justify-content:center;margin-top:4px;">Log out</button>
+      </div>
+    </nav>
+
+    <!-- ── PAGE ───────────────────────────────────────────────── -->
+    <div class="dash-page">
+
+      <!-- ── OVERVIEW PANEL ─────────────────────────────────────── -->
+      <div class="dash-panel active" id="panel-overview">
+        <div class="panel-head">
+          <h2>Overview</h2>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total users</div>
+            <div class="stat-value" id="statUsers">–</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total vendors</div>
+            <div class="stat-value" id="statVendors">–</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total products</div>
+            <div class="stat-value" id="statProducts">–</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Live products</div>
+            <div class="stat-value" id="statActiveProducts">–</div>
+          </div>
+          <div class="stat-card stat-card-warn">
+            <div class="stat-label">Flagged vendors</div>
+            <div class="stat-value" id="statFlagged">–</div>
+          </div>
+          <div class="stat-card stat-card-danger">
+            <div class="stat-label">Suspended vendors</div>
+            <div class="stat-value" id="statSuspended">–</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PRODUCTS PANEL ─────────────────────────────────────── -->
+      <div class="dash-panel" id="panel-products">
+        <div class="panel-head">
+          <h2>Products</h2>
+        </div>
+        <div class="filter-row-inner" style="padding:0 0 10px;">
+          <div class="nav-search">
+            <svg class="nav-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" />
+              <path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            <input type="text" id="productSearch" placeholder="Search by name or vendor…">
+          </div>
+          <button class="filter-main-btn" id="productFilterBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <path d="M3 5h18M6 12h12M10 19h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            Filters
+            <span class="filter-count-badge" id="productFilterCount" style="display:none;">0</span>
+          </button>
+        </div>
+        <div class="active-filters" id="productActiveFilters"></div>
+
+        <div class="filter-overlay" id="productFilterOverlay"></div>
+        <div class="filter-sheet" id="productFilterSheet">
+          <div class="filter-sheet-head">
+            Filters
+            <button class="filter-sheet-close" id="productFilterClose">✕</button>
+          </div>
+          <div class="filter-sheet-body">
+            <div class="filter-group">
+              <span class="filter-group-label">Status</span>
+              <select class="filter-select" id="productStatusFilter">
+                <option value="">All statuses</option>
+                <option value="active">Live</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <span class="filter-group-label">Reviewed</span>
+              <select class="filter-select" id="productReviewedFilter">
+                <option value="">All products</option>
+                <option value="viewed">Viewed</option>
+                <option value="unviewed">Unviewed</option>
+              </select>
+            </div>
+          </div>
+          <div class="filter-sheet-foot">
+            <button class="filter-clear-btn" id="productFilterClear">Clear all</button>
+            <button class="btn btn-primary" id="productFilterApply" style="width:auto;padding:9px 20px;">Apply</button>
+          </div>
+        </div>
+        <div id="productListBody">
+          <div class="admin-empty">Loading products…</div>
+        </div>
+      </div>
+
+      <!-- ── USERS PANEL ─────────────────────────────────────────── -->
+      <div class="dash-panel" id="panel-users">
+        <div class="panel-head">
+          <h2>Users</h2>
+        </div>
+        <div class="filter-row-inner" style="padding:0 0 10px;">
+          <div class="nav-search">
+            <svg class="nav-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" />
+              <path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            <input type="text" id="userSearch" placeholder="Search by name or email…">
+          </div>
+          <button class="filter-main-btn" id="userFilterBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <path d="M3 5h18M6 12h12M10 19h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            Filters
+            <span class="filter-count-badge" id="userFilterCount" style="display:none;">0</span>
+          </button>
+        </div>
+        <div class="active-filters" id="userActiveFilters"></div>
+
+        <div class="filter-overlay" id="userFilterOverlay"></div>
+        <div class="filter-sheet" id="userFilterSheet">
+          <div class="filter-sheet-head">
+            Filters
+            <button class="filter-sheet-close" id="userFilterClose">✕</button>
+          </div>
+          <div class="filter-sheet-body">
+            <div class="filter-group">
+              <span class="filter-group-label">Location</span>
+              <div class="filter-location-row">
+                <input class="filter-input" type="text" id="userCityFilter" placeholder="City">
+                <input class="filter-input" type="text" id="userAreaFilter" placeholder="Area">
+              </div>
+              <input class="filter-input" type="text" id="userStateFilter" placeholder="State" style="margin-top:8px;">
+            </div>
+          </div>
+          <div class="filter-sheet-foot">
+            <button class="filter-clear-btn" id="userFilterClear">Clear all</button>
+            <button class="btn btn-primary" id="userFilterApplyBtn" style="width:auto;padding:9px 20px;">Apply</button>
+          </div>
+        </div>
+        <div id="userListBody">
+          <div class="admin-empty">Loading users…</div>
+        </div>
+      </div>
+
+      <!-- ── VENDORS PANEL ──────────────────────────────────────── -->
+      <div class="dash-panel" id="panel-vendors">
+        <div class="panel-head">
+          <h2>Vendors</h2>
+        </div>
+        <div class="filter-row-inner" style="padding:0 0 10px;">
+          <div class="nav-search">
+            <svg class="nav-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" />
+              <path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            <input type="text" id="vendorSearch" placeholder="Search by name or email…">
+          </div>
+          <button class="filter-main-btn" id="vendorFilterBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <path d="M3 5h18M6 12h12M10 19h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            Filters
+            <span class="filter-count-badge" id="vendorFilterCount" style="display:none;">0</span>
+          </button>
+        </div>
+        <div class="active-filters" id="vendorActiveFilters"></div>
+
+        <div class="filter-overlay" id="vendorFilterOverlay"></div>
+        <div class="filter-sheet" id="vendorFilterSheet">
+          <div class="filter-sheet-head">
+            Filters
+            <button class="filter-sheet-close" id="vendorFilterClose">✕</button>
+          </div>
+          <div class="filter-sheet-body">
+            <div class="filter-group">
+              <span class="filter-group-label">Location</span>
+              <div class="filter-location-row">
+                <input class="filter-input" type="text" id="vendorCityFilter" placeholder="City">
+                <input class="filter-input" type="text" id="vendorAreaFilter" placeholder="Area">
+              </div>
+              <input class="filter-input" type="text" id="vendorStateFilter" placeholder="State"
+                style="margin-top:8px;">
+            </div>
+            <div class="filter-group">
+              <span class="filter-group-label">Plan</span>
+              <select class="filter-select" id="vendorPlanFilter">
+                <option value="">All plans</option>
+                <option value="trial">Trial</option>
+                <option value="free">Free</option>
+                <option value="starter">Starter</option>
+                <option value="growth">Growth</option>
+                <option value="premium">Premium</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <span class="filter-group-label">Status</span>
+              <select class="filter-select" id="vendorFlagFilter">
+                <option value="">All vendors</option>
+                <option value="active">Active only</option>
+                <option value="flagged">Has strikes</option>
+                <option value="suspended">Suspended</option>
+              </select>
+            </div>
+          </div>
+          <div class="filter-sheet-foot">
+            <button class="filter-clear-btn" id="vendorFilterClear">Clear all</button>
+            <button class="btn btn-primary" id="vendorFilterApplyBtn"
+              style="width:auto;padding:9px 20px;">Apply</button>
+          </div>
+        </div>
+        <div id="vendorListBody">
+          <div class="admin-empty">Loading vendors…</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── REMOVE PRODUCT MODAL (with reason) ────────────────────── -->
+  <div class="product-modal-overlay" id="removeProductModal">
+    <div class="product-modal-box">
+      <h3 class="product-modal-title">Remove this product?</h3>
+      <p class="product-modal-text">This will hide it from public listings and issue a strike to the vendor. Explain why
+        - this message is emailed to them.</p>
+      <textarea class="input" id="removeReasonInput" rows="4"
+        placeholder="e.g. Listing photos contain inappropriate content that violates our platform policy."
+        style="margin:12px 0;"></textarea>
+      <div class="product-modal-actions">
+        <button class="btn btn-secondary" id="removeProductCancel">Cancel</button>
+        <button class="btn btn-primary" id="removeProductConfirm" style="background:var(--c-error);">Remove & notify
+          vendor</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── UNFLAG VENDOR MODAL ────────────────────────────────────── -->
+  <div class="product-modal-overlay" id="unflagModal">
+    <div class="product-modal-box">
+      <h3 class="product-modal-title">Unflag this vendor?</h3>
+      <p class="product-modal-text" id="unflagModalText">This resets their strike count to 0 and reactivates their
+        account if suspended.</p>
+      <div class="product-modal-actions">
+        <button class="btn btn-secondary" id="unflagCancel">Cancel</button>
+        <button class="btn btn-primary" id="unflagConfirm">Unflag vendor</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CONFIRM MODAL ─────────────────────────────────────────── -->
+  <div class="product-modal-overlay" id="confirmModal">
+    <div class="product-modal-box">
+      <h3 class="product-modal-title" id="confirmTitle"></h3>
+      <p class="product-modal-text" id="confirmText"></p>
+      <div class="product-modal-actions">
+        <button class="btn btn-secondary" id="confirmCancel"></button>
+        <button class="btn btn-primary" id="confirmOk"></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="../js/api.js?v=4"></script>
+  <script src="../js/ui.js?v=1"></script>
+  <script src="../js/helpers.js?v=2"></script>
+  <script src="../js/admin-auth.js?v=1"></script>
+  <script src="../js/admin-dashboard.js?v=6"></script>
+</body>
+
+</html>
