@@ -105,7 +105,10 @@ function formatChatTime(ts) {
 let currentThreadConvo = null;
 
 async function openThread(convId) {
-  if (window.innerWidth < 768) document.querySelector('.dash-nav').style.display = 'none';
+  if (window.innerWidth < 768) {
+    const dashNav = document.querySelector('.dash-nav');
+    if (dashNav) dashNav.style.display = 'none';
+  }
   document.getElementById('panel-chat')?.classList.add('thread-open');
   document.getElementById('panel-chats')?.classList.add('thread-open');
   activeConvId = convId;

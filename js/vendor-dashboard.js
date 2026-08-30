@@ -112,7 +112,7 @@ function initModalPincodeAutofill() {
     statusEl: document.getElementById('modalPincodeStatus'),
   });
 }
-
+function renderProfilePlanSection() {}
 // ── Load vendor profile (plan strip + nav avatar) ─────────────
 // Also called after any product status change so counts stay fresh.
 async function loadVendorProfile() {
