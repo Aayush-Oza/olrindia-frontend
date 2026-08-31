@@ -88,7 +88,7 @@
   font-family: var(--font-body);
   font-weight: 500;
   line-height: 1;
-  color: var(--c-ink-soft);
+  color: var(--c-ink);
   white-space: nowrap;
 }
 
