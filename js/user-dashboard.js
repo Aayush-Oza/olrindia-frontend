@@ -1045,7 +1045,7 @@ async function loadBrowseHomepage() {
       : `<div style="grid-column:1/-1;text-align:center;padding:36px 20px;">
           <div style="font-size:48px;margin-bottom:12px;">🏪</div>
           <h3 style="margin:0 0 8px;font-family:var(--font-display);color:var(--text-main);">No categories live yet</h3>
-          <p style="margin:0;color:var(--text-muted);font-size:14px;">Vendors are setting up — products will appear here soon.</p>
+          <p style="margin:0;color:var(--text-muted);font-size:14px;">Vendors are setting up -products will appear here soon.</p>
         </div>`;
   }
 
