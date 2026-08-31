@@ -533,7 +533,7 @@ const CATEGORIES = [
   'Fashion', 'Events & Weddings', 'Commercial Vehicles', 'Passenger Vehicles',
   'Agricultural Equipment', 'Warehouse', 'Properties', 'Bikes',
   'Industrial Equipment', 'Machineries', 'Tools & tackles',
-  'Medical equipments', 'Cargo & Shipping','Camping','Hotel & Resorts'
+  'Medical equipments', 'Cargo & Shipping', 'Camping', 'Hotel & Resorts'
 ];
 
 async function loadHomepage() {
@@ -573,9 +573,10 @@ async function loadHomepage() {
   ]);
 
   // Render category cards
+  // Render category cards
   const catGrid = document.getElementById('catCardGrid');
   if (catGrid) {
-    catGrid.innerHTML = CATEGORIES.map((cat, i) => {
+    const catCards = CATEGORIES.map((cat, i) => {
       const res = catResults[i];
       const hasProducts = res.status === 'fulfilled' && res.value.success && res.value.products.length > 0;
       if (!hasProducts) return '';
@@ -586,14 +587,29 @@ async function loadHomepage() {
           <div class="cat-card-name">${cat}</div>
         </div>`;
     }).join('');
+
+    catGrid.innerHTML = catCards.trim()
+      ? catCards
+      : `<div style="grid-column:1/-1;text-align:center;padding:36px 20px;">
+          <div style="font-size:48px;margin-bottom:12px;">🏪</div>
+          <h3 style="margin:0 0 8px;font-family:var(--font-display);color:var(--text-main);">No categories live yet</h3>
+          <p style="margin:0;color:var(--text-muted);font-size:14px;">Vendors are setting up — products will appear here soon.</p>
+        </div>`;
   }
 
-  // Render products below
+  // Render featured products below
   const homeProdGrid = document.querySelector('#homeProdSection .product-grid');
-  if (homeProdGrid && prodData?.success) {
-    homeProdGrid.innerHTML = prodData.products.map(productCardHTML).join('');
-  } else if (homeProdGrid) {
-    homeProdGrid.innerHTML = '<div class="grid-empty"><p>No products yet.</p></div>';
+  if (homeProdGrid) {
+    if (prodData?.success && prodData.products.length > 0) {
+      homeProdGrid.innerHTML = prodData.products.map(productCardHTML).join('');
+    } else {
+      homeProdGrid.innerHTML = `
+        <div style="grid-column:1/-1;text-align:center;padding:36px 20px;">
+          <div style="font-size:48px;margin-bottom:12px;">📦</div>
+          <h3 style="margin:0 0 8px;font-family:var(--font-display);color:var(--text-main);">No products listed yet</h3>
+          <p style="margin:0;color:var(--text-muted);font-size:14px;">Be the first! <a href="/vendor/signup.html" style="color:var(--brand);font-weight:600;text-decoration:none;">List your item →</a></p>
+        </div>`;
+    }
   }
 }
 

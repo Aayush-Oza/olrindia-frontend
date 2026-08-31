@@ -1025,9 +1025,9 @@ async function loadBrowseHomepage() {
     apiRequest('/products/public?page=1&per_page=20', 'GET').catch(() => null)
   ]);
 
-  const catGrid = document.getElementById('catCardGrid');
+    const catGrid = document.getElementById('catCardGrid');
   if (catGrid) {
-    catGrid.innerHTML = CATEGORIES.map((cat, i) => {
+    const catCards = CATEGORIES.map((cat, i) => {
       const res = catResults[i];
       const hasProducts = res.status === 'fulfilled' && res.value.success && res.value.total > 0;
       if (!hasProducts) return '';
@@ -1039,11 +1039,28 @@ async function loadBrowseHomepage() {
           <div class="cat-card-name">${cat}</div>
         </div>`;
     }).join('');
+
+    catGrid.innerHTML = catCards.trim()
+      ? catCards
+      : `<div style="grid-column:1/-1;text-align:center;padding:36px 20px;">
+          <div style="font-size:48px;margin-bottom:12px;">🏪</div>
+          <h3 style="margin:0 0 8px;font-family:var(--font-display);color:var(--text-main);">No categories live yet</h3>
+          <p style="margin:0;color:var(--text-muted);font-size:14px;">Vendors are setting up — products will appear here soon.</p>
+        </div>`;
   }
 
   const homeProdGrid = document.getElementById('homeProdGrid');
-  if (homeProdGrid && prodData?.success) {
-    homeProdGrid.innerHTML = prodData.products.map(p => productCardHTML(p)).join('');
+  if (homeProdGrid) {
+    if (prodData?.success && prodData.products.length > 0) {
+      homeProdGrid.innerHTML = prodData.products.map(p => productCardHTML(p)).join('');
+    } else {
+      homeProdGrid.innerHTML = `
+        <div style="grid-column:1/-1;text-align:center;padding:36px 20px;">
+          <div style="font-size:48px;margin-bottom:12px;">📦</div>
+          <h3 style="margin:0 0 8px;font-family:var(--font-display);color:var(--text-main);">No products listed yet</h3>
+          <p style="margin:0;color:var(--text-muted);font-size:14px;">Be the first! <a href="../vendor/signup.html" style="color:var(--brand);font-weight:600;text-decoration:none;">List your item →</a></p>
+        </div>`;
+    }
   }
 }
 
