@@ -75,6 +75,23 @@
   gap: 10px;
 }
 
+.nav-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.nav-action span {
+  font-size: 10px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--c-ink-soft);
+  white-space: nowrap;
+}
+
 .nav-wish-btn {
   width: 38px;
   height: 38px;
