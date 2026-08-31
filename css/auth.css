@@ -420,4 +420,5 @@
   border-color: var(--c-blue);
   color: var(--c-blue);
   background: #EAF3FF;
+  text-decoration: none;
 }

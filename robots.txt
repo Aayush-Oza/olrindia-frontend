@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+Allow: /about.html
+Allow: /terms.html
+Allow: /privacy.html
+Allow: /vendor/signup.html
+Allow: /vendor/login.html
+Allow: /user/signup.html
+Allow: /user/login.html
+Allow: /p.html
+
+Disallow: /user/dashboard.html
+Disallow: /user/forgot-password.html
+Disallow: /user/reset-password.html
+Disallow: /user/verify-email.html
+Disallow: /vendor/dashboard.html
+Disallow: /vendor/forgot-password.html
+Disallow: /vendor/reset-password.html
+Disallow: /vendor/verify-email.html
+Disallow: /admin/
+
+Sitemap: https://olrindia.com/sitemap.xml
