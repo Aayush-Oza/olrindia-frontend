@@ -316,6 +316,8 @@ async function loadProduct() {
     if (isAdminView) {
       renderAdminCTA();
       hideAdminChrome();
+    } else if (sessionStorage.getItem('olr_vendor')) {
+      hideVendorChrome();
     } else {
       const loggedIn = isLoggedIn();
       renderCTA(loggedIn);
@@ -437,7 +439,18 @@ function hideAdminChrome() {
   const wishBtn = document.getElementById('pWishBtn');
   if (wishBtn) wishBtn.style.display = 'none';
 }
+function hideVendorChrome() {
+  // No wishlist for vendor accounts - they're not buyers
+  const wishBtn = document.getElementById('pWishBtn');
+  if (wishBtn) wishBtn.style.display = 'none';
 
+  // No chat CTA either - replace with a neutral note instead of a locked/login state
+  document.getElementById('ctaSection').innerHTML = `
+    <div class="cta-locked">
+      <div class="cta-locked-icon">🏪</div>
+      <p>You're viewing this as a vendor account. Log in with a user account to chat or save this listing.</p>
+    </div>`;
+}
 /* ── Back navigation ─────────────────────────────────────── */
 function goBack() {
   if (isAdminView) {

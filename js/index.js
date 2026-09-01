@@ -3,15 +3,6 @@
    Infinite scroll: 20 initial, +10 on scroll, skeleton cards
    ============================================================ */
 
-// ── Redirect if already logged in ────────────────────────────
-(function () {
-  if (sessionStorage.getItem('olr_preview_mode')) return;
-  const user = sessionStorage.getItem('olr_user');
-  const vendor = sessionStorage.getItem('olr_vendor');
-  if (user) { window.location.replace('user/dashboard.html'); return; }
-  if (vendor) { window.location.replace('vendor/dashboard.html'); return; }
-})();
-
 // ── Pagination config ─────────────────────────────────────────
 const PAGE_INITIAL = 20;
 const PAGE_MORE = 10;

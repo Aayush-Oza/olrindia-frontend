@@ -1377,6 +1377,12 @@ document.addEventListener('DOMContentLoaded', () => {
     })();
   }
 });
+// ADD after the validTabs/savedTab block
+if (sessionStorage.getItem('olr_vs_return')) {
+  sessionStorage.removeItem('olr_vs_return');
+  switchTab('viewsite');
+  vsLoadBrowseHomepage();
+}
 // ══════════════════════════════════════════════════════════════
 // VIEW SITE BROWSE PANEL
 // ══════════════════════════════════════════════════════════════
@@ -1474,7 +1480,7 @@ function vsProductCardHTML(p) {
       ? `<span class="vendor-browse-badge vendor-browse-badge-growth">✓ Verified</span>`
       : '';
   return `
-    <div class="vendor-product-card" onclick="window.open('../p.html?slug=${p.share_slug}','_blank')">
+    <div class="vendor-product-card" onclick="sessionStorage.setItem('olr_vs_return','1');window.location.href='../p.html?slug=${p.share_slug}'">
       ${img}
       ${badge}
       <div class="vendor-product-body">

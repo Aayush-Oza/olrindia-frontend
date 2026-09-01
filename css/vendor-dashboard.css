@@ -223,6 +223,13 @@
 
 /* ── Page shell ──────────────────────────────────────────────── */
 .dash-page {
+  width: 100%;
+}
+
+#panel-products,
+#panel-profile,
+#panel-privacy,
+#panel-terms {
   max-width: 1200px;
   margin: 0 auto;
   padding: 28px 28px 60px;
@@ -1537,7 +1544,10 @@
     display: flex;
   }
 
-  .dash-page {
+  #panel-products,
+  #panel-profile,
+  #panel-privacy,
+  #panel-terms {
     padding: 24px 24px 60px;
   }
 
@@ -1660,7 +1670,10 @@
     height: 46px;
   }
 
-  .dash-page {
+  #panel-products,
+  #panel-profile,
+  #panel-privacy,
+  #panel-terms {
     padding: 16px 14px 80px;
   }
 
