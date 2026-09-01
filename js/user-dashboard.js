@@ -448,11 +448,12 @@ function buildPriceLabel(p) {
 
 function catEmoji(cat) {
   const m = {
-    'Construction Equipment': '🏗️', 'Furniture': '🪑', 'Electrical Tools': '⚡', 'Home Appliances': '🏠',
-    'Hotel & Resorts': '🏨', 'Fashion': '👗', 'Events & Weddings': '🎉', 'Commercial Vehicles': '🚛',
-    'Passenger Vehicles': '🚗', 'Agricultural Equipment': '🌾', 'Warehouse': '🏭',
-    'Properties': '🏢', 'Bikes': '🏍️', 'Industrial Equipment': '⚙️', 'Machineries': '🔧',
-    'Tools & tackles': '🛠️', 'Medical equipments': '🩺', 'Cargo & Shipping': '📦', 'Camping': '🏕️'
+    'Construction Equipment': '🏗️', 'Furniture & Home Appliances': '🪑', 'Party & Celebration Decor': '🎈', 'Photography & Content Creator Gear': '📸',
+    'Events & Weddings': '🎉', 'Fashion & Designer Wear': '👗', 'Agricultural Equipment': '🌾', 'Passenger Vehicles': '🚗',
+    'Bikes & Scooters': '🏍️', 'Medical Equipment': '🩺', 'Baby & Kids Gear': '👶', 'Adventure & Trekking Gear': '🏕️',
+    'Sports & Fitness Equipment': '🏋️', 'Electrical & Power Tools': '⚡', 'Commercial Vehicles': '🚛', 'Tools & Tackles': '🛠️',
+    'Properties': '🏢', 'Industrial Equipment': '⚙️', 'Warehouse & Storage': '🏭', 'Cargo & Shipping': '📦',
+    'Machineries': '🔧', 'Residential Properties': '🏠', 'Musical Instruments': '🎵'
   };
   return m[cat] || '📦';
 }
@@ -931,24 +932,28 @@ window.addEventListener('resize', () => {
 function catImg(cat) {
   const m = {
     'Construction Equipment': 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400&q=80',
-    'Hotel & Resorts': 'https://images.unsplash.com/photo-1501117716987-c8e2f0b1c3d4?w=400&q=80',
-    'Camping': 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80',
-    'Furniture': 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&q=80',
-    'Electrical Tools': 'https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=400&q=80',
-    'Home Appliances': 'https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=400&q=80',
-    'Fashion': 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&q=80',
+    'Furniture & Home Appliances': 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&q=80',
+    'Party & Celebration Decor': 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80',
+    'Photography & Content Creator Gear': 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400&q=80',
     'Events & Weddings': 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80',
-    'Commercial Vehicles': 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=400&q=80',
-    'Passenger Vehicles': 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400&q=80',
+    'Fashion & Designer Wear': 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&q=80',
     'Agricultural Equipment': 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=400&q=80',
-    'Warehouse': 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&q=80',
+    'Passenger Vehicles': 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400&q=80',
+    'Bikes & Scooters': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80',
+    'Medical Equipment': 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&q=80',
+    'Baby & Kids Gear': 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?w=400&q=80',
+    'Adventure & Trekking Gear': 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=400&q=80',
+    'Sports & Fitness Equipment': 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&q=80',
+    'Electrical & Power Tools': 'https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=400&q=80',
+    'Commercial Vehicles': 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=400&q=80',
+    'Tools & Tackles': 'https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=400&q=80',
     'Properties': 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&q=80',
-    'Bikes': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80',
     'Industrial Equipment': 'https://images.unsplash.com/photo-1565043589221-1a6fd9ae45c7?w=400&q=80',
-    'Machineries': 'https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?w=400&q=80',
-    'Tools & tackles': 'https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=400&q=80',
-    'Medical equipments': 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&q=80',
+    'Warehouse & Storage': 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&q=80',
     'Cargo & Shipping': 'https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?w=400&q=80',
+    'Machineries': 'https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?w=400&q=80',
+    'Residential Properties': 'https://images.unsplash.com/photo-1560185008-b033106af5c3?w=400&q=80',
+    'Musical Instruments': 'https://images.unsplash.com/photo-1511376777868-611b54f68947?w=400&q=80',
   };
   return m[cat] || '';
 }
@@ -956,34 +961,38 @@ function catImg(cat) {
 function catColor(cat) {
   const m = {
     'Construction Equipment': { main: '#F59E0B', bg: '#FFFBEB' },
-    'Hotel & Resorts': { main: '#3B82F6', bg: '#EFF6FF' },
-    'Furniture': { main: '#8B5CF6', bg: '#F5F3FF' },
-    'Electrical Tools': { main: '#EF4444', bg: '#FEF2F2' },
-    'Home Appliances': { main: '#3B82F6', bg: '#EFF6FF' },
-    'Fashion': { main: '#EC4899', bg: '#FDF2F8' },
+    'Furniture & Home Appliances': { main: '#8B5CF6', bg: '#F5F3FF' },
+    'Party & Celebration Decor': { main: '#F97316', bg: '#FFF7ED' },
+    'Photography & Content Creator Gear': { main: '#EC4899', bg: '#FDF2F8' },
     'Events & Weddings': { main: '#F97316', bg: '#FFF7ED' },
-    'Commercial Vehicles': { main: '#14B8A6', bg: '#F0FDFA' },
-    'Passenger Vehicles': { main: '#0EA5E9', bg: '#F0F9FF' },
+    'Fashion & Designer Wear': { main: '#EC4899', bg: '#FDF2F8' },
     'Agricultural Equipment': { main: '#22C55E', bg: '#F0FDF4' },
-    'Warehouse': { main: '#64748B', bg: '#F8FAFC' },
+    'Passenger Vehicles': { main: '#0EA5E9', bg: '#F0F9FF' },
+    'Bikes & Scooters': { main: '#EF4444', bg: '#FEF2F2' },
+    'Medical Equipment': { main: '#06B6D4', bg: '#ECFEFF' },
+    'Baby & Kids Gear': { main: '#F472B6', bg: '#FDF2F8' },
+    'Adventure & Trekking Gear': { main: '#10B981', bg: '#ECFDF5' },
+    'Sports & Fitness Equipment': { main: '#14B8A6', bg: '#F0FDFA' },
+    'Electrical & Power Tools': { main: '#EF4444', bg: '#FEF2F2' },
+    'Commercial Vehicles': { main: '#14B8A6', bg: '#F0FDFA' },
+    'Tools & Tackles': { main: '#10B981', bg: '#ECFDF5' },
     'Properties': { main: '#6366F1', bg: '#EEF2FF' },
-    'Bikes': { main: '#EF4444', bg: '#FEF2F2' },
     'Industrial Equipment': { main: '#78716C', bg: '#FAFAF9' },
-    'Machineries': { main: '#F59E0B', bg: '#FFFBEB' },
-    'Tools & tackles': { main: '#10B981', bg: '#ECFDF5' },
-    'Medical equipments': { main: '#06B6D4', bg: '#ECFEFF' },
+    'Warehouse & Storage': { main: '#64748B', bg: '#F8FAFC' },
     'Cargo & Shipping': { main: '#8B5CF6', bg: '#F5F3FF' },
-    'Camping': { main: '#F97316', bg: '#FFF7ED' },
+    'Machineries': { main: '#F59E0B', bg: '#FFFBEB' },
+    'Residential Properties': { main: '#6366F1', bg: '#EEF2FF' },
+    'Musical Instruments': { main: '#EC4899', bg: '#FDF2F8' },
   };
   return m[cat] || { main: '#3B82F6', bg: '#EFF6FF' };
 }
 
 const CATEGORIES = [
-  'Construction Equipment', 'Furniture', 'Electrical Tools', 'Home Appliances',
-  'Fashion', 'Events & Weddings', 'Commercial Vehicles', 'Passenger Vehicles',
-  'Agricultural Equipment', 'Warehouse', 'Properties', 'Bikes',
-  'Industrial Equipment', 'Machineries', 'Tools & tackles',
-  'Medical equipments', 'Cargo & Shipping', 'Camping','Hotel & Resorts'
+  'Construction Equipment', 'Furniture & Home Appliances', 'Party & Celebration Decor', 'Photography & Content Creator Gear',
+  'Events & Weddings', 'Fashion & Designer Wear', 'Agricultural Equipment', 'Passenger Vehicles', 'Bikes & Scooters',
+  'Medical Equipment', 'Baby & Kids Gear', 'Adventure & Trekking Gear', 'Sports & Fitness Equipment', 'Electrical & Power Tools',
+  'Commercial Vehicles', 'Tools & Tackles', 'Properties', 'Industrial Equipment', 'Warehouse & Storage', 'Cargo & Shipping',
+  'Machineries', 'Residential Properties', 'Musical Instruments'
 ];
 
 async function loadBrowseHomepage() {
@@ -1025,7 +1034,7 @@ async function loadBrowseHomepage() {
     apiRequest('/products/public?page=1&per_page=20', 'GET').catch(() => null)
   ]);
 
-    const catGrid = document.getElementById('catCardGrid');
+  const catGrid = document.getElementById('catCardGrid');
   if (catGrid) {
     const catCards = CATEGORIES.map((cat, i) => {
       const res = catResults[i];
