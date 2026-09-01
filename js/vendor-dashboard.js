@@ -1365,6 +1365,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (validTabs.includes(savedTab)) {
     switchTab(savedTab);
+
+    if (savedTab === 'viewsite') {
+      vsLoadBrowseHomepage();
+    }
   }
 
   if (savedTab === 'chats') {
