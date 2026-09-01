@@ -15,6 +15,18 @@ const slotFiles = {};
 const slotUrls = {};
 let previewProductId = null;
 let originalProductSnapshot = null;
+// ── View Site state ───────────────────────────────────────────
+let vsAllProducts = [];
+let vsFilteredProducts = [];
+let vsCurrentPage = 1;
+let vsTotalProducts = 0;
+let vsHasMore = false;
+let vsIsLoadingMore = false;
+let vsSentinel = null;
+let vsScrollObserver = null;
+let vsActiveFilters = {
+  category: '', city: '', priceType: 'day', priceMin: 0, priceMax: Infinity,
+};
 
 const PLAN_LABELS = {
   trial: 'Free Trial',
@@ -112,7 +124,7 @@ function initModalPincodeAutofill() {
     statusEl: document.getElementById('modalPincodeStatus'),
   });
 }
-function renderProfilePlanSection() {}
+function renderProfilePlanSection() { }
 // ── Load vendor profile (plan strip + nav avatar) ─────────────
 // Also called after any product status change so counts stay fresh.
 async function loadVendorProfile() {
@@ -1329,7 +1341,11 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('hamburgerBtn')?.addEventListener('click', () => {
     document.getElementById('mobileMenu').classList.toggle('open');
   });
-
+  document.querySelectorAll('[data-tab="viewsite"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      vsLoadBrowseHomepage();
+    });
+  });
   // Add product buttons (header + empty state)
   document.getElementById('addProductBtn')?.addEventListener('click', openAddModal);
   document.getElementById('addProductBtnEmpty')?.addEventListener('click', openAddModal);
@@ -1341,7 +1357,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Restore tab (and open chat thread) from URL hash on refresh ──
   const hashRaw = location.hash.replace('#', '');
   const savedTab = hashRaw.split('=')[0];
-  const validTabs = ['products', 'chats', 'profile', 'privacy', 'terms'];
+  const validTabs = ['products', 'chats', 'profile', 'privacy', 'terms', 'viewsite'];
 
   if (validTabs.includes(savedTab)) {
     switchTab(savedTab);
@@ -1360,6 +1376,479 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     })();
   }
+});
+// ══════════════════════════════════════════════════════════════
+// VIEW SITE BROWSE PANEL
+// ══════════════════════════════════════════════════════════════
+
+const VS_CATEGORIES = [
+  'Construction Equipment', 'Furniture', 'Electrical Tools', 'Home Appliances',
+  'Fashion', 'Events & Weddings', 'Commercial Vehicles', 'Passenger Vehicles',
+  'Agricultural Equipment', 'Warehouse', 'Properties', 'Bikes',
+  'Industrial Equipment', 'Machineries', 'Tools & tackles',
+  'Medical equipments', 'Cargo & Shipping', 'Camping', 'Hotel & Resorts'
+];
+
+function vsCatEmoji(cat) {
+  const m = {
+    'Construction Equipment': '🏗️', 'Furniture': '🪑', 'Electrical Tools': '⚡',
+    'Home Appliances': '🏠', 'Hotel & Resorts': '🏨', 'Fashion': '👗',
+    'Events & Weddings': '🎉', 'Commercial Vehicles': '🚛', 'Passenger Vehicles': '🚗',
+    'Agricultural Equipment': '🌾', 'Warehouse': '🏭', 'Properties': '🏢',
+    'Bikes': '🏍️', 'Industrial Equipment': '⚙️', 'Machineries': '🔧',
+    'Tools & tackles': '🛠️', 'Medical equipments': '🩺', 'Cargo & Shipping': '📦', 'Camping': '🏕️'
+  };
+  return m[cat] || '📦';
+}
+
+function vsCatImg(cat) {
+  const m = {
+    'Construction Equipment': 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400&q=80',
+    'Hotel & Resorts': 'https://images.unsplash.com/photo-1501117716987-c8e2f0b1c3d4?w=400&q=80',
+    'Camping': 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80',
+    'Furniture': 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&q=80',
+    'Electrical Tools': 'https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=400&q=80',
+    'Home Appliances': 'https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?w=400&q=80',
+    'Fashion': 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&q=80',
+    'Events & Weddings': 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80',
+    'Commercial Vehicles': 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=400&q=80',
+    'Passenger Vehicles': 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400&q=80',
+    'Agricultural Equipment': 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=400&q=80',
+    'Warehouse': 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&q=80',
+    'Properties': 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&q=80',
+    'Bikes': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80',
+    'Industrial Equipment': 'https://images.unsplash.com/photo-1565043589221-1a6fd9ae45c7?w=400&q=80',
+    'Machineries': 'https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?w=400&q=80',
+    'Tools & tackles': 'https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=400&q=80',
+    'Medical equipments': 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=400&q=80',
+    'Cargo & Shipping': 'https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?w=400&q=80',
+  };
+  return m[cat] || '';
+}
+
+function vsCatColor(cat) {
+  const m = {
+    'Construction Equipment': { main: '#F59E0B', bg: '#FFFBEB' },
+    'Hotel & Resorts': { main: '#3B82F6', bg: '#EFF6FF' },
+    'Furniture': { main: '#8B5CF6', bg: '#F5F3FF' },
+    'Electrical Tools': { main: '#EF4444', bg: '#FEF2F2' },
+    'Home Appliances': { main: '#3B82F6', bg: '#EFF6FF' },
+    'Fashion': { main: '#EC4899', bg: '#FDF2F8' },
+    'Events & Weddings': { main: '#F97316', bg: '#FFF7ED' },
+    'Commercial Vehicles': { main: '#14B8A6', bg: '#F0FDFA' },
+    'Passenger Vehicles': { main: '#0EA5E9', bg: '#F0F9FF' },
+    'Agricultural Equipment': { main: '#22C55E', bg: '#F0FDF4' },
+    'Warehouse': { main: '#64748B', bg: '#F8FAFC' },
+    'Properties': { main: '#6366F1', bg: '#EEF2FF' },
+    'Bikes': { main: '#EF4444', bg: '#FEF2F2' },
+    'Industrial Equipment': { main: '#78716C', bg: '#FAFAF9' },
+    'Machineries': { main: '#F59E0B', bg: '#FFFBEB' },
+    'Tools & tackles': { main: '#10B981', bg: '#ECFDF5' },
+    'Medical equipments': { main: '#06B6D4', bg: '#ECFEFF' },
+    'Cargo & Shipping': { main: '#8B5CF6', bg: '#F5F3FF' },
+    'Camping': { main: '#F97316', bg: '#FFF7ED' },
+  };
+  return m[cat] || { main: '#3B82F6', bg: '#EFF6FF' };
+}
+
+function vsSkeletonCardHTML() {
+  return `<div class="vendor-skeleton-card">
+    <div class="vendor-skeleton-img"></div>
+    <div class="vendor-skeleton-body">
+      <div class="vendor-skeleton-line vendor-skeleton-line-sm"></div>
+      <div class="vendor-skeleton-line vendor-skeleton-line-md"></div>
+      <div class="vendor-skeleton-line vendor-skeleton-line-lg"></div>
+      <div class="vendor-skeleton-line vendor-skeleton-line-xs"></div>
+    </div>
+  </div>`;
+}
+
+function vsProductCardHTML(p) {
+  const img = p.images && p.images[0]
+    ? `<img class="vendor-product-img" src="${p.images[0]}" alt="${p.name}" loading="lazy">`
+    : `<div class="vendor-product-img-placeholder">${vsCatEmoji(p.category)}</div>`;
+  const price = vsBuildPriceLabel(p);
+  const badge = p.vendor_badge === 'featured'
+    ? `<span class="vendor-browse-badge vendor-browse-badge-premium">★ Top Vendor</span>`
+    : p.vendor_badge === 'verified'
+      ? `<span class="vendor-browse-badge vendor-browse-badge-growth">✓ Verified</span>`
+      : '';
+  return `
+    <div class="vendor-product-card" onclick="window.open('../p.html?slug=${p.share_slug}','_blank')">
+      ${img}
+      ${badge}
+      <div class="vendor-product-body">
+        <div class="vendor-product-cat">${p.category || ''}</div>
+        <div class="vendor-product-title">${p.name}</div>
+        <div class="vendor-product-bottom">
+          <div class="vendor-product-price">${price}</div>
+          <div class="vendor-product-loc">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" stroke="currentColor" stroke-width="2"/></svg>
+            ${p.city || ''}
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function vsBuildPriceLabel(p) {
+  const type = vsActiveFilters.priceType;
+  if (type === 'hour' && p.rent_per_hour) return `₹${p.rent_per_hour} <span>/ hour</span>`;
+  if (type === 'km' && p.rent_per_km) return `₹${p.rent_per_km} <span>/ km</span>`;
+  if (type === 'day' && p.rent_per_day) return `₹${p.rent_per_day} <span>/ day</span>`;
+  if (type === 'month' && p.rent_per_month) return `₹${p.rent_per_month} <span>/ month</span>`;
+  if (p.rent_per_hour) return `₹${p.rent_per_hour} <span>/ hour</span>`;
+  if (p.rent_per_km) return `₹${p.rent_per_km} <span>/ km</span>`;
+  if (p.rent_per_day) return `₹${p.rent_per_day} <span>/ day</span>`;
+  if (p.rent_per_month) return `₹${p.rent_per_month} <span>/ month</span>`;
+  return `<span style="color:var(--c-ink-faint);font-size:12px;">Price not set</span>`;
+}
+
+function vsShowSkeletons(count) {
+  document.getElementById('vsProductGrid').innerHTML = Array(count).fill(vsSkeletonCardHTML()).join('');
+}
+
+async function vsLoadBrowseProducts(reset = true) {
+  if (reset) {
+    vsCurrentPage = 1;
+    vsAllProducts = [];
+    vsShowSkeletons(20);
+  }
+  const params = new URLSearchParams({ page: vsCurrentPage, per_page: 20 });
+  if (vsActiveFilters.category) params.set('category', vsActiveFilters.category);
+  if (vsActiveFilters.city) params.set('city', vsActiveFilters.city);
+  if (vsActiveFilters.priceType) params.set('price_type', vsActiveFilters.priceType);
+  if (vsActiveFilters.priceMin > 0) params.set('price_min', vsActiveFilters.priceMin);
+  if (vsActiveFilters.priceMax < Infinity) params.set('price_max', vsActiveFilters.priceMax);
+  const q = document.getElementById('vsSearchInput').value.trim();
+  if (q) params.set('search', q);
+
+  try {
+    const res = await apiRequest(`/products/public?${params}`, 'GET');
+    if (!res.success) {
+      document.getElementById('vsProductGrid').innerHTML =
+        `<div class="vendor-grid-empty"><div style="font-size:40px">😕</div><p>Failed to load products.</p></div>`;
+      return;
+    }
+    vsTotalProducts = res.total;
+    vsHasMore = res.has_more;
+    vsAllProducts = res.products;
+    vsFilteredProducts = res.products;
+    vsRenderProducts();
+    vsAttachSentinel();
+    vsUpdateFilterBadge();
+  } catch (e) {
+    document.getElementById('vsProductGrid').innerHTML =
+      `<div class="vendor-grid-empty"><div style="font-size:40px">😕</div><p>Failed to load products.</p></div>`;
+  }
+}
+
+async function vsAppendNextBatch() {
+  if (vsIsLoadingMore || !vsHasMore) return;
+  vsIsLoadingMore = true;
+  document.getElementById('vsScrollSentinel')?.remove();
+  document.querySelector('.vendor-scroll-end-msg')?.remove();
+
+  const grid = document.getElementById('vsProductGrid');
+  const skeletonWrapper = document.createElement('div');
+  skeletonWrapper.id = 'vsSkeletonBatch';
+  skeletonWrapper.style.cssText = 'display:contents';
+  skeletonWrapper.innerHTML = Array(10).fill(vsSkeletonCardHTML()).join('');
+  grid.appendChild(skeletonWrapper);
+
+  vsCurrentPage++;
+  const params = new URLSearchParams({ page: vsCurrentPage, per_page: 10 });
+  if (vsActiveFilters.category) params.set('category', vsActiveFilters.category);
+  if (vsActiveFilters.city) params.set('city', vsActiveFilters.city);
+  if (vsActiveFilters.priceType) params.set('price_type', vsActiveFilters.priceType);
+  if (vsActiveFilters.priceMin > 0) params.set('price_min', vsActiveFilters.priceMin);
+  if (vsActiveFilters.priceMax < Infinity) params.set('price_max', vsActiveFilters.priceMax);
+  const q = document.getElementById('vsSearchInput').value.trim();
+  if (q) params.set('search', q);
+
+  try {
+    const res = await apiRequest(`/products/public?${params}`, 'GET');
+    skeletonWrapper.remove();
+    if (res.success) {
+      vsHasMore = res.has_more;
+      vsTotalProducts = res.total;
+      res.products.forEach(p => grid.insertAdjacentHTML('beforeend', vsProductCardHTML(p)));
+    }
+  } catch (e) {
+    skeletonWrapper.remove();
+    vsCurrentPage--;
+  }
+  vsIsLoadingMore = false;
+  vsAttachSentinel();
+}
+
+function vsAttachSentinel() {
+  if (vsScrollObserver) { vsScrollObserver.disconnect(); vsScrollObserver = null; }
+  vsSentinel?.remove();
+  const grid = document.getElementById('vsProductGrid');
+  if (!vsHasMore) {
+    if (vsTotalProducts > 20) {
+      grid.insertAdjacentHTML('beforeend',
+        `<div class="vendor-scroll-end-msg">✓ All ${vsTotalProducts} products loaded</div>`);
+    }
+    return;
+  }
+  grid.insertAdjacentHTML('beforeend', `<div id="vsScrollSentinel" style="grid-column:1/-1;height:40px;"></div>`);
+  vsSentinel = document.getElementById('vsScrollSentinel');
+  vsScrollObserver = new IntersectionObserver(
+    (entries) => { if (entries[0].isIntersecting) vsAppendNextBatch(); },
+    { rootMargin: '200px' }
+  );
+  vsScrollObserver.observe(vsSentinel);
+}
+
+function vsRenderProducts() {
+  const grid = document.getElementById('vsProductGrid');
+  const countEl = document.getElementById('vsProductsCount');
+  if (vsFilteredProducts.length === 0) {
+    countEl.textContent = '';
+    grid.innerHTML = `
+      <div class="vendor-grid-empty">
+        <div style="font-size:44px;margin-bottom:10px;">🔍</div>
+        <h3>No products found</h3>
+        <p>Try different filters or search terms.</p>
+        <button onclick="vsClearAllFilters()" style="margin-top:12px;padding:9px 22px;border-radius:var(--r-md);background:var(--grad-brand);color:#fff;border:none;font-weight:600;cursor:pointer;font-family:var(--font-display);">Clear filters</button>
+      </div>`;
+    return;
+  }
+  countEl.textContent = `${vsTotalProducts} product${vsTotalProducts !== 1 ? 's' : ''}`;
+  grid.innerHTML = vsFilteredProducts.map(p => vsProductCardHTML(p)).join('');
+}
+
+function vsApplyFilters() {
+  const homeSection = document.getElementById('vsBrowseHomeSection');
+  if (homeSection) homeSection.style.display = 'none';
+  document.getElementById('vsProductGrid').style.display = 'grid';
+  if (vsActiveFilters.category) {
+    document.getElementById('vsProductsTitle').textContent = vsActiveFilters.category;
+  } else {
+    const q = document.getElementById('vsSearchInput').value.trim();
+    document.getElementById('vsProductsTitle').textContent = q ? 'Search Results' : 'All Products';
+  }
+  vsLoadBrowseProducts(true);
+}
+
+function vsUpdateFilterBadge() {
+  let count = 0;
+  if (vsActiveFilters.category) count++;
+  if (vsActiveFilters.city) count++;
+  if (vsActiveFilters.priceMin > 0 || vsActiveFilters.priceMax < Infinity) count++;
+  const badge = document.getElementById('vsFilterCountBadge');
+  badge.style.display = count ? 'inline-flex' : 'none';
+  badge.textContent = count;
+  document.getElementById('vsFilterBtn').classList.toggle('has-filters', count > 0);
+}
+
+function vsRenderActiveFilterChips() {
+  const el = document.getElementById('vsActiveFilters');
+  const chips = [];
+  if (vsActiveFilters.category) chips.push({ label: vsActiveFilters.category, key: 'category' });
+  if (vsActiveFilters.city) chips.push({ label: `📍 ${vsActiveFilters.city}`, key: 'city' });
+  if (vsActiveFilters.priceMin > 0 || vsActiveFilters.priceMax < Infinity) {
+    const label = `₹${vsActiveFilters.priceMin}–${vsActiveFilters.priceMax === Infinity ? '∞' : vsActiveFilters.priceMax} / ${vsActiveFilters.priceType}`;
+    chips.push({ label, key: 'price' });
+  }
+  el.innerHTML = chips.map(c =>
+    `<button class="vendor-active-chip" onclick="vsRemoveFilter('${c.key}')">${c.label} ✕</button>`
+  ).join('');
+}
+
+function vsRemoveFilter(key) {
+  if (key === 'category') { vsActiveFilters.category = ''; document.getElementById('vsFilterCategory').value = ''; }
+  if (key === 'city') { vsActiveFilters.city = ''; document.getElementById('vsFilterCity').value = ''; }
+  if (key === 'price') { vsActiveFilters.priceMin = 0; vsActiveFilters.priceMax = Infinity; document.getElementById('vsFilterPriceMin').value = ''; document.getElementById('vsFilterPriceMax').value = ''; }
+  vsRenderActiveFilterChips();
+  vsUpdateFilterBadge();
+  const hasAny = vsActiveFilters.category || vsActiveFilters.city || vsActiveFilters.priceMin > 0 || vsActiveFilters.priceMax < Infinity || document.getElementById('vsSearchInput').value.trim();
+  if (!hasAny) { vsLoadBrowseHomepage(); } else { vsApplyFilters(); }
+}
+
+function vsClearAllFilters() {
+  vsActiveFilters = { category: '', city: '', priceType: 'day', priceMin: 0, priceMax: Infinity };
+  document.getElementById('vsSearchInput').value = '';
+  document.getElementById('vsFilterCategory').value = '';
+  document.getElementById('vsFilterCity').value = '';
+  document.getElementById('vsFilterPriceMin').value = '';
+  document.getElementById('vsFilterPriceMax').value = '';
+  document.querySelectorAll('.vendor-price-type-btn').forEach((b, i) => b.classList.toggle('active', i === 2));
+  vsRenderActiveFilterChips();
+  vsUpdateFilterBadge();
+  vsLoadBrowseHomepage();
+}
+
+function vsOpenFilterSheet() {
+  document.getElementById('vsFilterSheet').classList.add('open');
+  document.getElementById('vsFilterOverlay').classList.add('open');
+}
+
+function vsCloseFilterSheet() {
+  document.getElementById('vsFilterSheet').classList.remove('open');
+  document.getElementById('vsFilterOverlay').classList.remove('open');
+}
+
+function vsEnterBrowseCategory(cat) {
+  vsActiveFilters.category = cat;
+  document.getElementById('vsFilterCategory').value = cat;
+  document.getElementById('vsProductsCount').textContent = '';
+  const homeSection = document.getElementById('vsBrowseHomeSection');
+  if (homeSection) homeSection.style.display = 'none';
+  document.getElementById('vsProductGrid').style.display = 'grid';
+  vsRenderActiveFilterChips();
+  vsUpdateFilterBadge();
+  vsLoadBrowseProducts(true);
+}
+
+async function vsLoadBrowseHomepage() {
+  const grid = document.getElementById('vsProductGrid');
+  const countEl = document.getElementById('vsProductsCount');
+  countEl.textContent = '';
+  document.getElementById('vsProductsTitle').textContent = 'All products';
+  grid.style.display = 'none';
+
+  let homeSection = document.getElementById('vsBrowseHomeSection');
+  if (!homeSection) {
+    homeSection = document.createElement('div');
+    homeSection.id = 'vsBrowseHomeSection';
+    grid.parentNode.insertBefore(homeSection, grid);
+  }
+  homeSection.style.display = 'block';
+  homeSection.innerHTML = `
+    <div id="vsCatCardGrid" class="vendor-cat-card-grid">
+      ${VS_CATEGORIES.map(cat => {
+    const color = vsCatColor(cat);
+    return `<div class="vendor-cat-card" style="--cat-color:${color.main};--cat-bg:${color.bg};">
+          <div class="vendor-skeleton-img" style="height:100%;aspect-ratio:4/3;"></div>
+        </div>`;
+  }).join('')}
+    </div>
+    <div id="vsHomeProdSection">
+      <div class="vendor-home-prod-title">Featured Products</div>
+      <div class="vendor-product-grid" id="vsHomeProdGrid">
+        ${Array(8).fill(vsSkeletonCardHTML()).join('')}
+      </div>
+    </div>`;
+
+  const [catResults, prodData] = await Promise.all([
+    Promise.allSettled(
+      VS_CATEGORIES.map(cat =>
+        apiRequest(`/products/public?page=1&per_page=1&category=${encodeURIComponent(cat)}`, 'GET')
+      )
+    ),
+    apiRequest('/products/public?page=1&per_page=20', 'GET').catch(() => null)
+  ]);
+
+  const catGrid = document.getElementById('vsCatCardGrid');
+  if (catGrid) {
+    const catCards = VS_CATEGORIES.map((cat, i) => {
+      const res = catResults[i];
+      const hasProducts = res.status === 'fulfilled' && res.value.success && res.value.total > 0;
+      if (!hasProducts) return '';
+      const color = vsCatColor(cat);
+      const img = vsCatImg(cat);
+      return `
+        <div class="vendor-cat-card" style="--cat-color:${color.main};--cat-bg:${color.bg};" onclick="vsEnterBrowseCategory('${cat.replace(/'/g, "\\'")}')">
+          ${img ? `<img class="vendor-cat-card-img" src="${img}" alt="${cat}">` : ''}
+          <div class="vendor-cat-card-name">${cat}</div>
+        </div>`;
+    }).join('');
+    catGrid.innerHTML = catCards.trim()
+      ? catCards
+      : `<div style="grid-column:1/-1;text-align:center;padding:36px 20px;">
+          <div style="font-size:48px;margin-bottom:12px;">🏪</div>
+          <h3>No categories live yet</h3>
+        </div>`;
+  }
+
+  const homeProdGrid = document.getElementById('vsHomeProdGrid');
+  if (homeProdGrid) {
+    if (prodData?.success && prodData.products.length > 0) {
+      homeProdGrid.innerHTML = prodData.products.map(p => vsProductCardHTML(p)).join('');
+    } else {
+      homeProdGrid.innerHTML = `
+        <div style="grid-column:1/-1;text-align:center;padding:36px 20px;">
+          <div style="font-size:48px;margin-bottom:12px;">📦</div>
+          <h3>No products listed yet</h3>
+        </div>`;
+    }
+  }
+}
+
+// ── View Site filter event listeners ─────────────────────────
+document.getElementById('vsFilterBtn')?.addEventListener('click', vsOpenFilterSheet);
+
+document.querySelectorAll('.vendor-price-type-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.vendor-price-type-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+document.getElementById('vsFilterApplyBtn')?.addEventListener('click', () => {
+  const selectedType = document.querySelector('.vendor-price-type-btn.active')?.dataset.type || '';
+  const priceMin = parseFloat(document.getElementById('vsFilterPriceMin').value) || 0;
+  const priceMax = parseFloat(document.getElementById('vsFilterPriceMax').value) || Infinity;
+  const hint = document.getElementById('vsFilterPriceHint');
+
+  if (selectedType && priceMin === 0 && priceMax === Infinity) {
+    hint.textContent = 'Please enter a min or max price.';
+    hint.classList.add('error');
+    return;
+  }
+  hint.textContent = 'Enter a min or max to filter by price.';
+  hint.classList.remove('error');
+
+  vsActiveFilters.category = document.getElementById('vsFilterCategory').value;
+  vsActiveFilters.city = document.getElementById('vsFilterCity').value.trim().toLowerCase();
+  vsActiveFilters.priceType = selectedType || 'day';
+  vsActiveFilters.priceMin = priceMin;
+  vsActiveFilters.priceMax = priceMax;
+  vsCloseFilterSheet();
+  vsApplyFilters();
+  vsRenderActiveFilterChips();
+});
+
+document.getElementById('vsFilterClearBtn')?.addEventListener('click', () => {
+  vsClearAllFilters();
+  vsCloseFilterSheet();
+});
+
+let vsSearchDebounceTimer = null;
+document.getElementById('vsSearchInput')?.addEventListener('input', function () {
+  clearTimeout(vsSearchDebounceTimer);
+  vsSearchDebounceTimer = setTimeout(() => {
+    const homeSection = document.getElementById('vsBrowseHomeSection');
+    if (homeSection) homeSection.style.display = 'none';
+    document.getElementById('vsProductGrid').style.display = 'grid';
+    document.getElementById('vsProductsTitle').textContent = 'Search Results';
+    vsApplyFilters();
+  }, 400);
+});
+
+document.getElementById('vsFilterLocateBtn')?.addEventListener('click', () => {
+  if (!navigator.geolocation) { toastError('Your browser does not support location.'); return; }
+  const btn = document.getElementById('vsFilterLocateBtn');
+  btn.disabled = true; btn.style.opacity = '0.5';
+  toastInfo('Looking for your location…');
+  navigator.geolocation.getCurrentPosition(async pos => {
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json`, { headers: { 'Accept-Language': 'en' } });
+      const data = await res.json();
+      let city = data.address?.city || data.address?.town || data.address?.village || '';
+      if (!city) city = (data.address?.city_district || data.address?.state_district || '').split(' ')[0] || '';
+      if (city) { document.getElementById('vsFilterCity').value = city; }
+      else { toastError("Couldn't determine your city."); }
+    } catch (e) { toastError('Location lookup failed.'); }
+    finally { btn.disabled = false; btn.style.opacity = '1'; }
+  }, (err) => {
+    const messages = { 1: 'Location permission denied.', 2: 'Location unavailable.', 3: 'Location request timed out.' };
+    toastError(messages[err.code] || 'Could not get your location.');
+    btn.disabled = false; btn.style.opacity = '1';
+  });
 });
 window.addEventListener('resize', () => {
   if (window.innerWidth > 860) {

@@ -63,6 +63,14 @@
             </svg>
             Profile
           </button>
+          <button class="nav-link" data-tab="viewsite">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" stroke="currentColor"
+                stroke-width="1.8" />
+              <path d="M9 21V12h6v9" stroke="currentColor" stroke-width="1.8" />
+            </svg>
+            Browse
+          </button>
           <button class="nav-link" data-tab="privacy">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
               <path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4Z" stroke="currentColor"
@@ -75,15 +83,6 @@
               <path d="M6 2h9l5 5v15H6V2Z" stroke="currentColor" stroke-width="1.8" />
             </svg>
             Terms
-          </button>
-          <button class="nav-link"
-            onclick="sessionStorage.setItem('olr_preview_mode','1');window.location.href='../index.html'">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-              <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" stroke="currentColor"
-                stroke-width="1.8" />
-              <path d="M9 21V12h6v9" stroke="currentColor" stroke-width="1.8" />
-            </svg>
-            View Site
           </button>
         </div>
         <div class="dash-nav-right">
@@ -127,6 +126,14 @@
           </svg>
           Profile
         </button>
+        <button class="mobile-nav-link" data-tab="viewsite">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" stroke="currentColor"
+              stroke-width="1.8" />
+            <path d="M9 21V12h6v9" stroke="currentColor" stroke-width="1.8" />
+          </svg>
+          Browse
+        </button>
         <button class="nav-link" data-tab="privacy">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
             <path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4Z" stroke="currentColor" stroke-width="1.8" />
@@ -138,15 +145,6 @@
             <path d="M6 2h9l5 5v15H6V2Z" stroke="currentColor" stroke-width="1.8" />
           </svg>
           Terms
-        </button>
-        <button class="mobile-nav-link"
-          onclick="sessionStorage.setItem('olr_preview_mode','1');window.location.href='../index.html'">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" stroke="currentColor"
-              stroke-width="1.8" />
-            <path d="M9 21V12h6v9" stroke="currentColor" stroke-width="1.8" />
-          </svg>
-          View Site
         </button>
         <button class="nav-btn nav-btn-ghost" id="logoutBtnMobile"
           style="width:100%;justify-content:center;margin-top:4px;">Log out</button>
@@ -357,6 +355,112 @@
               </button>
             </div>
           </form>
+        </div>
+      </div>
+      <!-- ── VIEW SITE PANEL ─────────────────────────────────────── -->
+      <div class="dash-panel" id="panel-viewsite">
+
+        <div class="vendor-filter-row">
+          <div class="vendor-filter-row-inner">
+            <div class="vendor-nav-search">
+              <svg class="vendor-nav-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8" />
+                <path d="m16.5 16.5 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+              </svg>
+              <input type="text" id="vsSearchInput" placeholder="Search products…" autocomplete="off">
+            </div>
+            <button class="vendor-filter-main-btn" id="vsFilterBtn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                <path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+              </svg>
+              Filters
+              <span class="vendor-filter-count-badge" id="vsFilterCountBadge" style="display:none;">0</span>
+            </button>
+          </div>
+          <div class="vendor-active-filters" id="vsActiveFilters"></div>
+        </div>
+
+        <div class="vendor-filter-overlay" id="vsFilterOverlay" onclick="vsCloseFilterSheet()"></div>
+        <div class="vendor-filter-sheet" id="vsFilterSheet">
+          <div class="vendor-filter-sheet-head">
+            <span>Filters</span>
+            <button class="vendor-filter-sheet-close" onclick="vsCloseFilterSheet()">✕</button>
+          </div>
+          <div class="vendor-filter-sheet-body">
+            <div class="vendor-filter-group">
+              <div class="vendor-filter-group-label">Category</div>
+              <select class="vendor-filter-select" id="vsFilterCategory">
+                <option value="">All categories</option>
+                <option value="Construction Equipment">Construction Equipment</option>
+                <option value="Hotel & Resorts">Hotel & Resorts</option>
+                <option value="Camping">Camping</option>
+                <option value="Furniture">Furniture</option>
+                <option value="Electrical Tools">Electrical Tools</option>
+                <option value="Home Appliances">Home Appliances</option>
+                <option value="Fashion">Fashion</option>
+                <option value="Events & Weddings">Events & Weddings</option>
+                <option value="Commercial Vehicles">Commercial Vehicles</option>
+                <option value="Passenger Vehicles">Passenger Vehicles</option>
+                <option value="Agricultural Equipment">Agricultural Equipment</option>
+                <option value="Warehouse">Warehouse</option>
+                <option value="Properties">Properties</option>
+                <option value="Bikes">Bikes</option>
+                <option value="Industrial Equipment">Industrial Equipment</option>
+                <option value="Machineries">Machineries</option>
+                <option value="Tools & tackles">Tools & tackles</option>
+                <option value="Medical equipments">Medical equipments</option>
+                <option value="Cargo & Shipping">Cargo & Shipping</option>
+              </select>
+            </div>
+            <div class="vendor-filter-group">
+              <div class="vendor-filter-group-label">City / Location</div>
+              <div class="vendor-filter-location-row">
+                <input class="vendor-filter-input" type="text" id="vsFilterCity" placeholder="e.g. Mumbai, Delhi…">
+                <button class="vendor-filter-locate-btn" id="vsFilterLocateBtn" title="Use my location">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z"
+                      stroke="currentColor" stroke-width="1.8" />
+                    <circle cx="12" cy="9" r="2.5" stroke="currentColor" stroke-width="1.8" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="vendor-filter-group">
+              <div class="vendor-filter-group-label">Price per</div>
+              <div class="vendor-price-type-toggle">
+                <button class="vendor-price-type-btn" data-type="hour">Hour</button>
+                <button class="vendor-price-type-btn" data-type="km">Km</button>
+                <button class="vendor-price-type-btn active" data-type="day">Day</button>
+                <button class="vendor-price-type-btn" data-type="month">Month</button>
+              </div>
+            </div>
+            <div class="vendor-filter-group">
+              <div class="vendor-filter-group-label">Price range (₹)</div>
+              <div class="vendor-filter-price-row">
+                <input class="vendor-filter-input" type="number" id="vsFilterPriceMin" placeholder="Min" min="0">
+                <span class="vendor-filter-price-sep">–</span>
+                <input class="vendor-filter-input" type="number" id="vsFilterPriceMax" placeholder="Max" min="0">
+              </div>
+              <div class="vendor-filter-price-hint" id="vsFilterPriceHint">Enter a min or max to filter by price.</div>
+            </div>
+          </div>
+          <div class="vendor-filter-sheet-foot">
+            <button class="vendor-filter-clear-btn" id="vsFilterClearBtn">Clear all</button>
+            <button class="btn btn-primary" id="vsFilterApplyBtn" style="flex:1;padding:12px;">Apply</button>
+          </div>
+        </div>
+
+        <div class="vendor-page-body">
+          <div class="vendor-section-head">
+            <h2 id="vsProductsTitle">All products</h2>
+            <span class="vendor-products-count" id="vsProductsCount"></span>
+          </div>
+          <div class="vendor-product-grid" id="vsProductGrid">
+            <div class="vendor-grid-loading">
+              <div class="vendor-grid-spinner"></div>
+              <span>Loading products…</span>
+            </div>
+          </div>
         </div>
       </div>
       <!-- ── PRIVACY PANEL ───────────────────────────────────────── -->
