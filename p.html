@@ -5,36 +5,76 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- ── GEO / LANGUAGE ── -->
+  <meta name="geo.region" content="IN">
+  <meta name="geo.placename" content="India">
+  <meta name="language" content="English">
+  <meta http-equiv="content-language" content="en-IN">
+  <meta name="rating" content="general">
+
   <!-- ── PRIMARY SEO (defaults, overwritten by JS per product) ── -->
-  <title>Rent Products Near You - OLR India</title>
+  <title>Rent Products Near You – OLR India | Online Rental Marketplace</title>
   <meta name="description" id="metaDesc"
-    content="Browse and rent products from trusted local vendors across India on OLR India. Furniture, vehicles, fashion, medical equipment & more.">
-  <meta name="robots" content="index, follow">
+    content="Browse and rent products from trusted local vendors across India on OLR India. Furniture, bikes, cars, appliances, medical equipment & more. No middleman. No commission.">
+  <meta name="keywords" id="metaKeywords"
+    content="rent products india, rent near me, online rental india, OLR India, furniture on rent, bike on rent, car on rent, appliances on rent, medical equipment on rent, local vendors india">
+  <meta name="author" content="OLR India">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <link rel="canonical" href="https://olrindia.com/p.html" id="metaCanonical">
 
   <!-- ── OPEN GRAPH (updated by JS) ── -->
   <meta property="og:type" content="product">
   <meta property="og:site_name" content="OLR India">
   <meta property="og:locale" content="en_IN">
-  <meta property="og:title" id="ogTitle" content="Rent Products Near You - OLR India">
-  <meta property="og:description" id="ogDesc" content="Browse and rent from trusted local vendors across India.">
-  <meta property="og:image" id="ogImage" content="https://olrindia.com/assets/logo.png">
+  <meta property="og:title" id="ogTitle" content="Rent Products Near You – OLR India">
+  <meta property="og:description" id="ogDesc"
+    content="Browse and rent from trusted local vendors across India. No middleman. No commission.">
+  <meta property="og:image" id="ogImage" content="https://olrindia.com/assets/og-banner.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" id="ogImageAlt" content="OLR India - Rent Anything, Anywhere in India">
   <meta property="og:url" id="ogUrl" content="https://olrindia.com/p.html">
 
-  <!-- ── TWITTER CARD ── -->
+  <!-- ── TWITTER CARD (updated by JS) ── -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" id="twTitle" content="Rent Products Near You - OLR India">
-  <meta name="twitter:description" id="twDesc" content="Browse and rent from trusted local vendors across India.">
-  <meta name="twitter:image" id="twImage" content="https://olrindia.com/assets/logo.png">
+  <meta name="twitter:site" content="@olrindia">
+  <meta name="twitter:title" id="twTitle" content="Rent Products Near You – OLR India">
+  <meta name="twitter:description" id="twDesc"
+    content="Browse and rent from trusted local vendors across India. No middleman. No commission.">
+  <meta name="twitter:image" id="twImage" content="https://olrindia.com/assets/og-banner.jpg">
+  <meta name="twitter:image:alt" id="twImageAlt" content="OLR India - Online Rental Marketplace">
 
-  <!-- ── SCHEMA (updated by JS) ── -->
+  <!-- ── SCHEMA: Organization (static, always present) ── -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": "https://olrindia.com/#organization",
+    "name": "OLR India",
+    "alternateName": ["OLR", "Online Rental India", "olrindia.com"],
+    "url": "https://olrindia.com",
+    "logo": "https://olrindia.com/assets/logo.png",
+    "sameAs": [
+      "https://instagram.com/olrindia",
+      "https://facebook.com/olrindia"
+    ]
+  }
+  </script>
+
+  <!-- ── SCHEMA: Product (default, fully overwritten by JS per product) ── -->
   <script type="application/ld+json" id="productSchema">
   {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": "Rental Product",
-    "description": "Available for rent on OLR India",
-    "brand": { "@type": "Brand", "name": "OLR India" }
+    "description": "Available for rent on OLR India — India's online rental marketplace.",
+    "brand": {
+      "@type": "Brand",
+      "name": "OLR India"
+    },
+    "seller": {
+      "@id": "https://olrindia.com/#organization"
+    }
   }
   </script>
 
@@ -398,7 +438,7 @@
   <script src="js/helpers.js?v=1"></script>
   <script src="js/chat.js?v=1"></script>
   <script src="js/chat-ui.js?v=1"></script>
-  <script src="js/p.js?v=2"></script>
+  <script src="js/p.js?v=3"></script>
 </body>
 
 </html>

@@ -5,57 +5,90 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- ── GEO / LANGUAGE ── -->
+  <meta name="geo.region" content="IN">
+  <meta name="geo.placename" content="India">
+  <meta name="language" content="English">
+  <meta http-equiv="content-language" content="en-IN">
+  <meta name="rating" content="general">
+
   <!-- ── PRIMARY SEO ── -->
   <title>OLR India - Rent Anything, Anywhere in India | Online Rental Marketplace</title>
   <meta name="description"
-    content="OLR India is India's largest online rental marketplace. Rent furniture, bikes, cars, appliances, wedding outfits, medical equipment & more from local vendors near you. No middleman, no commission.">
+    content="OLR India — India's online rental marketplace. Rent furniture, bikes, cars, appliances, wedding outfits, medical equipment & more from local vendors near you. No middleman. No commission.">
   <meta name="keywords"
-    content="rent anything india, online rental india, furniture on rent, bike on rent near me, car on rent, dress on rent, wheelchair on rent, appliances on rent, equipment on rent, tent on rent, tractor on rent, OLR India, olrindia, rental marketplace india, rent instead of buy, local vendors rent india">
+    content="rent anything india, online rental marketplace india, OLR India, olr, furniture on rent, bike on rent, car on rent, appliances on rent, wedding outfit on rent, medical equipment on rent, tent on rent, tractor on rent, tools on rent, rent instead of buy, local rental vendors india, online rental india">
   <meta name="author" content="OLR India">
-  <meta name="robots" content="index, follow">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <link rel="canonical" href="https://olrindia.com/">
 
-  <!-- ── OPEN GRAPH (WhatsApp, Facebook preview) ── -->
+  <!-- ── OPEN GRAPH ── -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://olrindia.com/">
-  <meta property="og:title" content="OLR India - Rent Anything, Anywhere in India">
+  <meta property="og:title" content="OLR India - Rent Anything, Anywhere in India | Online Rental Marketplace">
   <meta property="og:description"
-    content="Browse thousands of rental products from local vendors across India. Furniture, vehicles, fashion, medical equipment & more. Rent instead of buy!">
-  <meta property="og:image" content="https://olrindia.com/assets/logo.png">
+    content="India's online rental marketplace. Rent furniture, bikes, cars, appliances, wedding outfits & more from local vendors. No middleman. No commission.">
+  <meta property="og:image" content="https://olrindia.com/assets/og-banner.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="OLR India - Rent Anything, Anywhere in India">
   <meta property="og:site_name" content="OLR India">
   <meta property="og:locale" content="en_IN">
 
   <!-- ── TWITTER CARD ── -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@olrindia">
   <meta name="twitter:title" content="OLR India - Rent Anything, Anywhere in India">
   <meta name="twitter:description"
-    content="India's online rental marketplace. Rent furniture, bikes, cars, appliances & more from local vendors near you.">
-  <meta name="twitter:image" content="https://olrindia.com/assets/logo.png">
+    content="India's online rental marketplace. Rent furniture, bikes, cars, appliances & more from local vendors near you. No middleman.">
+  <meta name="twitter:image" content="https://olrindia.com/assets/og-banner.jpg">
+  <meta name="twitter:image:alt" content="OLR India - Online Rental Marketplace">
 
-  <!-- ── SCHEMA (Google Rich Results) ── -->
+  <!-- ── SCHEMA: WebSite ── -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": "https://olrindia.com/#website",
     "name": "OLR India",
-    "alternateName": ["OLR", "Online Rental India", "olrindia"],
+    "alternateName": ["OLR", "Online Rental India", "olrindia", "OLR India Rental"],
     "url": "https://olrindia.com",
-    "description": "India's online rental marketplace connecting local vendors with customers. Rent anything from furniture to vehicles to wedding outfits.",
+    "inLanguage": "en-IN",
+    "description": "India's online rental marketplace connecting local vendors with customers across India.",
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://olrindia.com/?search={search_term_string}",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://olrindia.com/?search={search_term_string}"
+      },
       "query-input": "required name=search_term_string"
     }
   }
   </script>
 
+  <!-- ── SCHEMA: Organization ── -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": "https://olrindia.com/#organization",
     "name": "OLR India",
+    "alternateName": ["OLR", "Online Rental India", "olrindia.com", "OLR India Marketplace"],
     "url": "https://olrindia.com",
-    "logo": "https://olrindia.com/assets/logo.png",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://olrindia.com/assets/logo.png",
+      "width": 200,
+      "height": 60
+    },
+    "image": "https://olrindia.com/assets/og-banner.jpg",
+    "description": "OLR India is India's online rental marketplace where customers can rent anything — furniture, bikes, cars, appliances, wedding outfits, medical equipment and more — directly from local vendors across India with no middleman and no commission.",
+    "foundingDate": "2024",
+    "areaServed": {
+      "@type": "Country",
+      "name": "India"
+    },
+    "serviceType": "Online Rental Marketplace",
     "sameAs": [
       "https://instagram.com/olrindia",
       "https://facebook.com/olrindia"
@@ -63,9 +96,94 @@
     "contactPoint": {
       "@type": "ContactPoint",
       "email": "support@olrindia.com",
+      "telephone": "+91-99999-99999",
       "contactType": "customer support",
-      "areaServed": "IN"
+      "areaServed": "IN",
+      "availableLanguage": ["English", "Hindi"]
     }
+  }
+  </script>
+
+  <!-- ── SCHEMA: Service (Rental Marketplace) ── -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": "https://olrindia.com/#service",
+    "name": "OLR India - Online Rental Marketplace",
+    "provider": {
+      "@id": "https://olrindia.com/#organization"
+    },
+    "serviceType": "Online Rental Marketplace",
+    "description": "Rent anything in India — furniture, bikes, cars, appliances, tents, tractors, wedding outfits, medical equipment and more from verified local vendors. No middleman, no commission.",
+    "areaServed": {
+      "@type": "Country",
+      "name": "India"
+    },
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Rental Categories",
+      "itemListElement": [
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Furniture on Rent"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Bikes & Scooters on Rent"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Cars on Rent"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Appliances on Rent"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Wedding Outfits on Rent"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Medical Equipment on Rent"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Construction Equipment on Rent"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Agricultural Equipment on Rent"}}
+      ]
+    }
+  }
+  </script>
+
+  <!-- ── SCHEMA: FAQPage (captures People Also Ask) ── -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is OLR India?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "OLR India (olrindia.com) is India's online rental marketplace where you can rent anything — furniture, bikes, cars, appliances, wedding outfits, medical equipment, tents, tractors and more — directly from local vendors near you. OLR stands for Online Rental."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does OLR India work?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "OLR India connects customers with local vendors across India. Customers browse rental listings, contact vendors directly, and rent items without any middleman or commission. Vendors can list their products for free and start earning from idle assets."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What can I rent on OLR India?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "On OLR India you can rent furniture, bikes, scooters, cars, home appliances, wedding outfits, medical equipment like wheelchairs, construction equipment, agricultural equipment like tractors, tents, photography gear, musical instruments, sports equipment and much more from local vendors across India."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is OLR India free to use?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, OLR India is free for customers to browse and find rental products. There is no middleman and no commission — customers connect directly with local vendors."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How is OLR India different from OLX?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "OLX India is a classifieds platform for buying and selling used goods. OLR India is specifically an online rental marketplace — focused entirely on renting, not buying or selling. OLR India connects people who want to rent items with local vendors who list items for rent."
+        }
+      }
+    ]
   }
   </script>
 

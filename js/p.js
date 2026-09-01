@@ -229,37 +229,64 @@ async function loadProduct() {
     currentVendor = v;
     // ── Dynamic SEO update per product ──
     const productUrl = `https://olrindia.com/p.html?slug=${p.share_slug}`;
+    const cityText = p.city || 'India';
+    const categoryText = p.category || 'Product';
+    const productTitle = `${p.name} for Rent in ${cityText} – OLR India`;
     const productDesc = p.description
-      ? `${p.description.slice(0, 140)}… Rent from local vendors on OLR India.`
-      : `Rent ${p.name} in ${p.city || 'India'} from a trusted local vendor on OLR India. No middleman, direct chat.`;
-    const productImg = (p.images && p.images[0]) ? p.images[0] : 'https://olrindia.com/assets/logo.png';
+      ? `${p.description.slice(0, 130)}… Rent ${p.name} in ${cityText} from a trusted local vendor on OLR India. No middleman.`
+      : `Rent ${p.name} in ${cityText} from a trusted local vendor on OLR India. ${categoryText} available for rent — no middleman, direct chat.`;
+    const productImg = (p.images && p.images[0]) ? p.images[0] : 'https://olrindia.com/assets/og-banner.jpg';
+    const productKeywords = `${p.name} on rent, ${p.name} for rent in ${cityText}, ${categoryText} on rent ${cityText}, rent ${p.name} india, OLR India, online rental ${cityText}`;
 
-    document.title = `${p.name} for Rent in ${p.city || 'India'} – OLR India`;
+    document.title = productTitle;
     document.getElementById('metaDesc').setAttribute('content', productDesc);
+    document.getElementById('metaKeywords').setAttribute('content', productKeywords);
     document.getElementById('metaCanonical').setAttribute('href', productUrl);
-    document.getElementById('ogTitle').setAttribute('content', `${p.name} for Rent – OLR India`);
+
+    document.getElementById('ogTitle').setAttribute('content', productTitle);
     document.getElementById('ogDesc').setAttribute('content', productDesc);
     document.getElementById('ogImage').setAttribute('content', productImg);
+    document.getElementById('ogImageAlt').setAttribute('content', `${p.name} for rent in ${cityText} – OLR India`);
     document.getElementById('ogUrl').setAttribute('content', productUrl);
-    document.getElementById('twTitle').setAttribute('content', `${p.name} for Rent – OLR India`);
+
+    document.getElementById('twTitle').setAttribute('content', productTitle);
     document.getElementById('twDesc').setAttribute('content', productDesc);
     document.getElementById('twImage').setAttribute('content', productImg);
+    document.getElementById('twImageAlt').setAttribute('content', `${p.name} for rent – OLR India`);
 
-    // Update product schema
+    // ── Upgraded Product Schema ──
     document.getElementById('productSchema').textContent = JSON.stringify({
       "@context": "https://schema.org",
       "@type": "Product",
       "name": p.name,
-      "description": p.description || `${p.name} available for rent in ${p.city || 'India'}`,
+      "description": p.description || `${p.name} available for rent in ${cityText} on OLR India`,
       "image": p.images || [],
-      "brand": { "@type": "Brand", "name": "OLR India" },
+      "url": productUrl,
+      "category": p.category || "Rental Product",
+      "itemCondition": "https://schema.org/UsedCondition",
+      "brand": {
+        "@type": "Brand",
+        "name": "OLR India"
+      },
       "offers": {
         "@type": "Offer",
         "priceCurrency": "INR",
         "price": p.rent_per_day || p.rent_per_hour || p.rent_per_month || 0,
+        "priceSpecification": [
+          p.rent_per_hour && { "@type": "UnitPriceSpecification", "price": p.rent_per_hour, "priceCurrency": "INR", "unitText": "per hour" },
+          p.rent_per_day && { "@type": "UnitPriceSpecification", "price": p.rent_per_day, "priceCurrency": "INR", "unitText": "per day" },
+          p.rent_per_month && { "@type": "UnitPriceSpecification", "price": p.rent_per_month, "priceCurrency": "INR", "unitText": "per month" }
+        ].filter(Boolean),
         "availability": "https://schema.org/InStock",
-        "areaServed": p.city || "India",
-        "seller": { "@type": "Organization", "name": p.vendor_name || "OLR India Vendor" }
+        "areaServed": {
+          "@type": "City",
+          "name": cityText
+        },
+        "seller": {
+          "@type": "Organization",
+          "name": p.vendor_name || "OLR India Vendor",
+          "member": { "@id": "https://olrindia.com/#organization" }
+        }
       }
     });
     buildGallery(p.images || []);
