@@ -234,7 +234,7 @@ async function loadProduct() {
     const productTitle = `${p.name} for Rent in ${cityText} – OLR India`;
     const productDesc = p.description
       ? `${p.description.slice(0, 130)}… Rent ${p.name} in ${cityText} from a trusted local vendor on OLR India. No middleman.`
-      : `Rent ${p.name} in ${cityText} from a trusted local vendor on OLR India. ${categoryText} available for rent — no middleman, direct chat.`;
+      : `Rent ${p.name} in ${cityText} from a trusted local vendor on OLR India. ${categoryText} available for rent - no middleman, direct chat.`;
     const productImg = (p.images && p.images[0]) ? p.images[0] : 'https://olrindia.com/assets/og-banner.jpg';
     const productKeywords = `${p.name} on rent, ${p.name} for rent in ${cityText}, ${categoryText} on rent ${cityText}, rent ${p.name} india, OLR India, online rental ${cityText}`;
 
