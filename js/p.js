@@ -196,7 +196,7 @@ document.getElementById('loginOverlay').addEventListener('click', function (e) {
 /* ── Share ───────────────────────────────────────────────── */
 function shareProduct() {
   const slug = getSlug();
-  const url = `${window.location.origin}/products/share/${slug}`;
+  const url = `${window.location.origin}/api/products/share/${slug}`;
   const title = document.getElementById('infoName').textContent || 'Check this on OLR India';
   if (navigator.share) {
     navigator.share({ title, text: title, url }).catch(() => { });

@@ -521,7 +521,7 @@ function openShareModal(productId) {
     toastError('Share link not available for this product yet.');
     return;
   }
-  const url = `${window.location.origin}/products/share/${p.share_slug}`;
+  const url = `${window.location.origin}/api/products/share/${p.share_slug}`;
   const title = p.name || 'Check this out';
 
   if (navigator.share) {
