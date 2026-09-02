@@ -458,11 +458,6 @@ function openProfileCompleteModal(onSuccess) {
 }
 
 function hideAdminChrome() {
-  // No login/signup buttons for an admin viewer
-  document.getElementById('navRight').innerHTML =
-    `<span class="p-nav-btn p-nav-btn-outline" style="cursor:default;">Admin view</span>`;
-
-  // No wishlist button either - admin isn't a buyer
   const wishBtn = document.getElementById('pWishBtn');
   if (wishBtn) wishBtn.style.display = 'none';
 }
