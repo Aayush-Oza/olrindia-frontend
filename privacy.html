@@ -99,7 +99,7 @@
   <!-- Nav -->
   <nav class="legal-nav">
     <div class="legal-nav-inner">
-      <a class="legal-nav-logo" href="index.html">
+      <a class="legal-nav-logo" href="index.html" id="logoBtn">
         <img src="assets/logo.png?v=1" alt="OLR India">
       </a>
       <a class="legal-nav-back" href="index.html" id="backBtn">
@@ -113,6 +113,8 @@
         const ref = document.referrer;
         if (ref && new URL(ref).origin === location.origin) {
           document.getElementById('backBtn').href = ref;
+          document.getElementById('logoBtn').href = ref;
+          document.getElementById('footerLogoBtn').href = ref;
         }
       </script>
     </div>
@@ -223,20 +225,18 @@
           </svg>
           support@olrindia.com
         </a>
-        <a href="tel:+919999999999" class="footer-contact-item">
+        <!-- <a href="tel:+919999999999" class="footer-contact-item">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
             <path
-              d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.14 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.05 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 5.93 5.93l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16v.92h1z"
-              stroke="currentColor" stroke-width="1.8" />
-          </svg>
+              d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.14 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.05 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 5.93
           +91 99999 99999
-        </a>
+        </a>-->
       </div>
     </div>
     <hr class="footer-divider">
     <div class="footer-bottom">
       <div class="footer-bottom-top">
-        <a class="footer-logo" href="index.html">
+        <a class="footer-logo" href="index.html" id="footerLogoBtn">
           <img src="assets/logo.png?v=1" alt="OLR India">
         </a>
         <select class="footer-lang-select" id="footerLangSelect">
