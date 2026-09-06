@@ -364,7 +364,7 @@ function productCardHTML(p) {
       : '';
 
   return `
-    <div class="product-card" onclick="openProduct('${p.share_slug}')">
+    <div class="product-card" onclick="openProduct('${p.share_slug}','${p.category}','${p.city}')">
       ${img}
       ${badge}
       <button class="product-wish-btn" onclick="event.stopPropagation();handleWish(this,${p.id})" title="Save to wishlist">♡</button>
@@ -411,9 +411,11 @@ function planRank(plan) {
   return { premium: 0, growth: 1, starter: 2, free: 3, trial: 3 }[plan] ?? 3;
 }
 
-function openProduct(slug) {
-  if (!slug) return;
-  window.location.href = `p.html?slug=${slug}`;
+function openProduct(slug, category, city) {
+    if (!slug) return;
+    const cat = slugify(category || '');
+    const ct = slugify(city || 'india');
+    window.location.href = `/product/${cat}/${ct}/${slug}`;
 }
 
 function clearAllFilters() {
