@@ -8,43 +8,43 @@
   </url>
 
   <url>
-    <loc>https://olrindia.com/about.html</loc>
+    <loc>https://olrindia.com/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://olrindia.com/vendor/signup.html</loc>
+    <loc>https://olrindia.com/vendor/signup</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://olrindia.com/vendor/login.html</loc>
+    <loc>https://olrindia.com/vendor/login</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://olrindia.com/user/signup.html</loc>
+    <loc>https://olrindia.com/user/signup</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://olrindia.com/user/login.html</loc>
+    <loc>https://olrindia.com/user/login</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://olrindia.com/terms.html</loc>
+    <loc>https://olrindia.com/terms</loc>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
 
   <url>
-    <loc>https://olrindia.com/privacy.html</loc>
+    <loc>https://olrindia.com/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
