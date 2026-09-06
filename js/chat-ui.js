@@ -7,7 +7,7 @@
 
 let chatUnsubList = null;
 
-let chatContext = 'dashboard'; // 'dashboard' (default) or 'product' - set by p.js
+let chatContext = 'dashboard'; // 'dashboard' (default) or 'product' - set by product.js
 
 function openChatOverlay() {
   stopChatListeners();

@@ -2,10 +2,16 @@
 function isLoggedIn() {
   return !!(sessionStorage.getItem('olr_user') || sessionStorage.getItem('olr_vendor'));
 }
+function slugify(text) {
+  return (text || '')
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
 function getSlug() {
-  const parts = window.location.pathname.split('/');
-  const pIdx = parts.indexOf('p');
-  if (pIdx !== -1 && parts[pIdx + 1]) return parts[pIdx + 1];
+  const parts = window.location.pathname.split('/').filter(Boolean);
+  if (parts[0] === 'product' && parts.length === 4) return parts[3];
   return new URLSearchParams(window.location.search).get('slug') || '';
 }
 
@@ -196,7 +202,7 @@ document.getElementById('loginOverlay').addEventListener('click', function (e) {
 /* ── Share ───────────────────────────────────────────────── */
 function shareProduct() {
   const slug = getSlug();
-  const url = `${window.location.origin}/api/products/share/${slug}`;
+  const url = `${window.location.origin}/product/${slugify(currentProduct?.category || '')}/${slugify(currentProduct?.city || 'india')}/${slug}`;
   const title = document.getElementById('infoName').textContent || 'Check this on OLR India';
   if (navigator.share) {
     navigator.share({ title, text: title, url }).catch(() => { });
@@ -228,7 +234,7 @@ async function loadProduct() {
     currentProduct = p;
     currentVendor = v;
     // ── Dynamic SEO update per product ──
-    const productUrl = `https://olrindia.com/p.html?slug=${p.share_slug}`;
+    const productUrl = `https://olrindia.com/product/${slugify(p.category)}/${slugify(p.city || 'india')}/${p.share_slug}`;
     const cityText = p.city || 'India';
     const categoryText = p.category || 'Product';
     const productTitle = `${p.name} for Rent in ${cityText} – OLR India`;
@@ -494,7 +500,7 @@ window.addEventListener('pageshow', (event) => {
 });
 
 /* ============================================================
-   ADD TO p.js
+   ADD TO product.js
    Detects ?admin=1 in URL, verifies real admin session via
    /auth/admin/profile, and if valid shows a Remove button
    instead of the normal chat/login CTA.
@@ -531,7 +537,7 @@ function closeAdminRemoveModal() {
   document.getElementById('adminRemoveModal').classList.remove('is-open');
 }
 /* ============================================================
-   ADD TO p.js - new function, plus one small change to loadProduct().
+   ADD TO product.js - new function, plus one small change to loadProduct().
    ============================================================ */
 
 function renderAdminDetails(adminMeta) {
