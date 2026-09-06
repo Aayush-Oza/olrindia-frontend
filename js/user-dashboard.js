@@ -460,7 +460,7 @@ function catEmoji(cat) {
 
 function openProduct(slug) {
   if (!slug) return;
-  window.location.href = `../p.html?slug=${slug}`;
+  window.location.href = `/product?slug=${slug}`;
 }
 
 function clearAllFilters() {
@@ -861,7 +861,7 @@ document.getElementById('profileForm').addEventListener('submit', async (e) => {
     if (!confirmed) return;
     await apiRequest("/auth/user/logout", "POST");
     clearSessionAccount("user");
-    window.location.href = "login.html";
+    window.location.href = "/user/login";
   });
 });
 // ── Init ──────────────────────────────────────────────────────
@@ -877,7 +877,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener("storage", (e) => {
       if (e.key === "olr_user_session" && e.newValue !== String(savedUserId)) {
         clearSessionAccount("user");
-        window.location.href = "login.html";
+        window.location.href = "/user/login";
       }
     });
   });
@@ -886,7 +886,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const res = await apiRequest("/auth/user/profile", "GET");
       if (!res.success && res.httpStatus === 401) {
         clearSessionAccount("user");
-        window.location.href = "login.html";
+        window.location.href = "/user/login";
       }
     }
   });

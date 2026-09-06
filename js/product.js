@@ -92,7 +92,7 @@ let currentVendor = null;
 let isWished = false;
 
 function toggleProductWish() {
-  if (!isLoggedIn()) { window.location.href = 'user/login.html'; return; }
+  if (!isLoggedIn()) { window.location.href = '/user/login'; return; }
 
   const isVendorAcct = !!sessionStorage.getItem('olr_vendor');
   if (isVendorAcct) {
@@ -105,7 +105,7 @@ function toggleProductWish() {
 
 function goToLoginWithReturn(page) {
   sessionStorage.setItem('olr_return_after_login', window.location.href);
-  window.location.href = `user/${page}.html`;
+  window.location.href = `/user/${page}`;
 }
 
 async function doToggleWish() {
@@ -175,7 +175,7 @@ async function startChat() {
   });
 
   if (window.innerWidth >= 768) {
-    window.location.href = `user/dashboard.html#chat=${convId}`;
+    window.location.href = `/user/dashboard#chat=${convId}`;
     return;
   }
   openChatOverlay();
@@ -377,7 +377,7 @@ function showError(msg) {
     <div style="font-size:40px;margin-bottom:12px;">😕</div>
     <h3 style="color:var(--c-ink);margin-bottom:6px;">Something went wrong</h3>
     <p>${msg}</p>
-    <a href="index.html" style="margin-top:16px;display:inline-flex;padding:10px 22px;
+    <a href="/" style="margin-top:16px;display:inline-flex;padding:10px 22px;
       background:var(--grad-brand);color:#fff;border-radius:var(--r-md);
       font-weight:600;text-decoration:none;font-family:var(--font-display);">
       Back to home
@@ -482,14 +482,14 @@ function hideVendorChrome() {
 /* ── Back navigation ─────────────────────────────────────── */
 function goBack() {
   if (isAdminView) {
-    window.location.href = 'admin/dashboard.html#products';
+    window.location.href = '/admin/dashboard#products';
     return;
   }
   const cameFromSameSite = document.referrer && document.referrer.startsWith(window.location.origin);
   if (cameFromSameSite && history.length > 1) {
     history.back();
   } else {
-    window.location.href = 'index.html';
+    window.location.href = '/';
   }
 }
 
@@ -606,7 +606,7 @@ document.getElementById('adminRemoveConfirm')?.addEventListener('click', async (
         : `Product removed. Vendor now has ${res.strike_count} strike(s).`
     );
     setTimeout(() => {
-      window.location.href = 'admin/dashboard.html#products';
+      window.location.href = '/admin/dashboard#products';
     }, 1600);
   } else {
     toastError(res.message || 'Failed to remove product.');

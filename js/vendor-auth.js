@@ -38,7 +38,7 @@ async function handleVendorGoogleSignIn(btn) {
     saveSessionAccount("vendor", res.vendor);
     localStorage.setItem('olr_vendor_session', res.vendor.id);
     toastSuccess("Signed in with Google! Redirecting…");
-    setTimeout(() => { window.location.href = "dashboard.html"; }, 700);
+    setTimeout(() => { window.location.href = "/vendor/dashboard"; }, 700);
   }
 }
 
@@ -85,7 +85,7 @@ function initVendorLoginForm() {
       saveSessionAccount("vendor", res.vendor);
       localStorage.setItem('olr_vendor_session', res.vendor.id);
       toastSuccess("Welcome back! Redirecting…");
-      setTimeout(() => { window.location.href = "dashboard.html"; }, 700);
+      setTimeout(() => { window.location.href = "/vendor/dashboard"; }, 700);
     } else {
       if (res.resend_verification) {
         toastError(res.message + " Check your inbox, or contact support to resend it.");
@@ -229,7 +229,7 @@ function showPostSignupMessage(form, message) {
     </div>
     <h1 style="text-align:center;">Check your inbox</h1>
     <p style="text-align:center;">${message}</p>
-    <a href="login.html" class="btn btn-primary" style="margin-top:24px;">Go to login</a>
+    <a href="/vendor/login" class="btn btn-primary" style="margin-top:24px;">Go to login</a>
   `;
 }
 
@@ -260,7 +260,7 @@ function initVendorForgotForm() {
         </div>
         <h1 style="text-align:center;">Check your inbox</h1>
         <p style="text-align:center;">${res.message}</p>
-        <a href="login.html" class="btn btn-primary" style="margin-top:24px;">Back to login</a>
+        <a href="/vendor/login" class="btn btn-primary" style="margin-top:24px;">Back to login</a>
       `;
     } else {
       toastError(res.message);
@@ -282,7 +282,7 @@ function initVendorResetForm() {
       </div>
       <h1 style="text-align:center;">Invalid link</h1>
       <p style="text-align:center;">This reset link is missing its token. Please request a new one.</p>
-      <a href="forgot-password.html" class="btn btn-primary" style="margin-top:24px;">Request new link</a>
+      <a href="/vendor/forgot-password" class="btn btn-primary" style="margin-top:24px;">Request new link</a>
     `;
     return;
   }
@@ -320,7 +320,7 @@ function initVendorResetForm() {
 
     if (res.success) {
       toastSuccess(res.message);
-      setTimeout(() => { window.location.href = "login.html"; }, 1200);
+      setTimeout(() => { window.location.href = "/vendor/login"; }, 1200);
     } else {
       toastError(res.message);
     }
@@ -351,7 +351,7 @@ function renderVerifyResult(el, success, message) {
     </div>
     <h1 style="text-align:center;">${success ? "Email verified!" : "Verification failed"}</h1>
     <p style="text-align:center;">${message}</p>
-    <a href="login.html" class="btn btn-primary" style="margin-top:24px;">Go to login</a>
+    <a href="/vendor/login" class="btn btn-primary" style="margin-top:24px;">Go to login</a>
   `;
 }
 
@@ -377,7 +377,7 @@ function initVendorDashboard() {
     const res = await apiRequest("/auth/vendor/profile", "GET");
     if (!res.success) {
       const account = getSessionAccount("vendor");
-      if (!account) { window.location.href = "login.html"; return; }
+      if (!account) { window.location.href = "/vendor/login"; return; }
       populateVendorDashboard(account);
     } else {
       saveSessionAccount("vendor", res.vendor);
@@ -387,7 +387,7 @@ function initVendorDashboard() {
       window.addEventListener("storage", (e) => {
         if (e.key === "olr_vendor_session" && e.newValue !== String(savedVendorId)) {
           clearSessionAccount("vendor");
-          window.location.href = "login.html";
+          window.location.href = "/vendor/login";
         }
       });
     }
@@ -402,7 +402,7 @@ function initVendorDashboard() {
         const res = await apiRequest("/auth/vendor/profile", "GET");
         if (!res.success && res.httpStatus === 401) {
           clearSessionAccount("vendor");
-          window.location.href = "login.html";
+          window.location.href = "/vendor/login";
         }
       }
     });
@@ -497,7 +497,7 @@ function populateVendorDashboard(account) {
       if (!confirmed) return;
       await apiRequest("/auth/vendor/logout", "POST");
       clearSessionAccount("vendor");
-      window.location.href = "login.html";
+      window.location.href = "/vendor/login";
     });
   });
 }

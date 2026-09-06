@@ -41,8 +41,8 @@ async function apiRequest(path, method = "GET", body = null) {
     // ── Session expired / unauthorized ───────────────────────────
     if (res.status === 401) {
       const authPages = [
-        'login.html', 'signup.html', 'forgot-password.html',
-        'reset-password.html', 'verify-email.html', 'index.html', 'p.html'
+        'login', 'signup', 'forgot-password',
+        'reset-password', 'verify-email', '/', 'product'
       ];
       const currentPage = window.location.pathname.split('/').pop();
       const isAuthPage = authPages.some(p => currentPage === p || currentPage === '');
@@ -68,7 +68,7 @@ async function apiRequest(path, method = "GET", body = null) {
         sessionStorage.removeItem('olr_vendor');
         sessionStorage.removeItem('olr_admin_account');
 
-        const loginUrl = isAdmin ? '../admin/login.html' : (isVendor ? '../vendor/login.html' : '../user/login.html');
+        const loginUrl = isAdmin ? '/admin/login' : (isVendor ? '/vendor/login' : '/user/login');
         const msg = 'Your session has expired. Please log in again.';
         if (typeof toastError === 'function') toastError(msg); else alert(msg);
         setTimeout(() => { window.location.href = loginUrl; }, 1800);

@@ -207,7 +207,7 @@ function showPostSignupMessage(form, message) {
     </div>
     <h1 style="text-align:center;">Check your inbox</h1>
     <p style="text-align:center;">${message}</p>
-    <a href="login.html" class="btn btn-primary" style="margin-top:24px;">Go to login</a>
+    <a href="/user/login" class="btn btn-primary" style="margin-top:24px;">Go to login</a>
   `;
 }
 
@@ -238,7 +238,7 @@ function initUserForgotForm() {
         </div>
         <h1 style="text-align:center;">Check your inbox</h1>
         <p style="text-align:center;">${res.message}</p>
-        <a href="login.html" class="btn btn-primary" style="margin-top:24px;">Back to login</a>
+        <a href="/user/login" class="btn btn-primary" style="margin-top:24px;">Back to login</a>
       `;
     } else {
       toastError(res.message);
@@ -260,7 +260,7 @@ function initUserResetForm() {
       </div>
       <h1 style="text-align:center;">Invalid link</h1>
       <p style="text-align:center;">This reset link is missing its token. Please request a new one.</p>
-      <a href="forgot-password.html" class="btn btn-primary" style="margin-top:24px;">Request new link</a>
+      <a href="/user/forgot-password" class="btn btn-primary" style="margin-top:24px;">Request new link</a>
     `;
     return;
   }
@@ -298,7 +298,7 @@ function initUserResetForm() {
 
     if (res.success) {
       toastSuccess(res.message);
-      setTimeout(() => { window.location.href = "login.html"; }, 1200);
+      setTimeout(() => { window.location.href = "/user/login"; }, 1200);
     } else {
       toastError(res.message);
     }
@@ -329,7 +329,7 @@ function renderVerifyResult(el, success, message) {
     </div>
     <h1 style="text-align:center;">${success ? "Email verified!" : "Verification failed"}</h1>
     <p style="text-align:center;">${message}</p>
-    <a href="login.html" class="btn btn-primary" style="margin-top:24px;">Go to login</a>
+    <a href="/user/login" class="btn btn-primary" style="margin-top:24px;">Go to login</a>
   `;
 }
 

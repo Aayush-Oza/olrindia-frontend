@@ -52,7 +52,7 @@ async function initChatAuth(role) {
         clearSessionAccount(role);
         sessionStorage.setItem('olr_return_after_login', window.location.href);
         setTimeout(() => {
-          window.location.href = role === 'vendor' ? '/vendor/login.html' : '/user/login.html';
+          window.location.href = role === 'vendor' ? '/vendor/login' : '/user/login';
         }, 1200);
       } else {
         toastError(res.message || 'Could not connect to chat.');

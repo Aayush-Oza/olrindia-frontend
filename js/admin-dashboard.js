@@ -42,7 +42,7 @@ const loadedTabs = new Set();
 async function loadAdminProfile() {
   const res = await apiRequest('/auth/admin/profile', 'GET');
   if (!res.success) {
-    window.location.href = 'login.html';
+    window.location.href = '/login';
     return;
   }
   adminProfile = res.admin;
@@ -268,7 +268,7 @@ removeProductConfirm?.addEventListener('click', async () => {
     if (!confirmed) return;
     await apiRequest("/auth/admin/logout", "POST");
     clearSessionAccount("admin");
-    window.location.href = "login.html";
+    window.location.href = "/admin/login";
   });
 });
 
@@ -283,7 +283,7 @@ function renderProducts(products, reset = true) {
 
   // Desktop table rows (unchanged)
   const rows = products.map(product => {
-    const viewUrl = `../p.html?slug=${product.slug}&admin=1`;
+    const viewUrl = `/product?slug=${product.slug}&admin=1`;
     const image = product.image
       ? `<img src="${product.image}" class="admin-thumb" alt="${product.name}">`
       : `<div class="admin-thumb"></div>`;
@@ -307,7 +307,7 @@ function renderProducts(products, reset = true) {
 
   // Mobile cards (new, purpose-built - not a fake table)
   const cards = products.map(product => {
-    const viewUrl = `../p.html?slug=${product.slug}&admin=1`;
+    const viewUrl = `/product?slug=${product.slug}&admin=1`;
     const image = product.image
       ? `<img src="${product.image}" class="admin-thumb" alt="${product.name}">`
       : `<div class="admin-thumb"></div>`;
@@ -481,7 +481,7 @@ function renderVendors(vendors, reset = true) {
   // appended "load more" rows/cards get the click handler too)
   body.querySelectorAll('.admin-row-clickable').forEach(el => {
     el.addEventListener('click', () => {
-      window.location.href = `vendor-detail.html?id=${el.dataset.id}`;
+      window.location.href = `/admin/vendor-detail?id=${el.dataset.id}`;
     });
   });
 }

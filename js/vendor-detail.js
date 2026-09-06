@@ -149,7 +149,7 @@ function renderVendorProducts(products) {
     return;
   }
   grid.innerHTML = products.map(product => `
-    <a class="admin-product-card" href="../p.html?slug=${product.slug}&admin=1">
+    <a class="admin-product-card" href="/product?slug=${product.slug}&admin=1">
       ${product.image
       ? `<img src="${product.image}" alt="${product.name}">`
       : `<div class="admin-product-card-noimg"></div>`}

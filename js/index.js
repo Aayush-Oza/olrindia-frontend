@@ -512,8 +512,8 @@ function handleWish(btn, productId) {
 }
 
 document.getElementById('navWishBtn').addEventListener('click', () => {
-  if (!sessionStorage.getItem('olr_user')) { window.location.href = 'user/login.html'; return; }
-  window.location.href = 'user/dashboard.html';
+  if (!sessionStorage.getItem('olr_user')) { window.location.href = '/user/login'; return; }
+  window.location.href = '/user/dashboard';
 });
 
 // ── Auth modal ────────────────────────────────────────────────

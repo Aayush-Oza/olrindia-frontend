@@ -43,7 +43,7 @@ function initAdminLoginForm() {
     if (res.success) {
       saveSessionAccount("admin", res.admin);
       toastSuccess("Welcome back! Redirecting…");
-      setTimeout(() => { window.location.href = "dashboard.html"; }, 700);
+      setTimeout(() => { window.location.href = "/admin/dashboard"; }, 700);
     } else {
       toastError(res.message || "Invalid email or password.");
     }
