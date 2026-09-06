@@ -348,7 +348,12 @@ function attachSentinel() {
 
   scrollObserver.observe(sentinel);
 }
-
+function slugify(text) {
+  return (text || '').toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
 // ── Product card HTML ─────────────────────────────────────────
 function productCardHTML(p) {
   const img = p.images && p.images[0]
@@ -412,10 +417,10 @@ function planRank(plan) {
 }
 
 function openProduct(slug, category, city) {
-    if (!slug) return;
-    const cat = slugify(category || '');
-    const ct = slugify(city || 'india');
-    window.location.href = `/product/${cat}/${ct}/${slug}`;
+  if (!slug) return;
+  const cat = slugify(category || '');
+  const ct = slugify(city || 'india');
+  window.location.href = `/product/${cat}/${ct}/${slug}`;
 }
 
 function clearAllFilters() {
