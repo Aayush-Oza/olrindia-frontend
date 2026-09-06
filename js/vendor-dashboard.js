@@ -28,6 +28,9 @@ let vsActiveFilters = {
   category: '', city: '', priceType: 'day', priceMin: 0, priceMax: Infinity,
 };
 
+function slugify(text) {
+  return (text || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
 const PLAN_LABELS = {
   trial: 'Free Trial',
   free: 'Free',
@@ -521,7 +524,7 @@ function openShareModal(productId) {
     toastError('Share link not available for this product yet.');
     return;
   }
-  const url = `${window.location.origin}/api/products/share/${p.share_slug}`;
+  const url = `https://olrindia.com/product/${slugify(p.category)}/${slugify(p.city || 'india')}/${p.share_slug}`;
   const title = p.name || 'Check this out';
 
   if (navigator.share) {
@@ -1496,7 +1499,7 @@ function vsProductCardHTML(p) {
       ? `<span class="vendor-browse-badge vendor-browse-badge-growth">✓ Verified</span>`
       : '';
   return `
-    <div class="vendor-product-card" onclick="sessionStorage.setItem('olr_vs_return','1');window.location.href='../p.html?slug=${p.share_slug}'">
+    window.location.href='/product/${slugify(p.category)}/${slugify(p.city || 'india')}/${p.share_slug}'
       ${img}
       ${badge}
       <div class="vendor-product-body">
