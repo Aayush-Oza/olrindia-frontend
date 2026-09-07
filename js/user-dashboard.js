@@ -18,6 +18,9 @@ document.querySelectorAll('[data-tab="chat"]').forEach(btn => {
     renderChatList();
   });
 });
+function slugify(text) {
+  return (text || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
 document.querySelectorAll('[data-tab="wishlist"]').forEach(btn => {
   btn.addEventListener('click', () => renderWishlistPanel());
 });
@@ -460,7 +463,11 @@ function catEmoji(cat) {
 
 function openProduct(slug) {
   if (!slug) return;
-  window.location.href = `/product?slug=${slug}`;
+  // find product from allProducts to get category and city
+  const p = allProducts.find(x => x.share_slug === slug) || filteredProducts.find(x => x.share_slug === slug);
+  const cat = slugify(p?.category || '');
+  const city = slugify(p?.city || 'india');
+  window.location.href = `/product/${cat}/${city}/${slug}`;
 }
 
 function clearAllFilters() {

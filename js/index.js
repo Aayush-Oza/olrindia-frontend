@@ -609,7 +609,7 @@ async function loadHomepage() {
         <div style="grid-column:1/-1;text-align:center;padding:36px 20px;">
           <div style="font-size:48px;margin-bottom:12px;">📦</div>
           <h3 style="margin:0 0 8px;font-family:var(--font-display);color:var(--text-main);">No products listed yet</h3>
-          <p style="margin:0;color:var(--text-muted);font-size:14px;">Be the first! <a href="/vendor/signup.html" style="color:var(--brand);font-weight:600;text-decoration:none;">List your item →</a></p>
+          <p style="margin:0;color:var(--text-muted);font-size:14px;">Be the first! <a href="/vendor/signup" style="color:var(--brand);font-weight:600;text-decoration:none;">List your item →</a></p>
         </div>`;
     }
   }

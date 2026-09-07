@@ -1499,7 +1499,7 @@ function vsProductCardHTML(p) {
       ? `<span class="vendor-browse-badge vendor-browse-badge-growth">✓ Verified</span>`
       : '';
   return `
-    window.location.href='/product/${slugify(p.category)}/${slugify(p.city || 'india')}/${p.share_slug}'
+    <div class="vendor-product-card" onclick="sessionStorage.setItem('olr_vs_return','1');window.location.href='/product/${slugify(p.category)}/${slugify(p.city || 'india')}/${p.share_slug}'">
       ${img}
       ${badge}
       <div class="vendor-product-body">
