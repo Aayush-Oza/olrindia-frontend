@@ -32,7 +32,7 @@ async function handleUserGoogleSignIn(btn) {
     const returnUrl = sessionStorage.getItem('olr_return_after_login');
     sessionStorage.removeItem('olr_return_after_login');
     setTimeout(() => {
-      window.location.href = returnUrl || "dashboard.html";
+      window.location.href = returnUrl || "dashboard";
     }, 700);
   } else {
     toastError(res.message || "Google sign-in failed. Please try again.");

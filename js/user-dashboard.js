@@ -418,7 +418,7 @@ function productCardHTML(p) {
       : '';
 
   return `
-    <div class="product-card" onclick="openProduct('${p.share_slug}')">
+    <div class="product-card" onclick="openProduct('${p.share_slug}','${p.category||''}','${p.city||''}')">
       ${img}
       ${badge}
       <button class="product-wish-btn ${wished ? 'active' : ''}" onclick="event.stopPropagation();toggleWish(this,${p.id})" title="Save to wishlist">${wished ? '♥' : '♡'}</button>
@@ -461,13 +461,11 @@ function catEmoji(cat) {
   return m[cat] || '📦';
 }
 
-function openProduct(slug) {
+function openProduct(slug, category, city) {
   if (!slug) return;
-  // find product from allProducts to get category and city
-  const p = allProducts.find(x => x.share_slug === slug) || filteredProducts.find(x => x.share_slug === slug);
-  const cat = slugify(p?.category || '');
-  const city = slugify(p?.city || 'india');
-  window.location.href = `/product/${cat}/${city}/${slug}`;
+  const cat = slugify(category || '');
+  const ct = slugify(city || 'india');
+  window.location.href = `/product/${cat}/${ct}/${slug}`;
 }
 
 function clearAllFilters() {
