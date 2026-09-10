@@ -2,7 +2,13 @@
    OLR INDIA - COMPONENTS
    Buttons, form fields, cards, toasts, modal, navbar, spinner.
    ============================================================ */
+iframe.goog-te-banner-frame {
+  display: none !important;
+}
 
+body {
+  top: 0px !important;
+}
 /* ── Buttons ─────────────────────────────────────────────── */
 .btn {
   display: inline-flex;

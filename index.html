@@ -196,8 +196,8 @@
     rel="stylesheet">
   <link rel="stylesheet" href="css/variables.css?v=1">
   <link rel="stylesheet" href="css/base.css?v=1">
-  <link rel="stylesheet" href="css/components.css?v=1">
-  <link rel="stylesheet" href="css/index.css?v=1">
+  <link rel="stylesheet" href="css/components.css?v=2">
+  <link rel="stylesheet" href="css/index.css?v=2">
   <link rel="stylesheet" href="css/footer.css?v=1">
 </head>
 
@@ -209,7 +209,19 @@
         <img src="assets/logo.png?v=1" alt="OLR India">
       </a>
       <div class="nav-right">
+        <!-- Language -->
+        <div class="nav-action nav-lang-wrap" id="navLangWrap">
+          <button class="nav-wish-btn" id="navLangBtn" title="Language">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" />
+              <path d="M3 12h18M12 3c2.4 2.6 3.8 5.9 3.8 9s-1.4 6.4-3.8 9c-2.4-2.6-3.8-5.9-3.8-9S9.6 5.6 12 3Z"
+                stroke="currentColor" stroke-width="1.8" />
+            </svg>
+          </button>
+          <span>Language</span>
 
+          <div class="nav-lang-menu" id="navLangMenu"></div>
+        </div>
         <!-- Wishlist -->
         <div class="nav-action">
           <button class="nav-wish-btn" id="navWishBtn" title="Wishlist">
@@ -632,6 +644,54 @@
   </footer>
 
   <script src="js/footer.js?v=1"></script>
+  <script>
+    (function () {
+      const btn = document.getElementById('navLangBtn');
+      const menu = document.getElementById('navLangMenu');
+      const footerSelect = document.getElementById('footerLangSelect');
+
+      if (!btn || !menu || !footerSelect) return;
+
+      // Build menu from the SAME <select> options footer already uses
+      function buildMenu() {
+        menu.innerHTML = '';
+        Array.from(footerSelect.options).forEach(opt => {
+          const item = document.createElement('div');
+          item.className = 'nav-lang-item' + (opt.value === footerSelect.value ? ' active' : '');
+          item.textContent = opt.textContent;
+          item.dataset.value = opt.value;
+          item.addEventListener('click', () => {
+            footerSelect.value = opt.value;
+            footerSelect.dispatchEvent(new Event('change', { bubbles: true }));
+            menu.classList.remove('open');
+          });
+          menu.appendChild(item);
+        });
+      }
+
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const banner = document.getElementById('locationBanner');
+        if (banner) {
+          banner.classList.remove('show');
+          banner.style.display = 'none';
+        }
+        buildMenu();
+        menu.classList.toggle('open');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!menu.contains(e.target) && e.target !== btn) {
+          menu.classList.remove('open');
+        }
+      });
+
+      // Keep nav menu's active highlight in sync if footer select changes elsewhere
+      footerSelect.addEventListener('change', () => {
+        if (menu.classList.contains('open')) buildMenu();
+      });
+    })();
+  </script>
 </body>
 
 </html>

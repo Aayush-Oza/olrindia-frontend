@@ -92,9 +92,59 @@
   white-space: nowrap;
 }
 
+.nav-lang-wrap {
+  position: relative;
+}
+
+.nav-lang-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  background: #fff;
+  border: 1px solid var(--c-border-soft);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-lg);
+  min-width: 190px;
+  max-height: 320px;
+  overflow-y: auto;
+  z-index: 500;
+  padding: 6px;
+}
+
+.nav-lang-menu.open {
+  display: block;
+}
+
+.nav-lang-item {
+  padding: 8px 12px;
+  font-size: 13.5px;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  color: var(--c-ink);
+  white-space: nowrap;
+}
+
+.nav-lang-item:hover {
+  background: var(--c-bg);
+}
+
+.nav-lang-item.active {
+  color: var(--c-blue);
+  font-weight: 600;
+  background: #EAF3FF;
+}
+
+@media (max-width: 480px) {
+  .nav-lang-menu {
+    left: auto;
+    right: -40px;
+  }
+}
+
 .nav-wish-btn {
-  width: 38px;
-  height: 38px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -104,6 +154,11 @@
   color: var(--c-ink-soft);
   cursor: pointer;
   transition: all var(--t-fast) var(--ease);
+}
+
+.nav-wish-btn svg {
+  width: 17px;
+  height: 17px;
 }
 
 .nav-wish-btn:hover {
@@ -1388,6 +1443,16 @@
   .filter-sheet.open {
     transform: translateY(0);
   }
+
+  .nav-wish-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .nav-wish-btn svg {
+    width: 16px;
+    height: 16px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1399,6 +1464,20 @@
 
   .nav-logo img {
     height: 46px;
+  }
+
+  .nav-wish-btn {
+    width: 30px;
+    height: 30px;
+  }
+
+  .nav-wish-btn svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .nav-action span {
+    font-size: 7px;
   }
 
   .filter-row {
