@@ -32,7 +32,6 @@ function slugify(text) {
   return (text || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 const PLAN_LABELS = {
-  trial: 'Free Trial',
   free: 'Free',
   starter: 'Starter',
   growth: 'Growth',
@@ -131,7 +130,6 @@ function initModalPincodeAutofill() {
     statusEl: document.getElementById('modalPincodeStatus'),
   });
 }
-function renderProfilePlanSection() { }
 // ── Load vendor profile (plan strip + nav avatar) ─────────────
 // Also called after any product status change so counts stay fresh.
 async function loadVendorProfile() {
@@ -143,7 +141,7 @@ async function loadVendorProfile() {
   renderProfileAvatar();
   renderSuspendedBanner();
   renderProfilePlanSection();
-  /*await loadBillingHistory();*/
+  await loadBillingHistory();
 }
 function renderSuspendedBanner() {
   if (!vendorProfile) return;
@@ -230,9 +228,9 @@ function renderPlanUsageStrip() {
   }
 }
 
-/*document.getElementById('planUsageUpgradeBtn')?.addEventListener('click', () => {
+document.getElementById('planUsageUpgradeBtn')?.addEventListener('click', () => {
   openUpgradeModal();
-});*/
+});
 
 // ── Profile photo upload ──────────────────────────────────────
 document.getElementById('profileAvatarEditBtn')?.addEventListener('click', () => {
@@ -271,7 +269,7 @@ document.getElementById('profilePhotoInput')?.addEventListener('change', async f
   }
   this.value = '';
 });
-/*function renderExpiryBanner(banner) {
+function renderExpiryBanner(banner) {
   let el = document.getElementById('expiryBanner');
   if (!el) {
     el = document.createElement('div');
@@ -295,7 +293,7 @@ document.getElementById('profilePhotoInput')?.addEventListener('change', async f
     <button class="btn btn-primary" style="width:auto;padding:8px 16px;flex-shrink:0;font-size:13px;"
       onclick="openUpgradeModal()">Renew Now</button>
   `;
-}*/
+}
 // ── Load products ─────────────────────────────────────────────
 // Called by vendor-auth.js after profile loads, and after any CRUD action.
 async function loadProducts() {
@@ -304,7 +302,7 @@ async function loadProducts() {
   allProducts = res.products;
   renderProducts();
   updateStats();
-  /*renderExpiryBanner(res.expiry_banner);*/
+  renderExpiryBanner(res.expiry_banner);
   await loadVendorProfile(); // keep plan strip + nav fresh
 }
 
@@ -416,11 +414,11 @@ async function toggleProductStatus(productId, newStatus) {
     await loadProducts();
     if (previewProductId === productId) renderPreviewModal(productId);
   } else {
-    /*if (res.message && res.message.toLowerCase().includes('limit')) {
+    if (res.message && res.message.toLowerCase().includes('limit')) {
       openUpgradeModal(res.message);
-    } else {*/
+    } else {
     toastError(res.message || 'Failed to update status.');
-    /*}*/
+    }
   }
 }
 
@@ -574,13 +572,13 @@ document.getElementById('upgradeModalOverlay')?.addEventListener('click', (e) =>
   }
 });
 
-/*const PLAN_PRICES = {
+const PLAN_PRICES = {
   starter: 249,
-  growth: 599,
+  growth: 449,
   premium: 999,
-};*/
+};
 
-/*function openUpgradeModal(message) {
+function openUpgradeModal(message) {
   const sub = document.getElementById('upgradeModalText');
   if (sub) {
     sub.textContent = message || 'Upgrade your plan to list more products and get better visibility.';
@@ -590,13 +588,13 @@ document.getElementById('upgradeModalOverlay')?.addEventListener('click', (e) =>
   renderPlanCards();
 
   document.getElementById('upgradeModalOverlay').classList.add('open');
-}*/
+}
 
 /**
  * Highlights current plan card, disables its button,
  * hides the button for lower plans.
  */
-/*function renderPlanCards() {
+function renderPlanCards() {
   if (!vendorProfile) return;
 
   const current = vendorProfile.subscription_plan || 'free';
@@ -615,7 +613,7 @@ document.getElementById('upgradeModalOverlay')?.addEventListener('click', (e) =>
   }
 
   const order = ['free', 'starter', 'growth', 'premium'];
-  const currentIdx = order.indexOf(current === 'trial' ? 'free' : current);
+  const currentIdx = order.indexOf(current);
 
   order.forEach((plan, idx) => {
     const card = document.getElementById(`planCard-${plan}`);
@@ -626,7 +624,7 @@ document.getElementById('upgradeModalOverlay')?.addEventListener('click', (e) =>
 
     // Show free card only if vendor is on a paid plan (for reference)
     if (plan === 'free') {
-      card.style.display = (current !== 'free' && current !== 'trial') ? 'flex' : 'none';
+      card.style.display = (current !== 'free') ? 'flex' : 'none';
       return;
     }
 
@@ -658,13 +656,13 @@ document.getElementById('upgradeModalOverlay')?.addEventListener('click', (e) =>
       setButtonLoading(btn, false);
     }
   });
-}*/
+}
 
 /**
  * Called when vendor clicks a plan's "Get X" button.
  * Opens Razorpay checkout for that plan.
  */
-/*async function handlePlanSelect(plan) {
+async function handlePlanSelect(plan) {
   const btn = document.getElementById(`planBtn-${plan}`);
 
   try {
@@ -731,7 +729,7 @@ document.getElementById('upgradeModalOverlay')?.addEventListener('click', (e) =>
     toastError('Something went wrong. Please try again.');
     if (btn) setButtonLoading(btn, false);
   }
-}*/
+}
 
 /**
  * Called after Razorpay reports success.
@@ -765,7 +763,7 @@ async function verifyAndActivatePlan({ razorpay_order_id, razorpay_payment_id, r
   }
 }
 
-/*function showPaymentRetryBanner({ razorpay_order_id, razorpay_payment_id, razorpay_signature }) {
+function showPaymentRetryBanner({ razorpay_order_id, razorpay_payment_id, razorpay_signature }) {
   let el = document.getElementById('paymentRetryBanner');
   if (!el) {
     el = document.createElement('div');
@@ -790,9 +788,9 @@ async function verifyAndActivatePlan({ razorpay_order_id, razorpay_payment_id, r
     await verifyAndActivatePlan({ razorpay_order_id, razorpay_payment_id, razorpay_signature });
     el.remove();
   });
-}*/
+}
 
-/*function renderProfilePlanSection() {
+function renderProfilePlanSection() {
   const el = document.getElementById('profilePlanSection');
   if (!el || !vendorProfile) return;
 
@@ -816,8 +814,6 @@ async function verifyAndActivatePlan({ razorpay_order_id, razorpay_payment_id, r
     expiryHtml = `<div class="profile-plan-expires ${urgentClass}">
       Active until ${formatted}${urgentText}
     </div>`;
-  } else if (plan === 'trial') {
-    expiryHtml = `<div class="profile-plan-expires">7-day free trial</div>`;
   }
 
   // Badge pill
@@ -856,7 +852,7 @@ async function verifyAndActivatePlan({ razorpay_order_id, razorpay_payment_id, r
         ${plan === 'premium' ? 'Manage plan' : 'Upgrade plan'}
       </button>
     </div>`;
-}*/
+}
 
 // ── Image slots ───────────────────────────────────────────────
 // initImageSlots is called once by vendor-auth.js after the page loads.
@@ -995,11 +991,11 @@ function openAddModal() {
     toastError('Your account is suspended. Contact support to regain access.');
     return;
   }
-  /*if (vendorProfile && vendorProfile.max_active_posts !== null &&
+  if (vendorProfile && vendorProfile.max_active_posts !== null &&
     vendorProfile.active_product_count >= vendorProfile.max_active_posts) {
     openUpgradeModal(`You've reached your plan's limit of ${vendorProfile.max_active_posts} active posts. Upgrade to list more.`);
     return;
-  }*/
+  }
   editingId = null;
   document.getElementById('modalTitle').textContent = 'Add new product';
   document.getElementById('productForm').reset();
@@ -1020,13 +1016,13 @@ function openAddModal() {
   document.getElementById('productModalOverlay').classList.add('open');
 }
 
-/*async function loadBillingHistory() {
+async function loadBillingHistory() {
   const res = await apiRequest('/auth/vendor/billing', 'GET');
   if (!res.success) return;
   renderBillingHistory(res.billing);
-}*/
+}
 
-/*function renderBillingHistory(billing) {
+function renderBillingHistory(billing) {
   const el = document.getElementById('billingHistorySection');
   if (!el) return;
 
@@ -1065,7 +1061,7 @@ function openAddModal() {
         </div>
       </div>`;
   }).join('');
-}*/
+}
 
 // ── Open EDIT modal ───────────────────────────────────────────
 async function openEditModal(productId) {
