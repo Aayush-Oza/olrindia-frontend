@@ -417,7 +417,7 @@ async function toggleProductStatus(productId, newStatus) {
     if (res.message && res.message.toLowerCase().includes('limit')) {
       openUpgradeModal(res.message);
     } else {
-    toastError(res.message || 'Failed to update status.');
+      toastError(res.message || 'Failed to update status.');
     }
   }
 }
@@ -1570,7 +1570,7 @@ async function vsAppendNextBatch() {
   document.getElementById('vsScrollSentinel')?.remove();
   document.querySelector('.vendor-scroll-end-msg')?.remove();
 
-  const grid = document.getElementById('vsProductGrid');
+  const grid = document.getElementById('vsHomeProdGrid') || document.getElementById('vsProductGrid');
   const skeletonWrapper = document.createElement('div');
   skeletonWrapper.id = 'vsSkeletonBatch';
   skeletonWrapper.style.cssText = 'display:contents';
@@ -1578,7 +1578,7 @@ async function vsAppendNextBatch() {
   grid.appendChild(skeletonWrapper);
 
   vsCurrentPage++;
-  const params = new URLSearchParams({ page: vsCurrentPage, per_page: 10 });
+  const params = new URLSearchParams({ page: vsCurrentPage, per_page: 20 });
   if (vsActiveFilters.category) params.set('category', vsActiveFilters.category);
   if (vsActiveFilters.city) params.set('city', vsActiveFilters.city);
   if (vsActiveFilters.priceType) params.set('price_type', vsActiveFilters.priceType);
@@ -1606,7 +1606,7 @@ async function vsAppendNextBatch() {
 function vsAttachSentinel() {
   if (vsScrollObserver) { vsScrollObserver.disconnect(); vsScrollObserver = null; }
   vsSentinel?.remove();
-  const grid = document.getElementById('vsProductGrid');
+  const grid = document.getElementById('vsHomeProdGrid') || document.getElementById('vsProductGrid');
   if (!vsHasMore) {
     if (vsTotalProducts > 20) {
       grid.insertAdjacentHTML('beforeend',
@@ -1762,7 +1762,8 @@ async function vsLoadBrowseHomepage() {
     ),
     apiRequest('/products/public?page=1&per_page=20', 'GET').catch(() => null)
   ]);
-
+  vsHasMore = prodData?.has_more ?? false;
+  vsTotalProducts = prodData?.total ?? 0;
   const catGrid = document.getElementById('vsCatCardGrid');
   if (catGrid) {
     const catCards = VS_CATEGORIES.map((cat, i) => {
@@ -1797,6 +1798,7 @@ async function vsLoadBrowseHomepage() {
         </div>`;
     }
   }
+  vsAttachSentinel();
 }
 
 // ── View Site filter event listeners ─────────────────────────

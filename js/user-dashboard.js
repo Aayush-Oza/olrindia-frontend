@@ -251,7 +251,7 @@ async function appendNextBatch() {
   document.getElementById('scrollSentinel')?.remove();
   document.querySelector('.scroll-end-msg')?.remove();
 
-  const grid = document.getElementById('productGrid');
+  const grid = document.getElementById('homeProdGrid') || document.getElementById('productGrid');
   const skeletonWrapper = document.createElement('div');
   skeletonWrapper.id = 'skeletonBatch';
   skeletonWrapper.style.cssText = 'display:contents';
@@ -268,7 +268,7 @@ async function appendNextBatch() {
   grid.appendChild(skeletonWrapper);
 
   currentPage++;
-  const params = new URLSearchParams({ page: currentPage, per_page: 10 });
+  const params = new URLSearchParams({ page: currentPage, per_page: 20 });
   if (activeFilters.category) params.set('category', activeFilters.category);
   if (activeFilters.city) params.set('city', activeFilters.city);
   if (activeFilters.priceType) params.set('price_type', activeFilters.priceType);
@@ -298,7 +298,7 @@ async function appendNextBatch() {
 function attachSentinel() {
   if (scrollObserver) { scrollObserver.disconnect(); scrollObserver = null; }
   sentinel?.remove();
-  const grid = document.getElementById('productGrid');
+  const grid = document.getElementById('homeProdGrid') || document.getElementById('productGrid');
   if (!hasMore) {
     if (totalProducts > 20) {
       grid.insertAdjacentHTML('beforeend',
@@ -418,7 +418,7 @@ function productCardHTML(p) {
       : '';
 
   return `
-    <div class="product-card" onclick="openProduct('${p.share_slug}','${p.category||''}','${p.city||''}')">
+    <div class="product-card" onclick="openProduct('${p.share_slug}','${p.category || ''}','${p.city || ''}')">
       ${img}
       ${badge}
       <button class="product-wish-btn ${wished ? 'active' : ''}" onclick="event.stopPropagation();toggleWish(this,${p.id})" title="Save to wishlist">${wished ? '♥' : '♡'}</button>
@@ -1038,7 +1038,8 @@ async function loadBrowseHomepage() {
     ),
     apiRequest('/products/public?page=1&per_page=20', 'GET').catch(() => null)
   ]);
-
+  hasMore = prodData?.has_more ?? false;
+  totalProducts = prodData?.total ?? 0;
   const catGrid = document.getElementById('catCardGrid');
   if (catGrid) {
     const catCards = CATEGORIES.map((cat, i) => {
@@ -1075,6 +1076,17 @@ async function loadBrowseHomepage() {
           <p style="margin:0;color:var(--text-muted);font-size:14px;">Be the first! <a href="../vendor/signup.html" style="color:var(--brand);font-weight:600;text-decoration:none;">List your item →</a></p>
         </div>`;
     }
+  }
+  if (hasMore) {
+    const homeProdGrid = document.getElementById('homeProdGrid');
+    homeProdGrid?.insertAdjacentHTML('beforeend', `<div id="scrollSentinel" style="grid-column:1/-1;height:40px;"></div>`);
+    sentinel = document.getElementById('scrollSentinel');
+    if (scrollObserver) { scrollObserver.disconnect(); scrollObserver = null; }
+    scrollObserver = new IntersectionObserver(
+      (entries) => { if (entries[0].isIntersecting) appendNextBatch(); },
+      { rootMargin: '200px' }
+    );
+    scrollObserver.observe(sentinel);
   }
 }
 
