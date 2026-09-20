@@ -479,7 +479,6 @@ function catImg(cat) {
   const m = {
     'Construction Equipment': 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400&q=80',
     'Furniture & Home Appliances': 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&q=80',
-    'Party & Celebration Decor': '../assets/categories/PartyCelebrationDecor.png',
     'Photography & Content Creator Gear': '../assets/categories/PhotographyContentCreatorGear.png',
     'Events & Weddings': '../assets/categories/EventsWeddings.png',
     'Fashion & Designer Wear': '../assets/categories/FashionDesignerWear.png',
@@ -498,7 +497,6 @@ function catImg(cat) {
     'Warehouse & Storage': '../assets/categories/WarehouseStorage.png',
     'Cargo & Shipping': '../assets/categories/CargoShipping.png',
     'Machineries': '../assets/categories/Machineries.png',
-    'Residential Properties': '../assets/categories/Residential Properties.png',
     'Musical Instruments': '../assets/categories/Musical Instruments.png',
   };
   return m[cat] || '';
@@ -531,11 +529,11 @@ document.addEventListener('keydown', e => {
 
 // ── Category homepage ─────────────────────────────────────────
 const CATEGORIES = [
-  'Construction Equipment', 'Furniture & Home Appliances', 'Party & Celebration Decor', 'Photography & Content Creator Gear',
+  'Construction Equipment', 'Furniture & Home Appliances','Photography & Content Creator Gear',
   'Events & Weddings', 'Fashion & Designer Wear', 'Agricultural Equipment', 'Passenger Vehicles', 'Bikes & Scooters',
   'Medical Equipment', 'Baby & Kids Gear', 'Adventure & Trekking Gear', 'Sports & Fitness Equipment', 'Electrical & Power Tools',
   'Commercial Vehicles', 'Tools & Tackles', 'Properties', 'Industrial Equipment', 'Warehouse & Storage', 'Cargo & Shipping',
-  'Machineries', 'Residential Properties', 'Musical Instruments'
+  'Machineries','Musical Instruments'
 ];
 
 async function loadHomepage() {
@@ -649,7 +647,6 @@ function catColor(cat) {
   const m = {
     'Construction Equipment': { main: '#F59E0B', bg: '#FFFBEB' },
     'Furniture & Home Appliances': { main: '#8B5CF6', bg: '#F5F3FF' },
-    'Party & Celebration Decor': { main: '#F97316', bg: '#FFF7ED' },
     'Photography & Content Creator Gear': { main: '#EC4899', bg: '#FDF2F8' },
     'Events & Weddings': { main: '#F97316', bg: '#FFF7ED' },
     'Fashion & Designer Wear': { main: '#EC4899', bg: '#FDF2F8' },
@@ -668,7 +665,6 @@ function catColor(cat) {
     'Warehouse & Storage': { main: '#64748B', bg: '#F8FAFC' },
     'Cargo & Shipping': { main: '#8B5CF6', bg: '#F5F3FF' },
     'Machineries': { main: '#F59E0B', bg: '#FFFBEB' },
-    'Residential Properties': { main: '#6366F1', bg: '#EEF2FF' },
     'Musical Instruments': { main: '#EC4899', bg: '#FDF2F8' },
   };
   return m[cat] || { main: '#3B82F6', bg: '#EFF6FF' };
