@@ -1516,6 +1516,16 @@
 
 /* ── Tablet (≤ 860px) ────────────────────────────────────────── */
 @media (max-width: 860px) {
+  .nav-lang-wrap {
+    display: flex;
+    margin-left: auto;
+  }
+
+  .nav-hamburger {
+    display: flex;
+    margin-left: 8px;
+  }
+
   .nav-mobile-menu.open {
     display: flex;
   }
