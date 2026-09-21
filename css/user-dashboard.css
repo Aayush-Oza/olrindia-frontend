@@ -204,21 +204,21 @@ body {
 }
 
 @media (max-width: 860px) {
-
   .dash-nav-links,
   .dash-nav-right {
     display: none;
   }
 
+  .nav-lang-wrap {
+    display: flex;
+    margin-left: auto;
+  }
+
   .nav-hamburger {
     display: flex;
+    margin-left: 8px;
   }
-  .nav-lang-wrap {
-  margin-left: auto;
-}
-.nav-hamburger {
-  margin-left: 0;
-}
+
   .nav-mobile-menu.open {
     display: flex;
   }
