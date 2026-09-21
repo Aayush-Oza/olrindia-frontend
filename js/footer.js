@@ -90,6 +90,39 @@
   document.addEventListener('DOMContentLoaded', () => {
     initFooterLang();
     autoApplyLang();
+    ['navLangBtn', 'navLangBtnMobile'].forEach(btnId => {
+      const btn = document.getElementById(btnId);
+      const menu = btnId === 'navLangBtn'
+        ? document.getElementById('navLangMenu')
+        : document.getElementById('navLangMenuMobile');
+      const footerSelect = document.querySelector('.footer-lang-select');
+      if (!btn || !menu || !footerSelect) return;
+
+      function buildMenu() {
+        menu.innerHTML = '';
+        Array.from(footerSelect.options).forEach(opt => {
+          const item = document.createElement('div');
+          item.className = 'nav-lang-item' + (opt.value === footerSelect.value ? ' active' : '');
+          item.textContent = opt.textContent;
+          item.addEventListener('click', () => {
+            footerSelect.value = opt.value;
+            footerSelect.dispatchEvent(new Event('change', { bubbles: true }));
+            menu.classList.remove('open');
+          });
+          menu.appendChild(item);
+        });
+      }
+
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        buildMenu();
+        menu.classList.toggle('open');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!menu.contains(e.target) && e.target !== btn) menu.classList.remove('open');
+      });
+    });
   });
 
 })();

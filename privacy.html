@@ -92,6 +92,7 @@
   <link rel="stylesheet" href="css/components.css?v=2">
   <link rel="stylesheet" href="css/legal.css?v=1">
   <link rel="stylesheet" href="css/footer.css?v=1">
+  <link rel="stylesheet" href="css/index.css?v=2">
 </head>
 
 <body>
@@ -102,21 +103,17 @@
       <a class="legal-nav-logo" href="/" id="logoBtn">
         <img src="assets/logo.png?v=1" alt="OLR India">
       </a>
-      <a class="legal-nav-back" href="/" id="backBtn">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-          <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-            stroke-linejoin="round" />
-        </svg>
-        Back
-      </a>
-      <script>
-        const ref = document.referrer;
-        if (ref && new URL(ref).origin === location.origin) {
-          document.getElementById('backBtn').href = ref;
-          document.getElementById('logoBtn').href = ref;
-          document.getElementById('footerLogoBtn').href = ref;
-        }
-      </script>
+
+      <div class="nav-action nav-lang-wrap" id="navLangWrap" style="margin-left:auto;">
+        <button class="nav-wish-btn" id="navLangBtn" title="Language">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" />
+            <path d="M3 12h18M12 3c2.4 2.6 3.8 5.9 3.8 9s-1.4 6.4-3.8 9c-2.4-2.6-3.8-5.9-3.8-9S9.6 5.6 12 3Z"
+              stroke="currentColor" stroke-width="1.8" />
+          </svg>
+        </button>
+        <div class="nav-lang-menu" id="navLangMenu"></div>
+      </div>
     </div>
   </nav>
 
@@ -239,7 +236,7 @@
         <a class="footer-logo" href="/" id="footerLogoBtn">
           <img src="assets/logo.png?v=1" alt="OLR India">
         </a>
-        <select class="footer-lang-select" id="footerLangSelect">
+        <select class="footer-lang-select" id="footerLangSelect" style="display:none">
           <option value="en">🌐 English</option>
           <option value="hi">हिंदी (Hindi)</option>
           <option value="bn">বাংলা (Bengali)</option>
@@ -267,7 +264,48 @@
     </div>
   </footer>
 
-  <script src="js/footer.js?v=1"></script>
+  <script src="js/footer.js?v=2"></script>
+  <script>
+    (function () {
+      const btn = document.getElementById('navLangBtn');
+      const menu = document.getElementById('navLangMenu');
+      const footerSelect = document.getElementById('footerLangSelect');
+
+      if (!btn || !menu || !footerSelect) return;
+
+      function buildMenu() {
+        menu.innerHTML = '';
+        Array.from(footerSelect.options).forEach(opt => {
+          const item = document.createElement('div');
+          item.className = 'nav-lang-item' + (opt.value === footerSelect.value ? ' active' : '');
+          item.textContent = opt.textContent;
+          item.dataset.value = opt.value;
+          item.addEventListener('click', () => {
+            footerSelect.value = opt.value;
+            footerSelect.dispatchEvent(new Event('change', { bubbles: true }));
+            menu.classList.remove('open');
+          });
+          menu.appendChild(item);
+        });
+      }
+
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        buildMenu();
+        menu.classList.toggle('open');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!menu.contains(e.target) && e.target !== btn) {
+          menu.classList.remove('open');
+        }
+      });
+
+      footerSelect.addEventListener('change', () => {
+        if (menu.classList.contains('open')) buildMenu();
+      });
+    })();
+  </script>
 </body>
 
 </html>
