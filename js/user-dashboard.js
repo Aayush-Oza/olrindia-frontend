@@ -456,7 +456,7 @@ function catEmoji(cat) {
     'Bikes & Scooters': '🏍️', 'Medical Equipment': '🩺', 'Baby & Kids Gear': '👶', 'Adventure & Trekking Gear': '🏕️',
     'Sports & Fitness Equipment': '🏋️', 'Electrical & Power Tools': '⚡', 'Commercial Vehicles': '🚛', 'Tools & Tackles': '🛠️',
     'Properties': '🏢', 'Industrial Equipment': '⚙️', 'Warehouse & Storage': '🏭', 'Cargo & Shipping': '📦',
-    'Machineries': '🔧', 'Musical Instruments': '🎵'
+    'Machineries': '🔧', 'Musical Instruments': '🎵','Office & Business Essentials': '🖥️'
   };
   return m[cat] || '📦';
 }
@@ -957,6 +957,7 @@ function catImg(cat) {
     'Cargo & Shipping': '../assets/categories/CargoShipping.png',
     'Machineries': '../assets/categories/Machineries.png',
     'Musical Instruments': '../assets/categories/Musical Instruments.png',
+    'Office & Business Essentials': 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&q=80',
   };
   return m[cat] || '';
 }
@@ -984,6 +985,7 @@ function catColor(cat) {
     'Cargo & Shipping': { main: '#8B5CF6', bg: '#F5F3FF' },
     'Machineries': { main: '#F59E0B', bg: '#FFFBEB' },
     'Musical Instruments': { main: '#EC4899', bg: '#FDF2F8' },
+    'Office & Business Essentials': { main: '#0EA5E9', bg: '#F0F9FF' },
   };
   return m[cat] || { main: '#3B82F6', bg: '#EFF6FF' };
 }
@@ -993,7 +995,7 @@ const CATEGORIES = [
   'Events & Weddings', 'Fashion & Designer Wear', 'Agricultural Equipment', 'Passenger Vehicles', 'Bikes & Scooters',
   'Medical Equipment', 'Baby & Kids Gear', 'Adventure & Trekking Gear', 'Sports & Fitness Equipment', 'Electrical & Power Tools',
   'Commercial Vehicles', 'Tools & Tackles', 'Properties', 'Industrial Equipment', 'Warehouse & Storage', 'Cargo & Shipping',
-  'Machineries', 'Musical Instruments'
+  'Machineries', 'Musical Instruments','Office and  Business Essentials'
 ];
 
 async function loadBrowseHomepage() {
