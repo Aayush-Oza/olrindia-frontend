@@ -662,54 +662,6 @@
   </footer>
 
   <script src="js/footer.js?v=2"></script>
-  <script>
-    (function () {
-      const btn = document.getElementById('navLangBtn');
-      const menu = document.getElementById('navLangMenu');
-      const footerSelect = document.getElementById('footerLangSelect');
-
-      if (!btn || !menu || !footerSelect) return;
-
-      // Build menu from the SAME <select> options footer already uses
-      function buildMenu() {
-        menu.innerHTML = '';
-        Array.from(footerSelect.options).forEach(opt => {
-          const item = document.createElement('div');
-          item.className = 'nav-lang-item' + (opt.value === footerSelect.value ? ' active' : '');
-          item.textContent = opt.textContent;
-          item.dataset.value = opt.value;
-          item.addEventListener('click', () => {
-            footerSelect.value = opt.value;
-            footerSelect.dispatchEvent(new Event('change', { bubbles: true }));
-            menu.classList.remove('open');
-          });
-          menu.appendChild(item);
-        });
-      }
-
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const banner = document.getElementById('locationBanner');
-        if (banner) {
-          banner.classList.remove('show');
-          banner.style.display = 'none';
-        }
-        buildMenu();
-        menu.classList.toggle('open');
-      });
-
-      document.addEventListener('click', (e) => {
-        if (!menu.contains(e.target) && e.target !== btn) {
-          menu.classList.remove('open');
-        }
-      });
-
-      // Keep nav menu's active highlight in sync if footer select changes elsewhere
-      footerSelect.addEventListener('change', () => {
-        if (menu.classList.contains('open')) buildMenu();
-      });
-    })();
-  </script>
 </body>
 
 </html>
