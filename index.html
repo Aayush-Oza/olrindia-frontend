@@ -197,14 +197,14 @@
   <link rel="stylesheet" href="css/variables.css?v=1">
   <link rel="stylesheet" href="css/base.css?v=1">
   <link rel="stylesheet" href="css/components.css?v=2">
-  <link rel="stylesheet" href="css/index.css?v=2">
+  <link rel="stylesheet" href="css/index.css?v=3">
   <link rel="stylesheet" href="css/footer.css?v=1">
   <!-- Meta Pixel Code -->
   <script>
     !function (f, b, e, v, n, t, s) {
       if (f.fbq) return; n = f.fbq = function () {
         n.callMethod ?
-        n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+          n.callMethod.apply(n, arguments) : n.queue.push(arguments)
       };
       if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
       n.queue = []; t = b.createElement(e); t.async = !0;
@@ -286,40 +286,14 @@
   <section class="hero">
     <div class="hero-inner">
       <div class="hero-animation" id="heroAnimation">
-        <div class="hanim-scene active" id="hs1">
-          <div class="hanim-icon">📦</div>
-          <div class="hanim-title">Got idle stuff at home?</div>
-          <div class="hanim-sub">Fridge, camera, AC, furniture sitting unused?</div>
-          <div class="hanim-tags">
-            <span>🧊 Fridge</span><span>📷 Camera</span><span>❄️ AC</span><span>🪑 Furniture</span>
-          </div>
-        </div>
-        <div class="hanim-scene" id="hs2">
-          <div class="hanim-icon">📱</div>
-          <div class="hanim-title">List it on OLR India</div>
-          <div class="hanim-sub">Add photos, set your price, go live in 2 minutes</div>
-          <div class="hanim-money">₹ Earning starts</div>
-        </div>
-        <div class="hanim-scene" id="hs3">
-          <div class="hanim-icon">🔍</div>
-          <div class="hanim-title">Customers find & rent</div>
-          <div class="hanim-sub">People near you rent instead of buying - saving money, helping you earn</div>
-          <div class="hanim-tags">
-            <span>📍 Near you</span><span>✅ Verified vendors</span>
-          </div>
-        </div>
-        <div class="hanim-scene" id="hs4">
-          <div class="hanim-icon">💬</div>
-          <div class="hanim-title">Chat & connect directly</div>
-          <div class="hanim-sub">No middleman, no commission. Direct between vendor and renter.</div>
-        </div>
-        <div class="hanim-scene" id="hs5">
-          <div class="hanim-title hanim-title-big">Rent anything,<br>anywhere in India</div>
-          <div class="hanim-sub">Thousands of local vendors -<br>furniture, tools, vehicles, fashion & more.</div>
-          <div class="hanim-tags">
-            <span>🏗️ Construction</span><span>🚗 Vehicles</span><span>👗 Fashion</span><span>🏠 Appliances</span>
-          </div>
-        </div>
+        <img class="hanim-slide active" src="assets/slider/slider (1).png" alt="Slide 1">
+        <img class="hanim-slide" src="assets/slider/slider (2).png" alt="Slide 2">
+        <img class="hanim-slide" src="assets/slider/slider (3).png" alt="Slide 3">
+        <img class="hanim-slide" src="assets/slider/slider (4).png" alt="Slide 4">
+        <img class="hanim-slide" src="assets/slider/slider (5).png" alt="Slide 5">
+        <img class="hanim-slide" src="assets/slider/slider (6).png" alt="Slide 6">
+        <img class="hanim-slide" src="assets/slider/slider (7).png" alt="Slide 7">
+        <img class="hanim-slide" src="assets/slider/slider (8).png" alt="Slide 8">
         <div class="hanim-bar" id="hanimBar"></div>
         <div class="hanim-dots" id="hanimDots"></div>
       </div>
@@ -508,55 +482,49 @@
   <script src="js/index.js?v=11"></script>
   <script>
     (function () {
-      const scenes = ['hs1', 'hs2', 'hs3', 'hs4', 'hs5'];
-      const durations = [3000, 3000, 3000, 3000, 4000];
+      const slides = document.querySelectorAll('.hanim-slide');
+      const total = slides.length;
+      const duration = 3000;
       let cur = 0, timer = null, rafId = null, startTime = null;
 
       const dotsEl = document.getElementById('hanimDots');
-      scenes.forEach((_, i) => {
+      slides.forEach((_, i) => {
         const d = document.createElement('div');
         d.className = 'hanim-dot' + (i === 0 ? ' active' : '');
         d.id = 'hd' + i;
+        d.onclick = () => { clearTimeout(timer); show(i); scheduleNext(); };
         dotsEl.appendChild(d);
       });
 
       function show(idx) {
-        scenes.forEach((id, i) => {
-          document.getElementById(id).classList.toggle('active', i === idx);
-          document.getElementById('hd' + i).classList.toggle('active', i === idx);
-        });
+        slides.forEach((s, i) => s.classList.toggle('active', i === idx));
+        document.querySelectorAll('.hanim-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+        cur = idx;
         if (rafId) cancelAnimationFrame(rafId);
         const bar = document.getElementById('hanimBar');
         bar.style.transition = 'none';
         bar.style.width = '0%';
-        const dur = durations[idx];
         startTime = null;
         function tick(now) {
           if (!startTime) startTime = now;
-          const pct = Math.min(100, ((now - startTime) / dur) * 100);
+          const pct = Math.min(100, ((now - startTime) / duration) * 100);
           bar.style.width = pct + '%';
           if (pct < 100) rafId = requestAnimationFrame(tick);
         }
         rafId = requestAnimationFrame(tick);
       }
 
-      function next() {
-        cur = (cur + 1) % scenes.length;
-        show(cur);
+      function scheduleNext() {
         clearTimeout(timer);
-        timer = setTimeout(next, durations[cur]);
+        timer = setTimeout(() => { show((cur + 1) % total); scheduleNext(); }, duration);
       }
+
       const animEl = document.getElementById('heroAnimation');
-      animEl.addEventListener('mouseenter', () => {
-        clearTimeout(timer);
-        if (rafId) cancelAnimationFrame(rafId);
-      });
-      animEl.addEventListener('mouseleave', () => {
-        clearTimeout(timer);
-        next();
-      });
+      animEl.addEventListener('mouseenter', () => { clearTimeout(timer); if (rafId) cancelAnimationFrame(rafId); });
+      animEl.addEventListener('mouseleave', scheduleNext);
+
       show(0);
-      timer = setTimeout(next, durations[0]);
+      scheduleNext();
     })();
   </script>
   <!-- Google Translate -->
@@ -629,7 +597,7 @@
     <hr class="footer-divider">
 
     <div class="footer-bottom">
-      <div class="footer-bottom-top">     
+      <div class="footer-bottom-top">
         <a class="footer-logo" href="/">
           <img src="assets/logo.png?v=1" alt="OLR India">
         </a>
