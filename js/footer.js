@@ -116,6 +116,9 @@
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         buildMenu();
+        const rect = btn.getBoundingClientRect();
+        menu.style.top = (rect.bottom + 8) + 'px';
+        menu.style.left = rect.left + 'px';
         menu.classList.toggle('open');
       });
 

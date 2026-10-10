@@ -98,9 +98,7 @@
 
 .nav-lang-menu {
   display: none;
-  position: absolute;
-  top: calc(100% + 10px);
-  left: 0;
+  position: fixed;
   background: #fff;
   border: 1px solid var(--c-border-soft);
   border-radius: var(--r-md);
@@ -108,7 +106,7 @@
   min-width: 190px;
   max-height: 320px;
   overflow-y: auto;
-  z-index: 500;
+  z-index: 9000;
   padding: 6px;
 }
 
