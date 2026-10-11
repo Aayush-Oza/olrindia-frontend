@@ -200,13 +200,23 @@ async function sendChatMessage(convId, text) {
   const otherUnreadField = chatRole === 'user' ? 'unread_count_vendor' : 'unread_count_user';
   const currentUnread = convData[otherUnreadField] || 0;
 
-  await window.fsUpdateDoc(convRef, {
+    await window.fsUpdateDoc(convRef, {
     last_message: text,
     last_message_at: window.fsServerTimestamp(),
     last_sender_role: chatRole,
     [otherUnreadField]: currentUnread + 1,
     [`${chatRole}_typing`]: false,
   });
+
+  // ── Push notification to recipient ──────────────────────────
+  try {
+    await apiRequest(`/auth/${chatRole}/chat/notify`, 'POST', {
+      conv_id: convId,
+      text: text,
+      sender_role: chatRole,
+    });
+  } catch (_) {}
+  // ───────────────────────────────────────────────────────────
 }
 
 // ── Listen to messages in a conversation (real-time) ─────────────
