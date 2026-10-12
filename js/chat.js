@@ -320,9 +320,9 @@ function listenToUnreadBadge() {
   const q = window.fsQuery(convRef, window.fsWhere(field, '==', chatMyUid));
 
   if (chatUnsubUnread) chatUnsubUnread();
-  chatUnsubUnread = window.fsOnSnapshot(q, snap => {
+    chatUnsubUnread = window.fsOnSnapshot(q, snap => {
     let total = 0;
-    snap.forEach(doc => { total += doc.data()[unreadField] || 0; });
+    snap.forEach(doc => { if ((doc.data()[unreadField] || 0) > 0) total += 1; });
     updateChatBadge(total);
   }, error => {
     console.warn('Chat listener error (likely auth transition):', error.message);
