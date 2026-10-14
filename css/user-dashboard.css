@@ -203,20 +203,29 @@ body {
   color: var(--c-blue);
 }
 
-@media (max-width: 860px) {
+ @media (max-width: 860px) {
   .dash-nav-links,
   .dash-nav-right {
     display: none;
   }
 
+  .dash-nav-inner {
+    gap: 0;
+  }
+
   .nav-lang-wrap {
     display: flex;
+    align-items: center;
     margin-left: auto;
+    flex-shrink: 0;
   }
 
   .nav-hamburger {
     display: flex;
-    margin-left: 8px;
+    align-items: center;
+    justify-content: center;
+    margin-left: 2px;
+    flex-shrink: 0;
   }
 
   .nav-mobile-menu.open {
