@@ -3,11 +3,9 @@
    Infinite scroll: 20 initial, +10 on scroll, skeleton cards
    ============================================================ */
 
-// ── Pagination config ─────────────────────────────────────────
 const PAGE_INITIAL = 20;
 const PAGE_MORE = 10;
 
-// ── State ─────────────────────────────────────────────────────
 let allProducts = [];
 let filteredProducts = [];
 let displayedCount = 0;
@@ -15,7 +13,6 @@ let isLoadingMore = false;
 let currentPage = 1;
 let totalProducts = 0;
 let hasMore = false;
-let userCity = '';
 let activeFilters = {
   category: '',
   city: '',
@@ -69,7 +66,7 @@ async function loadProducts(reset = true) {
       totalProducts = data.total;
       hasMore = data.has_more;
       allProducts = data.products;
-      filteredProducts = data.products;   // already filtered by backend
+      filteredProducts = data.products;
       displayedCount = data.products.length;
       renderInitialBatch();
       updateFilterBadge();
@@ -139,18 +136,9 @@ document.getElementById('filterApplyBtn').addEventListener('click', () => {
   const selectedType = document.querySelector('.price-type-btn.active')?.dataset.type || '';
   const priceMin = parseFloat(document.getElementById('filterPriceMin').value) || 0;
   const priceMax = parseFloat(document.getElementById('filterPriceMax').value) || Infinity;
-  const hint = document.getElementById('filterPriceHint');
-
-  if (!selectedType && (priceMin > 0 || priceMax < Infinity)) {
-    hint.textContent = 'Please select Hour / Km / Day / Month first.';
-    hint.classList.add('error');
-    return;
-  }
-
-  hint.textContent = 'Optional — leave empty to show all prices for selected period.';
-  hint.classList.remove('error');
-  document.getElementById('filterPriceMin').classList.remove('error');
-  document.getElementById('filterPriceMax').classList.remove('error');
+  
+  document.getElementById('filterPriceHint').textContent = 'Enter a min or max to filter by price.';
+  document.getElementById('filterPriceHint').classList.remove('error');
 
   activeFilters.category = document.getElementById('filterCategory').value;
   activeFilters.city = document.getElementById('filterCity').value.trim().toLowerCase();
@@ -169,8 +157,6 @@ document.getElementById('filterClearBtn').addEventListener('click', () => {
   document.getElementById('filterPriceMax').value = '';
   document.getElementById('filterPriceHint').textContent = 'Enter a min or max to filter by price.';
   document.getElementById('filterPriceHint').classList.remove('error');
-  document.getElementById('filterPriceMin').classList.remove('error');
-  document.getElementById('filterPriceMax').classList.remove('error');
   document.querySelectorAll('.price-type-btn').forEach(b => b.classList.remove('active'));
   activeFilters = { category: '', city: '', priceType: '', priceMin: 0, priceMax: Infinity };
   closeFilterSheet();
@@ -182,16 +168,10 @@ document.getElementById('filterClearBtn').addEventListener('click', () => {
 let searchDebounceTimer = null;
 document.getElementById('searchInput').addEventListener('input', function () {
   clearTimeout(searchDebounceTimer);
-  const q = this.value.trim().toLowerCase();
-  searchDebounceTimer = setTimeout(() => applyFilters(q), 400);
+  searchDebounceTimer = setTimeout(() => applyFilters(), 400);
 });
 
-// ── Apply filters (resets pagination to top) ──────────────────
-function applyFilters() {
-  enterFilteredView();
-}
-
-// ── Render first PAGE_INITIAL cards from scratch ──────────────
+// ── Render first batch ────────────────────────────────────────
 function renderInitialBatch() {
   const grid = document.getElementById('productGrid');
   const countEl = document.getElementById('productsCount');
@@ -211,20 +191,18 @@ function renderInitialBatch() {
   countEl.textContent = `${totalProducts} product${totalProducts !== 1 ? 's' : ''}`;
   grid.innerHTML = filteredProducts.map(productCardHTML).join('');
   attachSentinel();
+  setTimeout(() => window.retranslateDynamic?.(), 600);
 }
 
-// ── Append next PAGE_MORE cards ───────────────────────────────
+// ── Append next batch ─────────────────────────────────────────
 async function appendNextBatch() {
-  if (isLoadingMore) return;
-  if (!hasMore) return;
+  if (isLoadingMore || !hasMore) return;
 
   isLoadingMore = true;
   document.getElementById('scrollSentinel')?.remove();
   document.querySelector('.scroll-end-msg')?.remove();
 
   const grid = document.getElementById('productGrid');
-
-  // Show skeletons while fetching
   const skeletonWrapper = document.createElement('div');
   skeletonWrapper.id = 'skeletonBatch';
   skeletonWrapper.style.cssText = 'display:contents';
@@ -244,7 +222,6 @@ async function appendNextBatch() {
   try {
     const data = await apiRequest(`/products/public?${params}`, 'GET');
     skeletonWrapper.remove();
-
     if (data.success) {
       hasMore = data.has_more;
       totalProducts = data.total;
@@ -252,18 +229,19 @@ async function appendNextBatch() {
         grid.insertAdjacentHTML('beforeend', productCardHTML(p));
       });
       displayedCount += data.products.length;
+      setTimeout(() => window.retranslateDynamic?.(), 600);
     }
   } catch (e) {
     skeletonWrapper.remove();
     toastError('Failed to load more products.');
-    currentPage--;   // roll back so retry works
+    currentPage--;
   }
 
   isLoadingMore = false;
   attachSentinel();
 }
 
-// ── Sentinel: invisible div at bottom watched by IntersectionObserver ──
+// ── Sentinel ──────────────────────────────────────────────────
 let sentinel = null;
 let scrollObserver = null;
 
@@ -272,7 +250,6 @@ function attachSentinel() {
   sentinel?.remove();
 
   const grid = document.getElementById('productGrid');
-
   if (!hasMore) {
     if (totalProducts > PAGE_INITIAL) {
       grid.insertAdjacentHTML('beforeend',
@@ -283,24 +260,25 @@ function attachSentinel() {
 
   grid.insertAdjacentHTML('beforeend', `<div id="scrollSentinel"></div>`);
   sentinel = document.getElementById('scrollSentinel');
-
   scrollObserver = new IntersectionObserver((entries) => {
     if (entries[0].isIntersecting) appendNextBatch();
   }, { rootMargin: '200px' });
-
   scrollObserver.observe(sentinel);
 }
+
+// ── Slugify ───────────────────────────────────────────────────
 function slugify(text) {
   return (text || '').toLowerCase()
     .replace(/&/g, 'and')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 }
+
 // ── Product card HTML ─────────────────────────────────────────
 function productCardHTML(p) {
   const img = p.images && p.images[0]
     ? `<img class="product-img" src="${p.images[0]}" alt="${p.name}" loading="lazy">`
-    : `<div class="product-img-placeholder">${catImg(p.category)}</div>`;
+    : `<div class="product-img-placeholder"></div>`;
 
   const price = buildPriceLabel(p);
 
@@ -331,33 +309,21 @@ function productCardHTML(p) {
     </div>`;
 }
 
-// ── Helpers ───────────────────────────────────────────────────
+// ── Price label ───────────────────────────────────────────────
 function buildPriceLabel(p) {
   const type = activeFilters.priceType;
   if (type === 'hour' && p.rent_per_hour) return `₹${p.rent_per_hour} <span>/ hour</span>`;
-  if (type === 'km' && p.rent_per_km) return `₹${p.rent_per_km} <span>/ km</span>`;
-  if (type === 'day' && p.rent_per_day) return `₹${p.rent_per_day} <span>/ day</span>`;
-  if (type === 'month' && p.rent_per_month) return `₹${p.rent_per_month} <span>/ month</span>`;
-  // fallback - show best available price
-  if (p.rent_per_day) return `₹${p.rent_per_day} <span>/ day</span>`;
-  if (p.rent_per_hour) return `₹${p.rent_per_hour} <span>/ hour</span>`;
+  if (type === 'km'   && p.rent_per_km)   return `₹${p.rent_per_km} <span>/ km</span>`;
+  if (type === 'day'  && p.rent_per_day)  return `₹${p.rent_per_day} <span>/ day</span>`;
+  if (type === 'month'&& p.rent_per_month)return `₹${p.rent_per_month} <span>/ month</span>`;
+  if (p.rent_per_day)   return `₹${p.rent_per_day} <span>/ day</span>`;
+  if (p.rent_per_hour)  return `₹${p.rent_per_hour} <span>/ hour</span>`;
   if (p.rent_per_month) return `₹${p.rent_per_month} <span>/ month</span>`;
-  if (p.rent_per_km) return `₹${p.rent_per_km} <span>/ km</span>`;
+  if (p.rent_per_km)    return `₹${p.rent_per_km} <span>/ km</span>`;
   return 'Price not available';
 }
 
-function getPriceForType(p, type) {
-  if (type === 'hour') return parseFloat(p.rent_per_hour);
-  if (type === 'km') return parseFloat(p.rent_per_km);
-  if (type === 'day') return parseFloat(p.rent_per_day);
-  if (type === 'month') return parseFloat(p.rent_per_month);
-  return null;
-}
-
-function planRank(plan) {
-  return { premium: 0, growth: 1, starter: 2, free: 3, trial: 3 }[plan] ?? 3;
-}
-
+// ── Open product ──────────────────────────────────────────────
 function openProduct(slug, category, city) {
   if (!slug) return;
   const cat = slugify(category || '');
@@ -365,6 +331,7 @@ function openProduct(slug, category, city) {
   window.location.href = `/product/${cat}/${ct}/${slug}`;
 }
 
+// ── Clear all filters ─────────────────────────────────────────
 function clearAllFilters() {
   activeFilters = { category: '', city: '', priceType: '', priceMin: 0, priceMax: Infinity };
   document.getElementById('searchInput').value = '';
@@ -378,6 +345,7 @@ function clearAllFilters() {
   loadHomepage();
 }
 
+// ── Filter badge + chips ──────────────────────────────────────
 function updateFilterBadge() {
   let count = 0;
   if (activeFilters.category) count++;
@@ -414,35 +382,7 @@ function removeFilter(key) {
   renderActiveFilterChips();
   updateFilterBadge();
   const hasAny = activeFilters.category || activeFilters.city || activeFilters.priceMin > 0 || activeFilters.priceMax < Infinity || document.getElementById('searchInput').value.trim();
-  if (!hasAny) { loadHomepage(); } else { loadProducts(true); }
-}
-
-function catImg(cat) {
-  const m = {
-    'Construction Equipment': 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400&q=80',
-    'Furniture & Home Appliances': 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&q=80',
-    'Photography & Content Creator Gear': '../assets/categories/PhotographyContentCreatorGear.webp',
-    'Events & Weddings': '../assets/categories/EventsWeddings.webp',
-    'Fashion & Designer Wear': '../assets/categories/FashionDesignerWear.webp',
-    'Agricultural Equipment': '../assets/categories/AgriculturalEquipment.webp',
-    'Passenger Vehicles': '../assets/categories/PassengerVehicles.webp',
-    'Bikes & Scooters': '../assets/categories/BikesScooters.webp',
-    'Medical Equipment': '../assets/categories/MedicalEquipment.webp',
-    'Baby & Kids Gear': '../assets/categories/BabyKidsGear.webp',
-    'Adventure & Trekking Gear': '../assets/categories/AdventureTrekkingGear.webp',
-    'Sports & Fitness Equipment': '../assets/categories/SportsFitnessEquipment.webp',
-    'Electrical & Power Tools': 'https://images.unsplash.com/photo-1581092921461-eab62e97a780?w=400&q=80',
-    'Commercial Vehicles': '../assets/categories/CommercialVehicles.webp',
-    'Tools & Tackles': '../assets/categories/ToolsTackles.webp',
-    'Properties': '../assets/categories/Properties.webp',
-    'Industrial Equipment': '../assets/categories/IndustrialEquipment.webp',
-    'Warehouse & Storage': '../assets/categories/WarehouseStorage.webp',
-    'Cargo & Shipping': '../assets/categories/CargoShipping.webp',
-    'Machineries': '../assets/categories/Machineries.webp',
-    'Musical Instruments': '../assets/categories/Musical Instruments.webp',
-    'Office & Business Essentials': 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&q=80',
-  };
-  return m[cat] || '';
+  if (!hasAny) loadHomepage(); else loadProducts(true);
 }
 
 // ── Wishlist ──────────────────────────────────────────────────
@@ -470,15 +410,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { closeAuthModal(); closeFilterSheet(); }
 });
 
-// ── Category homepage ─────────────────────────────────────────
-const CATEGORIES = [
-  'Construction Equipment', 'Furniture & Home Appliances','Photography & Content Creator Gear',
-  'Events & Weddings', 'Fashion & Designer Wear', 'Agricultural Equipment', 'Passenger Vehicles', 'Bikes & Scooters',
-  'Medical Equipment', 'Baby & Kids Gear', 'Adventure & Trekking Gear', 'Sports & Fitness Equipment', 'Electrical & Power Tools',
-  'Commercial Vehicles', 'Tools & Tackles', 'Properties', 'Industrial Equipment', 'Warehouse & Storage', 'Cargo & Shipping',
-  'Machineries','Musical Instruments','Office and Business Essentials'
-];
-
+// ── Homepage: fetch categories + products from API ────────────
 async function loadHomepage() {
   currentMode = 'home';
   document.getElementById('productsTitle').textContent = 'Browse & Rent';
@@ -487,64 +419,52 @@ async function loadHomepage() {
 
   const grid = document.getElementById('productGrid');
 
-  // Show category cards skeleton + product skeletons
+  // Show skeletons
   grid.innerHTML = `
     <div id="catCardGrid" class="cat-card-grid">
-      ${CATEGORIES.map(cat => {
-    const color = catColor(cat);
-    return `<div class="cat-card skeleton-cat-card" style="--cat-color:${color.main};--cat-bg:${color.bg};">
-          <div class="skeleton-img" style="height:48px;width:48px;border-radius:50%;margin:0 auto 8px;"></div>
-          <div class="skeleton-line skeleton-line-md" style="margin:0 auto;width:70%;"></div>
-        </div>`;
-  }).join('')}
+      ${Array(8).fill(`
+        <div class="cat-card skeleton-cat-card">
+          <div class="skeleton-img" style="height:100%;width:100%;border-radius:var(--r-md);"></div>
+        </div>`).join('')}
     </div>
     <div id="homeProdSection">
       <div class="home-prod-title">Featured Products</div>
-            <div class="product-grid">
+      <div class="product-grid">
         ${Array(6).fill(skeletonCardHTML()).join('')}
       </div>
     </div>`;
 
-  // Fetch categories + products in parallel
-  const [catResults, prodData] = await Promise.all([
-    Promise.allSettled(
-      CATEGORIES.map(cat =>
-        apiRequest(`/products/public?page=1&per_page=3&category=${encodeURIComponent(cat)}`, 'GET')
-      )
-    ),
+  // Fetch categories + featured products in parallel
+  const [catData, prodData] = await Promise.all([
+    apiRequest('/products/categories', 'GET').catch(() => null),
     apiRequest('/products/public?page=1&per_page=51', 'GET').catch(() => null)
   ]);
 
-  // Render category cards
-  // Render category cards
+  // ── Render category cards from API ──
   const catGrid = document.getElementById('catCardGrid');
   if (catGrid) {
-    const catCards = CATEGORIES.map((cat, i) => {
-      const res = catResults[i];
-      const hasProducts = res.status === 'fulfilled' && res.value.success && res.value.products.length > 0;
-      if (!hasProducts) return '';
-      const color = catColor(cat);
-      return `
-        <div class="cat-card" style="--cat-color:${color.main};--cat-bg:${color.bg};" onclick="enterCategoryView('${cat.replace(/'/g, "\\'")}')">
-          <img class="cat-card-img" src="${catImg(cat)}" alt="${cat}">
-          <div class="cat-card-name">${cat}</div>
-        </div>`;
-    }).join('');
-
-    catGrid.innerHTML = catCards.trim()
-      ? catCards
-      : `<div style="grid-column:1/-1;text-align:center;padding:36px 20px;">
+    if (catData?.success && catData.categories.length > 0) {
+      catGrid.innerHTML = catData.categories.map(cat => `
+        <div class="cat-card" onclick="enterCategoryView('${cat.name.replace(/'/g, "\\'")}')">
+          <img class="cat-card-img" src="${cat.image_url}" alt="${cat.name}" loading="lazy">
+          <div class="cat-card-name">${cat.name}</div>
+        </div>`).join('');
+    } else {
+      catGrid.innerHTML = `
+        <div style="grid-column:1/-1;text-align:center;padding:36px 20px;">
           <div style="font-size:48px;margin-bottom:12px;">🏪</div>
           <h3 style="margin:0 0 8px;font-family:var(--font-display);color:var(--text-main);">No categories live yet</h3>
-          <p style="margin:0;color:var(--text-muted);font-size:14px;">Vendors are setting up -products will appear here soon.</p>
+          <p style="margin:0;color:var(--text-muted);font-size:14px;">Vendors are setting up - products will appear here soon.</p>
         </div>`;
+    }
   }
 
-  // Render featured products below
+  // ── Render featured products from API ──
   const homeProdGrid = document.querySelector('#homeProdSection .product-grid');
   if (homeProdGrid) {
     if (prodData?.success && prodData.products.length > 0) {
       homeProdGrid.innerHTML = prodData.products.map(productCardHTML).join('');
+      setTimeout(() => window.retranslateDynamic?.(), 600);
     } else {
       homeProdGrid.innerHTML = `
         <div style="grid-column:1/-1;text-align:center;padding:36px 20px;">
@@ -568,58 +488,19 @@ function enterCategoryView(cat) {
   loadProducts(true);
 }
 
-// ── Enter filtered view (search/filter) ──────────────────────
+// ── Enter filtered view ───────────────────────────────────────
 function enterFilteredView() {
   currentMode = 'filtered';
   document.getElementById('productGrid').style.display = 'grid';
-  if (!activeFilters.category) {
-    document.getElementById('productsTitle').textContent = 'Search Results';
-  } else {
-    document.getElementById('productsTitle').textContent = activeFilters.category;
-  }
+  document.getElementById('productsTitle').textContent = activeFilters.category || 'Search Results';
   loadProducts(true);
 }
 
-// ── applyFilters ──────────────────────────────────────────────
 function applyFilters() {
   enterFilteredView();
-}
-
-// ── Color map ─────────────────────────────────────────────────
-function catColor(cat) {
-  const m = {
-    'Construction Equipment': { main: '#F59E0B', bg: '#FFFBEB' },
-    'Furniture & Home Appliances': { main: '#8B5CF6', bg: '#F5F3FF' },
-    'Photography & Content Creator Gear': { main: '#EC4899', bg: '#FDF2F8' },
-    'Events & Weddings': { main: '#F97316', bg: '#FFF7ED' },
-    'Fashion & Designer Wear': { main: '#EC4899', bg: '#FDF2F8' },
-    'Agricultural Equipment': { main: '#22C55E', bg: '#F0FDF4' },
-    'Passenger Vehicles': { main: '#0EA5E9', bg: '#F0F9FF' },
-    'Bikes & Scooters': { main: '#EF4444', bg: '#FEF2F2' },
-    'Medical Equipment': { main: '#06B6D4', bg: '#ECFEFF' },
-    'Baby & Kids Gear': { main: '#F472B6', bg: '#FDF2F8' },
-    'Adventure & Trekking Gear': { main: '#10B981', bg: '#ECFDF5' },
-    'Sports & Fitness Equipment': { main: '#14B8A6', bg: '#F0FDFA' },
-    'Electrical & Power Tools': { main: '#EF4444', bg: '#FEF2F2' },
-    'Commercial Vehicles': { main: '#14B8A6', bg: '#F0FDFA' },
-    'Tools & Tackles': { main: '#10B981', bg: '#ECFDF5' },
-    'Properties': { main: '#6366F1', bg: '#EEF2FF' },
-    'Industrial Equipment': { main: '#78716C', bg: '#FAFAF9' },
-    'Warehouse & Storage': { main: '#64748B', bg: '#F8FAFC' },
-    'Cargo & Shipping': { main: '#8B5CF6', bg: '#F5F3FF' },
-    'Machineries': { main: '#F59E0B', bg: '#FFFBEB' },
-    'Musical Instruments': { main: '#EC4899', bg: '#FDF2F8' },
-    'Office & Business Essentials': { main: '#0EA5E9', bg: '#F0F9FF' },
-  };
-  return m[cat] || { main: '#3B82F6', bg: '#EFF6FF' };
 }
 
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   loadHomepage();
-  if (sessionStorage.getItem('olr_vendor')) {
-    document.getElementById('navLoginBtn').style.display = 'none';
-    document.getElementById('navSignupBtn').style.display = 'none';
-    document.getElementById('navWishBtn').style.display = 'none';
-  }
 });
