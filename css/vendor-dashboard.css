@@ -26,6 +26,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: nowrap;
 }
 
 .dash-nav-logo img {
@@ -48,6 +49,8 @@
   align-items: center;
   gap: 12px;
   margin-left: auto;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .dash-nav-user {
@@ -1513,12 +1516,14 @@
 /* ══════════════════════════════════════════════════════════════
    RESPONSIVE -desktop-first (max-width breakpoints)
    ══════════════════════════════════════════════════════════════ */
-
+.nav-lang-wrap {
+  display: none;
+}
 /* ── Tablet (≤ 860px) ────────────────────────────────────────── */
 @media (max-width: 860px) {
   .nav-lang-wrap {
     display: flex;
-    margin-left: auto;
+    margin-left: center;
   }
 
   .nav-hamburger {
