@@ -73,7 +73,7 @@
   border: none;
   cursor: pointer;
   padding: 6px;
-  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .nav-hamburger span {
@@ -1525,11 +1525,12 @@
   .nav-lang-wrap {
     display: flex;
     align-items: center;
+    margin-left: auto;
   }
 
   .nav-hamburger {
     display: flex;
-    margin-left: 8px;
+    margin-left: 4px;
   }
 
   .nav-mobile-menu.open {
