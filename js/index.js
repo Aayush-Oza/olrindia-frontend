@@ -44,56 +44,6 @@ function showSkeletons(count = PAGE_INITIAL) {
   grid.innerHTML = Array(count).fill(skeletonCardHTML()).join('');
 }
 
-// ── Location banner ───────────────────────────────────────────
-document.getElementById('locationAllowBtn').addEventListener('click', () => {
-  requestLocation();
-  hideBanner();
-});
-document.getElementById('locationSkipBtn').addEventListener('click', hideBanner);
-
-function hideBanner() {
-  const b = document.getElementById('locationBanner');
-  b.style.opacity = '0';
-  setTimeout(() => b.style.display = 'none', 300);
-}
-
-function requestLocation() {
-  if (!navigator.geolocation) { toastError('Your browser does not support location.'); return; }
-  toastInfo('Looking for your location…');
-  navigator.geolocation.getCurrentPosition(async pos => {
-    try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json`,
-        { headers: { 'Accept-Language': 'en' } }
-      );
-      const data = await res.json();
-      let filterCity = data.address?.city || data.address?.town || data.address?.village || '';
-      if (!filterCity) {
-        const fallback = data.address?.city_district || data.address?.state_district || '';
-        filterCity = fallback.split(' ')[0] || '';
-      }
-      const displayArea = data.address?.suburb || data.address?.neighbourhood || filterCity;
-      const state = data.address?.state || '';
-      if (filterCity) {
-        userCity = filterCity;
-        activeFilters.city = filterCity.toLowerCase();
-        document.getElementById('filterCity').value = filterCity;
-        document.getElementById('heroLocation').style.display = 'flex';
-        document.getElementById('heroLocationText').textContent = `${displayArea}, ${state}`;
-        document.getElementById('productsTitle').textContent = `Near you · ${displayArea}`;
-        applyFilters();
-      } else {
-        toastError("Couldn't determine your city from that location.");
-      }
-    } catch (e) {
-      toastError('Location lookup failed. Please try again.');
-    }
-  }, (err) => {
-    const messages = { 1: 'Location permission denied.', 2: 'Location unavailable.', 3: 'Request timed out.' };
-    toastError(messages[err.code] || 'Could not get your location.');
-  });
-}
-
 // ── Fetch products ────────────────────────────────────────────
 async function loadProducts(reset = true) {
   document.getElementById('productGrid').style.display = 'grid';
@@ -667,10 +617,6 @@ function catColor(cat) {
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   loadHomepage();
-  setTimeout(() => {
-    const banner = document.getElementById('locationBanner');
-    if (banner) banner.style.display = 'flex';
-  }, 1000);
   if (sessionStorage.getItem('olr_vendor')) {
     document.getElementById('navLoginBtn').style.display = 'none';
     document.getElementById('navSignupBtn').style.display = 'none';

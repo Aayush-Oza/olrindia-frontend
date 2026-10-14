@@ -201,109 +201,6 @@
   transform: translateY(-1px);
 }
 
-/* ── Location popup ─────────────────────────────────────────── */
-.location-popup {
-  display: none;
-  position: fixed;
-  top: 72px;
-  right: 16px;
-  left: 16px;
-  max-width: 340px;
-  margin-left: auto;
-  background: #fff;
-  border: 1px solid #D0E4FF;
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow-lg);
-  padding: 14px 16px;
-  z-index: 300;
-  transform: translateY(-8px);
-  opacity: 0;
-  transition: all 0.25s var(--ease);
-}
-
-.location-popup.show {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-.location-popup-close {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: none;
-  background: var(--c-bg);
-  color: var(--c-ink-faint);
-  cursor: pointer;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.location-popup-close:hover {
-  background: var(--c-border);
-}
-
-.location-popup-top {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding-right: 20px;
-  margin-bottom: 12px;
-}
-
-.location-popup-icon {
-  font-size: 18px;
-  flex-shrink: 0;
-}
-
-.location-popup-text {
-  font-size: 13.5px;
-  color: var(--c-ink-soft);
-  font-weight: 500;
-}
-
-.location-popup-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-.location-banner-allow {
-  padding: 6px 16px;
-  border-radius: var(--r-md);
-  background: var(--c-blue);
-  color: #fff;
-  border: none;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: var(--font-display);
-  cursor: pointer;
-  transition: filter var(--t-fast) var(--ease);
-}
-
-.location-banner-allow:hover {
-  filter: brightness(1.1);
-}
-
-.location-banner-skip {
-  padding: 6px 12px;
-  border-radius: var(--r-md);
-  background: transparent;
-  color: var(--c-ink-faint);
-  border: none;
-  font-size: 13px;
-  cursor: pointer;
-  transition: color var(--t-fast) var(--ease);
-}
-
-.location-banner-skip:hover {
-  color: var(--c-ink);
-}
-
 /* ── Hero ────────────────────────────────────────────────────── */
 .hero {
   background: var(--grad-brand);
@@ -1477,10 +1374,6 @@
 
   .filter-row {
     top: 62px;
-  }
-
-  .location-popup {
-    top: 72px;
   }
 
   .product-grid {
