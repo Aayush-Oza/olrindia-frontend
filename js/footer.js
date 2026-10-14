@@ -15,24 +15,24 @@
     });
   }
 
-  function triggerTranslate(lang) {
-    document.cookie = 'googtrans=/en/' + lang + '; path=/';
-    document.cookie = 'googtrans=/en/' + lang + '; path=/; domain=.' + location.hostname;
-
-    let attempts = 0;
-    const interval = setInterval(() => {
-      attempts++;
-      const combo = document.querySelector('.goog-te-combo');
-      if (combo) {
-        clearInterval(interval);
-        combo.value = lang;
-        combo.dispatchEvent(new Event('change'));
-      } else if (attempts > 50) {
-        clearInterval(interval);
-      }
-    }, 150);
+  function setGoogCookie(lang) {
+    if (lang === 'en') {
+      document.cookie = 'googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+      document.cookie = 'googtrans=; path=/; domain=.' + location.hostname + '; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    } else {
+      document.cookie = 'googtrans=/en/' + lang + '; path=/';
+      document.cookie = 'googtrans=/en/' + lang + '; path=/; domain=.' + location.hostname;
+    }
   }
 
+  function applyLang(lang) {
+    setLang(lang);
+    syncSelectors(lang);
+    setGoogCookie(lang);
+    location.reload();
+  }
+
+  /* ── Re-translate dynamically loaded content ── */
   function retranslateDynamic() {
     const lang = getLang();
     if (!lang || lang === 'en') return;
@@ -40,15 +40,16 @@
     if (combo) combo.dispatchEvent(new Event('change'));
   }
 
+  // Expose globally so index.js can call it after products render
   window.retranslateDynamic = retranslateDynamic;
 
+  /* ── On page load: auto-apply stored language ── */
   function autoApplyLang() {
     const lang = getLang();
     if (!lang || lang === 'en') return;
-
-    document.cookie = 'googtrans=/en/' + lang + '; path=/';
-    document.cookie = 'googtrans=/en/' + lang + '; path=/; domain=.' + location.hostname;
-
+    // Set cookie — Google Translate reads it automatically on page load
+    setGoogCookie(lang);
+    // Also try combo in case GT is already loaded
     let attempts = 0;
     const interval = setInterval(() => {
       attempts++;
@@ -71,10 +72,7 @@
     syncSelectors(getLang());
     selects.forEach(select => {
       select.addEventListener('change', function () {
-        const lang = this.value;
-        setLang(lang);
-        syncSelectors(lang);
-        triggerTranslate(lang);
+        applyLang(this.value);
       });
     });
   }
@@ -88,28 +86,22 @@
       item.className = 'nav-lang-item' + (opt.value === stored ? ' active' : '');
       item.textContent = opt.textContent;
 
-      // Use mousedown instead of click — fires before document click closes menu
+      // mousedown fires before document click closes menu
       item.addEventListener('mousedown', (e) => {
-        e.preventDefault(); // prevent blur/close race
-        const lang = opt.value;
-        setLang(lang);
-        syncSelectors(lang);
-        triggerTranslate(lang);
+        e.preventDefault();
         menu.querySelectorAll('.nav-lang-item').forEach(i => i.classList.remove('active'));
         item.classList.add('active');
         menu.classList.remove('open');
+        applyLang(opt.value);
       });
 
-      // Touch support for mobile - same fix
+      // touchend for mobile
       item.addEventListener('touchend', (e) => {
         e.preventDefault();
-        const lang = opt.value;
-        setLang(lang);
-        syncSelectors(lang);
-        triggerTranslate(lang);
         menu.querySelectorAll('.nav-lang-item').forEach(i => i.classList.remove('active'));
         item.classList.add('active');
         menu.classList.remove('open');
+        applyLang(opt.value);
       });
 
       menu.appendChild(item);
@@ -128,7 +120,7 @@
 
       if (!btn || !menu || !footerSelect) return;
 
-      // Build menu ONCE here, not on every click
+      // Build menu ONCE on init
       buildNavMenu(menu, footerSelect);
 
       btn.addEventListener('click', (e) => {
