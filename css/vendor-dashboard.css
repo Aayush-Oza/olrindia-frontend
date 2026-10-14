@@ -2544,3 +2544,36 @@
     padding: 16px 12px 40px;
   }
 }
+/* ── Language selector (desktop) ─────────────────────────────── */
+.nav-lang-select-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--r-md);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: var(--font-display);
+  color: var(--c-ink-soft);
+  white-space: nowrap;
+  transition: all var(--t-fast) var(--ease);
+}
+
+.nav-lang-select-btn:hover {
+  background: var(--c-bg);
+  color: var(--c-ink);
+}
+
+.nav-lang-select-btn svg {
+  flex-shrink: 0;
+}
+
+/* Hide desktop lang on mobile */
+@media (max-width: 860px) {
+  .nav-lang-select-btn {
+    display: none;
+  }
+}

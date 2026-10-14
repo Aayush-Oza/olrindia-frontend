@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="../css/base.css?v=1">
   <link rel="stylesheet" href="../css/components.css?v=2">
   <link rel="stylesheet" href="../css/index.css?v=6">
-  <link rel="stylesheet" href="../css/user-dashboard.css?v=3">
+  <link rel="stylesheet" href="../css/user-dashboard.css?v=4">
   <link rel="stylesheet" href="../css/chat.css?v=1">
   <link rel="stylesheet" href="../css/legal.css?v=1">
   <link rel="stylesheet" href="../css/footer.css?v=1">
@@ -68,8 +68,18 @@
             </svg>
             Profile
           </button>
+          <!-- Desktop language button (in .dash-nav-links) -->
+          <button class="nav-lang-select-btn" id="navLangBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" />
+              <path d="M3 12h18M12 3c2.4 2.6 3.8 5.9 3.8 9s-1.4 6.4-3.8 9c-2.4-2.6-3.8-5.9-3.8-9S9.6 5.6 12 3Z"
+                stroke="currentColor" stroke-width="1.8" />
+            </svg>
+            🌐 Language
+          </button>
+          <div class="nav-lang-menu" id="navLangMenu"></div>
         </div>
-        <!-- Globe (desktop: after Terms, before user) -->
+        <!-- Mobile globe (always visible, next to hamburger) -->
         <div class="nav-lang-wrap" id="navLangWrapMobile">
           <button class="nav-wish-btn" id="navLangBtnMobile" title="Language">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
