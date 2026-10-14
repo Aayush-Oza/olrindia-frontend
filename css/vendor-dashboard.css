@@ -1519,11 +1519,12 @@
 .nav-lang-wrap {
   display: none;
 }
+
 /* ── Tablet (≤ 860px) ────────────────────────────────────────── */
 @media (max-width: 860px) {
   .nav-lang-wrap {
     display: flex;
-    margin-left: center;
+    align-items: center;
   }
 
   .nav-hamburger {
@@ -2549,6 +2550,7 @@
     padding: 16px 12px 40px;
   }
 }
+
 /* ── Language selector (desktop) ─────────────────────────────── */
 .nav-lang-select-btn {
   display: inline-flex;
