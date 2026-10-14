@@ -224,7 +224,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-left: 2px;
+    margin-left: 8px;
     flex-shrink: 0;
   }
 
@@ -1322,6 +1322,10 @@ body {
     z-index: 9999;
     background: #fff;
   }
+}
+
+.nav-lang-wrap {
+  display: none;
 }
 
 /* ══════════════════════════════════════════════════════════════
