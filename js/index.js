@@ -350,6 +350,7 @@ function updateFilterBadge() {
   let count = 0;
   if (activeFilters.category) count++;
   if (activeFilters.city) count++;
+  if (activeFilters.priceType) count++;   
   if (activeFilters.priceMin > 0 || activeFilters.priceMax < Infinity) count++;
   const badge = document.getElementById('filterCountBadge');
   badge.style.display = count ? 'inline-flex' : 'none';
@@ -362,8 +363,9 @@ function renderActiveFilterChips() {
   const chips = [];
   if (activeFilters.category) chips.push({ label: activeFilters.category, key: 'category' });
   if (activeFilters.city) chips.push({ label: `📍 ${activeFilters.city}`, key: 'city' });
+  if (activeFilters.priceType) chips.push({ label: `⏱ ${activeFilters.priceType}`, key: 'priceType' }); 
   if (activeFilters.priceMin > 0 || activeFilters.priceMax < Infinity) {
-    const label = `₹${activeFilters.priceMin}–${activeFilters.priceMax === Infinity ? '∞' : activeFilters.priceMax} / ${activeFilters.priceType}`;
+    const label = `₹${activeFilters.priceMin}–${activeFilters.priceMax === Infinity ? '∞' : activeFilters.priceMax}`;  
     chips.push({ label, key: 'price' });
   }
   el.innerHTML = chips.map(c =>
@@ -374,6 +376,7 @@ function renderActiveFilterChips() {
 function removeFilter(key) {
   if (key === 'category') { activeFilters.category = ''; document.getElementById('filterCategory').value = ''; }
   if (key === 'city') { activeFilters.city = ''; document.getElementById('filterCity').value = ''; }
+  if (key === 'priceType') { activeFilters.priceType = ''; document.querySelectorAll('.price-type-btn').forEach(b => b.classList.remove('active')); }  
   if (key === 'price') {
     activeFilters.priceMin = 0; activeFilters.priceMax = Infinity;
     document.getElementById('filterPriceMin').value = '';
@@ -381,7 +384,7 @@ function removeFilter(key) {
   }
   renderActiveFilterChips();
   updateFilterBadge();
-  const hasAny = activeFilters.category || activeFilters.city || activeFilters.priceMin > 0 || activeFilters.priceMax < Infinity || document.getElementById('searchInput').value.trim();
+  const hasAny = activeFilters.category || activeFilters.city || activeFilters.priceType || activeFilters.priceMin > 0 || activeFilters.priceMax < Infinity || document.getElementById('searchInput').value.trim();
   if (!hasAny) loadHomepage(); else loadProducts(true);
 }
 
