@@ -42,10 +42,11 @@ const PLAN_LABELS = {
 
 // ── Tab switching ─────────────────────────────────────────────
 function switchTab(name) {
+  const navHighlight = (name === 'privacy' || name === 'terms') ? 'profile' : name;
   document.querySelectorAll('.nav-link').forEach(l =>
-    l.classList.toggle('active', l.dataset.tab === name));
+    l.classList.toggle('active', l.dataset.tab === navHighlight));
   document.querySelectorAll('.mobile-nav-link').forEach(l =>
-    l.classList.toggle('active', l.dataset.tab === name));
+    l.classList.toggle('active', l.dataset.tab === navHighlight));
   document.querySelectorAll('.dash-panel').forEach(p =>
     p.classList.toggle('active', p.id === 'panel-' + name));
   document.getElementById('mobileMenu').classList.remove('open');
