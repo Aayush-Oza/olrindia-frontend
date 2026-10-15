@@ -38,7 +38,7 @@ async function handleVendorGoogleSignIn(btn) {
     saveSessionAccount("vendor", res.vendor);
     localStorage.setItem('olr_vendor_session', res.vendor.id);
     toastSuccess("Signed in with Google! Redirecting…");
-    setTimeout(() => { window.location.href = "/vendor/dashboard"; }, 700);
+    setTimeout(() => { window.location.href = "/vendor/my-products"; }, 700);
   }
 }
 
@@ -85,7 +85,7 @@ function initVendorLoginForm() {
       saveSessionAccount("vendor", res.vendor);
       localStorage.setItem('olr_vendor_session', res.vendor.id);
       toastSuccess("Welcome back! Redirecting…");
-      setTimeout(() => { window.location.href = "/vendor/dashboard"; }, 700);
+      setTimeout(() => { window.location.href = "/vendor/my-products"; }, 700);
     } else {
       if (res.resend_verification) {
         toastError(res.message + " Check your inbox, or contact support to resend it.");
