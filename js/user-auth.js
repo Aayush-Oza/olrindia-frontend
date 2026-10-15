@@ -32,7 +32,7 @@ async function handleUserGoogleSignIn(btn) {
     const returnUrl = sessionStorage.getItem('olr_return_after_login');
     sessionStorage.removeItem('olr_return_after_login');
     setTimeout(() => {
-      window.location.href = returnUrl || "dashboard";
+      window.location.href = returnUrl || "browse";
     }, 700);
   } else {
     toastError(res.message || "Google sign-in failed. Please try again.");
@@ -85,7 +85,7 @@ function initUserLoginForm() {
       toastSuccess("Welcome back! Redirecting…");
       const returnUrl = sessionStorage.getItem('olr_return_after_login');
       sessionStorage.removeItem('olr_return_after_login');
-      setTimeout(() => { window.location.href = returnUrl || "dashboard.html"; }, 700);
+      setTimeout(() => { window.location.href = returnUrl || "browse.html"; }, 700);
     } else {
       if (res.resend_verification) {
         toastError(res.message + " Check your inbox, or contact support to resend it.");
