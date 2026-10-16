@@ -22,6 +22,13 @@ let activeFilters = {
   priceMax: Infinity,
 };
 
+function populateCategoryDropdown(categories) {
+  const sel = document.getElementById('filterCategory');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">All categories</option>' +
+    categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+}
+
 // ── Slugify ───────────────────────────────────────────────────
 function slugify(text) {
   return (text || '').toLowerCase()
@@ -438,6 +445,7 @@ async function loadBrowseHomepage() {
   const catGrid = document.getElementById('catCardGrid');
   if (catGrid) {
     if (catData?.success && catData.categories.length > 0) {
+      populateCategoryDropdown(catData.categories);
       catGrid.innerHTML = catData.categories.map(cat => `
         <div class="cat-card" onclick="enterBrowseCategory('${cat.name.replace(/'/g, "\\'")}')">
           <img class="cat-card-img" src="${cat.image_url}" alt="${cat.name}" loading="lazy">

@@ -15,6 +15,13 @@ let vsSentinel = null;
 let vsScrollObserver = null;
 let vsActiveFilters = { category:'', city:'', priceType:'', priceMin:0, priceMax:Infinity };
 
+function vsPopulateCategoryDropdown(categories) {
+  const sel = document.getElementById('vsFilterCategory');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">All categories</option>' +
+    categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+}
+
 function slugify(text) {
   return (text || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
@@ -280,6 +287,7 @@ async function vsLoadBrowseHomepage() {
   const catGrid = document.getElementById('vsCatCardGrid');
   if (catGrid) {
     if (catData?.success && catData.categories.length > 0) {
+      vsPopulateCategoryDropdown(catData.categories);
       catGrid.innerHTML = catData.categories.map(cat => `
         <div class="vendor-cat-card" onclick="vsEnterBrowseCategory('${cat.name.replace(/'/g, "\\'")}')">
           <img class="vendor-cat-card-img" src="${cat.image_url}" alt="${cat.name}" loading="lazy">
