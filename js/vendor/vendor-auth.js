@@ -391,7 +391,9 @@ function initVendorDashboard() {
         }
       });
     }
-    ensureFirebaseChatAuth('vendor').then(ok => { if (ok) listenToUnreadBadge(); });
+    if (typeof listenToUnreadBadge === 'function') {
+  ensureFirebaseChatAuth('vendor').then(ok => { if (ok) listenToUnreadBadge(); });
+}
     // Load categories and products after profile
     if (typeof loadCategories === "function") await loadCategories();
     if (typeof loadProducts === "function") await loadProducts();
