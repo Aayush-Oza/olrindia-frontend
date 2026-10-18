@@ -102,10 +102,8 @@ function renderProfilePlanSection() {
   const limit = v.max_active_posts;
   let expiryHtml = '';
   if (expires && plan !== 'free') {
-    const d = new Date(expires);
-    const now = new Date();
-    const daysLeft = Math.ceil((d - now) / (1000 * 60 * 60 * 24));
-    const formatted = d.toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
+    const daysLeft = daysUntilExpiry(expires);
+    const formatted = parseExpiryDate(expires).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
     const urgentClass = daysLeft <= 7 ? 'expiring-soon' : '';
     const urgentText = daysLeft <= 7 ? ` (${daysLeft} day${daysLeft === 1 ? '' : 's'} left!)` : '';
     expiryHtml = `<div class="profile-plan-expires ${urgentClass}">Active until ${formatted}${urgentText}</div>`;
@@ -144,8 +142,8 @@ async function loadBillingHistory() {
     el.innerHTML = `<p style="color:var(--c-ink-faint);font-size:13.5px;">No payment history yet.</p>`; return;
   }
   el.innerHTML = billing.map(b => {
-    const start = b.period_start ? new Date(b.period_start).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '-';
-    const end = b.period_end ? new Date(b.period_end).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '-';
+    const start = b.period_start ? new Date(b.period_start).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
+    const end = b.period_end ? new Date(b.period_end).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
     const tag = b.is_current
       ? `<span style="background:#dcfce7;color:#15803d;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;">CURRENT</span>`
       : b.is_future
@@ -228,12 +226,11 @@ function renderPlanCards() {
     const planName = PLAN_LABELS[current] || current;
     let expiryText = '';
     if (expires && current !== 'free') {
-      const d = new Date(expires);
-      expiryText = ` · renews ${d.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })}`;
+      expiryText = ` · renews ${parseExpiryDate(expires).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })}`;
     }
     bar.innerHTML = `You're on <strong>${planName}</strong>${expiryText}`;
   }
-  const order = ['free','starter','growth','premium'];
+  const order = ['free', 'starter', 'growth', 'premium'];
   const currentIdx = order.indexOf(current);
   order.forEach((plan, idx) => {
     const card = document.getElementById(`planCard-${plan}`);

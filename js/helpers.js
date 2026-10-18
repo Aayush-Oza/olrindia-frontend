@@ -183,3 +183,15 @@ function validatePANFormat(pan) {
   // Standard Indian PAN: 5 letters, 4 digits, 1 letter (e.g. ABCDE1234F)
   return /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan.toUpperCase());
 }
+
+function daysUntilExpiry(isoString) {
+  if (!isoString) return null;
+  const normalized = isoString.trim().replace(' ', 'T').replace(/Z?$/, 'Z');
+  return Math.ceil((new Date(normalized).getTime() - Date.now()) / 86400000);
+}
+
+function parseExpiryDate(isoString) {
+  if (!isoString) return null;
+  const normalized = isoString.trim().replace(' ', 'T').replace(/Z?$/, 'Z');
+  return new Date(normalized);
+}
