@@ -102,10 +102,10 @@ function renderProfilePlanSection() {
   const limit = v.max_active_posts;
   let expiryHtml = '';
   if (expires && plan !== 'free') {
-    const daysLeft = daysUntilExpiry(expires);
     const formatted = parseExpiryDate(expires).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
-    const urgentClass = daysLeft <= 7 ? 'expiring-soon' : '';
-    const urgentText = daysLeft <= 7 ? ` (${daysLeft} day${daysLeft === 1 ? '' : 's'} left!)` : '';
+    const expiryLabel = v.expiry_label || null;
+    const urgentClass = expiryLabel ? 'expiring-soon' : '';
+    const urgentText = expiryLabel ? ` (${expiryLabel})` : '';
     expiryHtml = `<div class="profile-plan-expires ${urgentClass}">Active until ${formatted}${urgentText}</div>`;
   }
   let badgeHtml = '';
