@@ -104,7 +104,7 @@ async function loadCategories() {
 document.getElementById('modalCategory')?.addEventListener('change', function () {
   const subSel = document.getElementById('modalSubcategory');
   subSel.innerHTML = '<option value="">Select subcategory (optional)</option>';
-  (CATEGORIES[this.value] || []).forEach(s => {
+  ((CATEGORIES[this.value] || {}).subcategories || []).forEach(s => {
     const o = document.createElement('option');
     o.value = s; o.textContent = s;
     subSel.appendChild(o);
