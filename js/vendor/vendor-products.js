@@ -409,18 +409,74 @@ function renderPlanCards() {
   };
   const currentRank = rankMap[current] ?? 0;
 
-  // ── Plan definitions ───────────────────────────────────────
+  // ── Plan definitions with full feature lists ───────────────
   const monthlyPlans = [
-    { key: 'free',    label: 'Free',    price: '₹0',   sub: 'Forever free', posts: '5 listings',  badge: '' },
-    { key: 'starter', label: 'Starter', price: '₹249', sub: 'per month',    posts: '10 listings', badge: '' },
-    { key: 'growth',  label: 'Growth',  price: '₹449', sub: 'per month',    posts: '20 listings', badge: '✓ Verified' },
-    { key: 'premium', label: 'Premium', price: '₹999', sub: 'per month',    posts: 'Unlimited',   badge: '★ Featured' },
+    {
+      key: 'free', label: 'Free', price: '₹0', sub: 'Forever free', posts: '5 listings', badge: '',
+      features: [
+        { text: '5 active listings',       yes: true  },
+        { text: 'Basic visibility',         yes: true  },
+        { text: 'No badge',                 yes: false },
+        { text: 'No priority listing',      yes: false },
+      ],
+    },
+    {
+      key: 'starter', label: 'Starter', price: '₹249', sub: 'per month', posts: '10 listings', badge: '',
+      features: [
+        { text: '10 active listings',       yes: true  },
+        { text: 'Priority over free vendors',yes: true  },
+        { text: 'No badge',                 yes: false },
+        { text: 'Email support',            yes: true  },
+      ],
+    },
+    {
+      key: 'growth', label: 'Growth', price: '₹449', sub: 'per month', posts: '20 listings', badge: '✓ Verified',
+      features: [
+        { text: '20 active listings',       yes: true  },
+        { text: 'Higher priority ranking',  yes: true  },
+        { text: 'Verified badge ✓',         yes: true  },
+        { text: 'Priority support',         yes: true  },
+      ],
+    },
+    {
+      key: 'premium', label: 'Premium', price: '₹999', sub: 'per month', posts: 'Unlimited', badge: '★ Featured',
+      features: [
+        { text: 'Unlimited listings',       yes: true  },
+        { text: 'Highest priority ranking', yes: true  },
+        { text: 'Featured badge ★',         yes: true  },
+        { text: 'Dedicated support',        yes: true  },
+      ],
+    },
   ];
 
   const yearlyPlans = [
-    { key: 'starter_yearly', label: 'Starter', price: '₹2,499', sub: 'per year', posts: '10 listings', badge: '' },
-    { key: 'growth_yearly',  label: 'Growth',  price: '₹4,499', sub: 'per year', posts: '20 listings', badge: '✓ Verified' },
-    { key: 'premium_yearly', label: 'Premium', price: '₹9,999', sub: 'per year', posts: 'Unlimited',   badge: '★ Featured' },
+    {
+      key: 'starter_yearly', label: 'Starter', price: '₹2,499', sub: 'per year', posts: '10 listings', badge: '',
+      features: [
+        { text: '10 active listings',       yes: true  },
+        { text: 'Priority over free vendors',yes: true  },
+        { text: 'No badge',                 yes: false },
+        { text: 'Email support',            yes: true  },
+      ],
+    },
+    {
+      key: 'growth_yearly', label: 'Growth', price: '₹4,499', sub: 'per year', posts: '20 listings', badge: '✓ Verified',
+      features: [
+        { text: '20 active listings',       yes: true  },
+        { text: 'Higher priority ranking',  yes: true  },
+        { text: 'Verified badge ✓',         yes: true  },
+        { text: 'Priority support',         yes: true  },
+      ],
+    },
+    {
+      key: 'premium_yearly', label: 'Premium', price: '₹9,999', sub: 'per year', posts: 'Unlimited', badge: '★ Featured',
+      features: [
+        { text: 'Unlimited listings',       yes: true  },
+        { text: 'Highest priority ranking', yes: true  },
+        { text: 'Featured badge ★',         yes: true  },
+        { text: 'Dedicated support',        yes: true  },
+      ],
+    },
   ];
 
   function planCardHtml(plan, isYearly) {
@@ -454,6 +510,10 @@ function renderPlanCards() {
     const popularTag = isPopular ? `<div class="plan-popular-tag">Most Popular</div>` : '';
     const badgeHtml = plan.badge ? `<span class="plan-badge">${plan.badge}</span>` : '';
 
+    const featuresHtml = plan.features.map(f =>
+      `<li>${f.yes ? '✓' : '✗'} ${f.text}</li>`
+    ).join('');
+
     return `
       <div class="plan-card ${isCurrent ? 'plan-card-current' : ''} ${isPopular ? 'plan-card-popular' : ''}">
         ${popularTag}
@@ -463,12 +523,13 @@ function renderPlanCards() {
           <div class="plan-price">${plan.price}</div>
           <div class="plan-sub">${plan.sub}</div>
           ${discountHtml}
-          <div class="plan-posts">${plan.posts}</div>
         </div>
+        <ul class="plan-features">${featuresHtml}</ul>
         <button class="btn btn-primary plan-select-btn" ${btnDisabled} ${btnOpacity}
           onclick="handlePlanSelect('${plan.key}')"
           id="planBtn-${plan.key}">
           <span class="btn-label">${btnLabel}</span>
+          <span class="spinner"></span>
         </button>
       </div>`;
   }
