@@ -16,6 +16,147 @@
   <link rel="stylesheet" href="../css/legal.css?v=1">
   <link rel="stylesheet" href="../css/footer.css?v=1">
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    /* ── Plans modal overrides for monthly + yearly layout ── */
+    .plans-modal {
+      max-width: 860px;
+      width: 95vw;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .plans-section-heading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--c-ink-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+    }
+    .plans-yearly-tag {
+      background: #dcfce7;
+      color: #15803d;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .plans-grid-monthly,
+    .plans-grid-yearly {
+      display: grid;
+      gap: 12px;
+    }
+    .plans-grid-monthly { grid-template-columns: repeat(4, 1fr); }
+    .plans-grid-yearly  { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 700px) {
+      .plans-grid-monthly { grid-template-columns: repeat(2, 1fr); }
+      .plans-grid-yearly  { grid-template-columns: repeat(1, 1fr); }
+    }
+    @media (max-width: 420px) {
+      .plans-grid-monthly { grid-template-columns: 1fr; }
+    }
+    .plan-card {
+      border: 1.5px solid var(--c-border-soft);
+      border-radius: var(--r-lg);
+      padding: 16px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      background: var(--c-surface);
+      transition: box-shadow 0.15s;
+    }
+    .plan-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.08); }
+    .plan-card-current { border-color: var(--c-blue-mid); background: #f0f6ff; }
+    .plan-card-popular { border-color: #f97316; }
+    .plan-popular-tag {
+      position: absolute;
+      top: -11px; left: 50%;
+      transform: translateX(-50%);
+      background: #f97316;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 12px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .plan-current-tag {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--c-blue-mid);
+      text-align: center;
+    }
+    .plan-card-top { display: flex; flex-direction: column; gap: 4px; }
+    .plan-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--c-ink);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .plan-badge {
+      font-size: 11px;
+      font-weight: 600;
+      background: #fef9c3;
+      color: #854d0e;
+      padding: 1px 7px;
+      border-radius: 20px;
+    }
+    .plan-price {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--c-blue-deep);
+      line-height: 1.1;
+    }
+    .plan-sub {
+      font-size: 12px;
+      color: var(--c-ink-faint);
+    }
+    .plan-posts {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--c-ink-soft);
+      margin-top: 2px;
+    }
+    .plan-yearly-discount {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    .plan-original-price {
+      font-size: 12px;
+      color: var(--c-ink-faint);
+      text-decoration: line-through;
+    }
+    .plan-save-badge {
+      background: #dcfce7;
+      color: #15803d;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+    .plan-saving-amount {
+      font-size: 12px;
+      color: #15803d;
+      font-weight: 600;
+    }
+    .plan-select-btn {
+      width: 100%;
+      padding: 10px;
+      font-size: 13px;
+      margin-top: auto;
+    }
+  </style>
 </head>
 <body>
 <div id="dashRoot">
@@ -176,7 +317,7 @@
 
 </div>
 
-<!-- UPGRADE / PLANS MODAL (needed for plan upgrade button on profile) -->
+<!-- UPGRADE / PLANS MODAL -->
 <div class="product-modal-overlay" id="upgradeModalOverlay">
   <div class="plans-modal">
     <div class="plans-modal-head">
@@ -186,35 +327,10 @@
       </div>
       <button class="modal-close" id="upgradeModalCancel">✕</button>
     </div>
-    <div class="plans-current-bar" id="plansCurrentBar"><span id="plansCurrentLabel"></span></div>
-    <div class="plans-grid">
-      <div class="plan-card" id="planCard-free" data-plan="free" style="display:none;">
-        <div class="plan-card-head"><span class="plan-name">Free</span><div class="plan-price">₹0<span>/mo</span></div></div>
-        <ul class="plan-features"><li>✓ 5 active listing</li><li>✓ Basic visibility</li><li>✗ No badge</li><li>✗ No priority listing</li></ul>
-        <div class="plan-current-tag" id="planTag-free" style="display:none;">Your current plan</div>
-        <button class="btn plan-btn plan-btn-ghost" disabled>Free plan</button>
-      </div>
-      <div class="plan-card" id="planCard-starter">
-        <div class="plan-card-head"><span class="plan-name">Starter</span><div class="plan-price">₹249<span>/mo</span></div></div>
-        <ul class="plan-features"><li>✓ 10 active listings</li><li>✓ Priority over free vendors</li><li>✗ No badge</li><li>✓ Email support</li></ul>
-        <div class="plan-current-tag" id="planTag-starter" style="display:none;">Your current plan</div>
-        <button class="btn plan-btn" id="planBtn-starter" onclick="handlePlanSelect('starter')"><span class="btn-label">Get Starter</span><span class="spinner"></span></button>
-      </div>
-      <div class="plan-card plan-card-featured" id="planCard-growth">
-        <div class="plan-popular-tag">Most popular</div>
-        <div class="plan-card-head"><span class="plan-name">Growth</span><div class="plan-price">₹449<span>/mo</span></div></div>
-        <ul class="plan-features"><li>✓ 20 active listings</li><li>✓ Higher priority ranking</li><li>✓ <strong>Verified badge</strong> ✓</li><li>✓ Priority support</li></ul>
-        <div class="plan-current-tag" id="planTag-growth" style="display:none;">Your current plan</div>
-        <button class="btn plan-btn plan-btn-featured" id="planBtn-growth" onclick="handlePlanSelect('growth')"><span class="btn-label">Get Growth</span><span class="spinner"></span></button>
-      </div>
-      <div class="plan-card" id="planCard-premium">
-        <div class="plan-card-head"><span class="plan-name">Premium</span><div class="plan-price">₹999<span>/mo</span></div></div>
-        <ul class="plan-features"><li>✓ <strong>Unlimited</strong> listings</li><li>✓ Highest priority ranking</li><li>✓ <strong>Featured badge</strong> ★</li><li>✓ Dedicated support</li></ul>
-        <div class="plan-current-tag" id="planTag-premium" style="display:none;">Your current plan</div>
-        <button class="btn plan-btn" id="planBtn-premium" onclick="handlePlanSelect('premium')"><span class="btn-label">Get Premium</span><span class="spinner"></span></button>
-      </div>
-    </div>
-    <p class="plans-note">Billed monthly. Cancel or change plan anytime. Secure payment via Razorpay.</p>
+    <div class="plans-current-bar" id="plansCurrentBar"></div>
+    <!-- Plans rendered dynamically by renderPlanCards() in vendor-products.js -->
+    <div id="plansContainer"></div>
+    <p class="plans-note">Secure payment via Razorpay. Cancel or change plan anytime.</p>
   </div>
 </div>
 
@@ -289,7 +405,8 @@
 <script src="../js/ui.js?v=1"></script>
 <script src="../js/helpers.js?v=2"></script>
 <script src="../js/firebase-chat-auth.js?v=1"></script>
-  <script src="../js/vendor/vendor-auth.js?v=1"></script>
+<script src="../js/vendor/vendor-auth.js?v=1"></script>
+<script src="../js/vendor/vendor-products.js?v=3"></script>
 <script src="../js/vendor/vendor-profile.js?v=3"></script>
 </body>
 </html>
