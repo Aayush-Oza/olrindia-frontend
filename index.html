@@ -104,40 +104,21 @@
   }
   </script>
 
-  <!-- ── SCHEMA: Service (Rental Marketplace) ── -->
+  <!-- ── SCHEMA: Service ── -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "Service",
     "@id": "https://olrindia.com/#service",
     "name": "OLR India - Online Rental Marketplace",
-    "provider": {
-      "@id": "https://olrindia.com/#organization"
-    },
+    "provider": { "@id": "https://olrindia.com/#organization" },
     "serviceType": "Online Rental Marketplace",
-    "description": "Rent anything in India - furniture, bikes, cars, appliances, tents, tractors, wedding outfits, medical equipment and more from verified local vendors. No middleman, no commission.",
-    "areaServed": {
-      "@type": "Country",
-      "name": "India"
-    },
-    "hasOfferCatalog": {
-      "@type": "OfferCatalog",
-      "name": "Rental Categories",
-      "itemListElement": [
-        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Furniture on Rent"}},
-        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Bikes & Scooters on Rent"}},
-        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Cars on Rent"}},
-        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Appliances on Rent"}},
-        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Wedding Outfits on Rent"}},
-        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Medical Equipment on Rent"}},
-        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Construction Equipment on Rent"}},
-        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Agricultural Equipment on Rent"}}
-      ]
-    }
+    "description": "Rent anything in India from verified local vendors. No middleman, no commission.",
+    "areaServed": { "@type": "Country", "name": "India" }
   }
   </script>
 
-  <!-- ── SCHEMA: FAQPage (captures People Also Ask) ── -->
+  <!-- ── SCHEMA: FAQPage ── -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -148,7 +129,7 @@
         "name": "What is OLR India?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "OLR India (olrindia.com) is India's online rental marketplace where you can rent anything - furniture, bikes, cars, appliances, wedding outfits, medical equipment, tents, tractors and more - directly from local vendors near you. OLR stands for Online Rental."
+          "text": "OLR India (olrindia.com) is India's online rental marketplace where you can rent anything directly from local vendors near you. OLR stands for Online Rental."
         }
       },
       {
@@ -156,7 +137,7 @@
         "name": "How does OLR India work?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "OLR India connects customers with local vendors across India. Customers browse rental listings, contact vendors directly, and rent items without any middleman or commission. Vendors can list their products for free and start earning from idle assets."
+          "text": "OLR India connects customers with local vendors across India. Customers browse rental listings, contact vendors directly, and rent items without any middleman or commission."
         }
       },
       {
@@ -164,7 +145,7 @@
         "name": "What can I rent on OLR India?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "On OLR India you can rent furniture, bikes, scooters, cars, home appliances, wedding outfits, medical equipment like wheelchairs, construction equipment, agricultural equipment like tractors, tents, photography gear, musical instruments, sports equipment and much more from local vendors across India."
+          "text": "On OLR India you can rent furniture, bikes, scooters, cars, home appliances, wedding outfits, medical equipment, construction equipment, agricultural equipment, photography gear, musical instruments, sports equipment and much more."
         }
       },
       {
@@ -172,15 +153,7 @@
         "name": "Is OLR India free to use?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes, OLR India is free for customers to browse and find rental products. There is no middleman and no commission - customers connect directly with local vendors."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "How is OLR India different from OLX?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "OLX India is a classifieds platform for buying and selling used goods. OLR India is specifically an online rental marketplace - focused entirely on renting, not buying or selling. OLR India connects people who want to rent items with local vendors who list items for rent."
+          "text": "Yes, OLR India is free for customers to browse and find rental products. There is no middleman and no commission."
         }
       }
     ]
@@ -191,37 +164,109 @@
   <link rel="icon" href="assets/favicon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/variables.css?v=1">
   <link rel="stylesheet" href="css/base.css?v=1">
   <link rel="stylesheet" href="css/components.css?v=1">
-  <link rel="stylesheet" href="css/index.css?v=1">
+  <link rel="stylesheet" href="css/index.css?v=2">
   <link rel="stylesheet" href="css/footer.css?v=1">
+
   <!-- Meta Pixel Code -->
   <script>
-    !function (f, b, e, v, n, t, s) {
-      if (f.fbq) return; n = f.fbq = function () {
-        n.callMethod ?
-          n.callMethod.apply(n, arguments) : n.queue.push(arguments)
-      };
-      if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
-      n.queue = []; t = b.createElement(e); t.async = !0;
-      t.src = v; s = b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t, s)
-    }(window, document, 'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '1083939711042882');
-    fbq('track', 'PageView');
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init','1083939711042882');fbq('track','PageView');
   </script>
   <noscript><img height="1" width="1" style="display:none"
-      src="https://www.facebook.com/tr?id=1083939711042882&ev=PageView&noscript=1" /></noscript>
+    src="https://www.facebook.com/tr?id=1083939711042882&ev=PageView&noscript=1"/></noscript>
   <!-- End Meta Pixel Code -->
+
+  <style>
+    /* ── HERO (text-only, centered) ── */
+    .hero {
+      background: linear-gradient(135deg, #ff6b1a 0%, #f7931e 40%, #00b4d8 100%);
+      padding: 56px 20px 48px;
+      text-align: center;
+    }
+    .hero-inner {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    .hero h1 {
+      font-family: var(--font-display, 'Poppins', sans-serif);
+      font-size: clamp(1.6rem, 4vw, 2.6rem);
+      font-weight: 700;
+      color: #fff;
+      margin: 0 0 12px;
+      line-height: 1.25;
+    }
+    .hero p {
+      font-size: clamp(0.9rem, 2vw, 1.05rem);
+      color: rgba(255,255,255,0.88);
+      margin: 0 0 20px;
+    }
+    .hero-location {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.75);
+      margin-top: 4px;
+    }
+
+    /* ── RENT / SELL TABS ── */
+    .listing-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      background: var(--surface, #fff);
+      border-bottom: 2px solid var(--border, #eee);
+      padding: 0 20px;
+      position: sticky;
+      top: 56px; /* below navbar */
+      z-index: 90;
+    }
+    .listing-tab {
+      padding: 14px 32px;
+      font-family: var(--font-display, 'Poppins', sans-serif);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-muted, #888);
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+      margin-bottom: -2px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .listing-tab.active {
+      color: var(--brand, #f7931e);
+      border-bottom-color: var(--brand, #f7931e);
+    }
+    .listing-tab:hover:not(.active) {
+      color: var(--text-main, #222);
+    }
+    .tab-icon {
+      font-size: 17px;
+    }
+
+    /* ── FILTER SHEET → RIGHT SIDE ── */
+    .filter-sheet {
+      right: 0 !important;
+      left: auto !important;
+      border-radius: 16px 0 0 16px !important;
+    }
+  </style>
 </head>
 
 <body>
-  <!-- ── NAVBAR ─────────────────────────────────────────────────── -->
+  <!-- ── NAVBAR ── -->
   <nav class="site-nav">
     <div class="site-nav-inner">
       <a class="nav-logo" href="/">
@@ -232,94 +277,73 @@
         <div class="nav-action nav-lang-wrap" id="navLangWrap">
           <button class="nav-wish-btn" id="navLangBtn" title="Language">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" />
-              <path d="M3 12h18M12 3c2.4 2.6 3.8 5.9 3.8 9s-1.4 6.4-3.8 9c-2.4-2.6-3.8-5.9-3.8-9S9.6 5.6 12 3Z"
-                stroke="currentColor" stroke-width="1.8" />
+              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M3 12h18M12 3c2.4 2.6 3.8 5.9 3.8 9s-1.4 6.4-3.8 9c-2.4-2.6-3.8-5.9-3.8-9S9.6 5.6 12 3Z" stroke="currentColor" stroke-width="1.8"/>
             </svg>
           </button>
           <span>Language</span>
-
           <div class="nav-lang-menu" id="navLangMenu"></div>
         </div>
         <!-- Wishlist -->
         <div class="nav-action">
           <button class="nav-wish-btn" id="navWishBtn" title="Wishlist">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"
-                stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
             </svg>
           </button>
           <span>Wishlist</span>
         </div>
-
         <!-- Login -->
         <div class="nav-action">
           <button class="nav-wish-btn" id="navProfileBtn" title="Login" onclick="openAuthModal('login')">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M4 21v-1a7 7 0 0 1 14 0v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-              <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8" />
+              <path d="M4 21v-1a7 7 0 0 1 14 0v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/>
             </svg>
           </button>
           <span>Login</span>
         </div>
-
       </div>
-    </div>
     </div>
   </nav>
 
-  <!-- ── HERO ───────────────────────────────────────────────────── -->
+  <!-- ── HERO (text only, no slider) ── -->
   <section class="hero">
     <div class="hero-inner">
-      <div class="hero-animation" id="heroAnimation">
-        <img class="hanim-slide active" src="assets/slider/slider (10).png" alt="Slide 1">
-        <img class="hanim-slide" src="assets/slider/slider (11).png" alt="Slide 2">
-        <img class="hanim-slide" src="assets/slider/slider (12).png" alt="Slide 3">
-        <img class="hanim-slide" src="assets/slider/slider (13).png" alt="Slide 4">
-        <img class="hanim-slide" src="assets/slider/slider (14).png" alt="Slide 5">
-        <img class="hanim-slide" src="assets/slider/slider (15).png" alt="Slide 6">
-        <img class="hanim-slide" src="assets/slider/slider (16).png" alt="Slide 7">
-        <img class="hanim-slide" src="assets/slider/slider (17).png" alt="Slide 8">
-        <div class="hanim-bar" id="hanimBar"></div>
-        <div class="hanim-dots" id="hanimDots"></div>
-      </div>
-
-      <!-- Desktop right side text -->
-      <div class="hero-text-side">
-        <h1>Rent anything, anywhere in India</h1>
-        <p>Thousands of local vendors - furniture, tools, vehicles, fashion & more.</p>
-        <!-- <a href="#" class="hero-install-btn">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-            <path d="M12 16V4M12 16l-4-4M12 16l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-            <path d="M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-          </svg>
-          Install App
-        </a>-->
-        <div class="hero-location" id="heroLocation" style="display:none;">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" stroke="currentColor"
-              stroke-width="1.8" />
-          </svg>
-          <span id="heroLocationText"></span>
-        </div>
+      <h1>Rent anything, anywhere in India</h1>
+      <p>Thousands of local vendors — furniture, tools, vehicles, fashion &amp; more.</p>
+      <div class="hero-location" id="heroLocation" style="display:none;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" stroke="currentColor" stroke-width="1.8"/>
+        </svg>
+        <span id="heroLocationText"></span>
       </div>
     </div>
   </section>
 
-  <!-- ── FILTER ROW ─────────────────────────────────────────────── -->
+  <!-- ── RENT / SELL TABS ── -->
+  <div class="listing-tabs" id="listingTabs">
+    <button class="listing-tab active" id="tabRent" onclick="switchTab('rent')">
+      <span class="tab-icon">🔑</span> Rent
+    </button>
+    <button class="listing-tab" id="tabSell" onclick="switchTab('sell')">
+      <span class="tab-icon">🏷️</span> Buy / Sell
+    </button>
+  </div>
+
+  <!-- ── FILTER ROW ── -->
   <div class="filter-row">
     <div class="filter-row-inner">
       <div class="nav-search">
         <svg class="nav-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
-          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8" />
-          <path d="m16.5 16.5 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/>
+          <path d="m16.5 16.5 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
         </svg>
         <input type="text" id="searchInput" placeholder="Search products…" autocomplete="off">
       </div>
       <button class="filter-main-btn" id="filterBtn">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-          <path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
         </svg>
         Filters
         <span class="filter-count-badge" id="filterCountBadge" style="display:none;">0</span>
@@ -329,7 +353,7 @@
     <div class="active-filters" id="activeFilters"></div>
   </div>
 
-  <!-- ── FILTER SHEET OVERLAY ───────────────────────────────────── -->
+  <!-- ── FILTER SHEET OVERLAY ── -->
   <div class="filter-overlay" id="filterOverlay" onclick="closeFilterSheet()"></div>
   <div class="filter-sheet" id="filterSheet">
     <div class="filter-sheet-head">
@@ -338,29 +362,30 @@
     </div>
 
     <div class="filter-sheet-body">
+      <!-- Category (both tabs) -->
       <div class="filter-group">
         <div class="filter-group-label">Category</div>
         <select class="filter-select" id="filterCategory">
           <option value="">All categories</option>
         </select>
       </div>
-      <!-- Location -->
+
+      <!-- Location (both tabs) -->
       <div class="filter-group">
         <div class="filter-group-label">City / Location</div>
         <div class="filter-location-row">
           <input class="filter-input" type="text" id="filterCity" placeholder="e.g. Mumbai, Delhi…">
           <button class="filter-locate-btn" id="filterLocateBtn" title="Use my location">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" stroke="currentColor"
-                stroke-width="1.8" />
-              <circle cx="12" cy="9" r="2.5" stroke="currentColor" stroke-width="1.8" />
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" stroke="currentColor" stroke-width="1.8"/>
+              <circle cx="12" cy="9" r="2.5" stroke="currentColor" stroke-width="1.8"/>
             </svg>
           </button>
         </div>
       </div>
 
-      <!-- Price type -->
-      <div class="filter-group">
+      <!-- RENT-ONLY: Price per type -->
+      <div class="filter-group" id="filterGroupPriceType">
         <div class="filter-group-label">Price per</div>
         <div class="price-type-toggle">
           <button class="price-type-btn" data-type="hour">Hour</button>
@@ -370,7 +395,19 @@
         </div>
       </div>
 
-      <!-- Price range -->
+      <!-- SELL-ONLY: Condition -->
+      <div class="filter-group" id="filterGroupCondition" style="display:none;">
+        <div class="filter-group-label">Condition</div>
+        <select class="filter-select" id="filterCondition">
+          <option value="">Any condition</option>
+          <option value="new">New</option>
+          <option value="like_new">Like New</option>
+          <option value="good">Good</option>
+          <option value="fair">Fair</option>
+        </select>
+      </div>
+
+      <!-- Price range (both tabs) -->
       <div class="filter-group">
         <div class="filter-group-label">Price range (₹)</div>
         <div class="filter-price-row">
@@ -380,15 +417,15 @@
         </div>
         <div class="filter-price-hint" id="filterPriceHint">Enter a min or max to filter by price.</div>
       </div>
-
     </div>
+
     <div class="filter-sheet-foot">
       <button class="filter-clear-btn" id="filterClearBtn">Clear all</button>
       <button class="btn btn-primary" id="filterApplyBtn" style="flex:1;padding:12px;">Apply</button>
     </div>
   </div>
 
-  <!-- ── PAGE BODY ──────────────────────────────────────────────── -->
+  <!-- ── PAGE BODY ── -->
   <div class="page-body">
     <div class="section-head">
       <h2 id="productsTitle">All products</h2>
@@ -402,7 +439,7 @@
     </div>
   </div>
 
-  <!-- ── AUTH MODAL ─────────────────────────────────────────────── -->
+  <!-- ── AUTH MODAL ── -->
   <div class="auth-overlay" id="authOverlay" onclick="if(event.target===this)closeAuthModal()">
     <div class="auth-modal">
       <button class="auth-modal-close" onclick="closeAuthModal()">✕</button>
@@ -416,8 +453,8 @@
         <a id="authUser" href="/user/login" class="auth-choice auth-choice-user">
           <div class="auth-choice-icon">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M4 21v-1a7 7 0 0 1 14 0v1" stroke="white" stroke-width="1.8" stroke-linecap="round" />
-              <circle cx="11" cy="7" r="4" stroke="white" stroke-width="1.8" />
+              <path d="M4 21v-1a7 7 0 0 1 14 0v1" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+              <circle cx="11" cy="7" r="4" stroke="white" stroke-width="1.8"/>
             </svg>
           </div>
           <div>
@@ -428,8 +465,7 @@
         <a id="authVendor" href="/vendor/login" class="auth-choice auth-choice-vendor">
           <div class="auth-choice-icon">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M3 9.5 12 3l9 6.5M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5" stroke="white" stroke-width="1.8"
-                stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M3 9.5 12 3l9 6.5M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
           <div>
@@ -444,54 +480,8 @@
   <div id="toast-container"></div>
   <script src="js/api.js?v=1"></script>
   <script src="js/ui.js?v=1"></script>
-  <script src="js/index.js?v=2"></script>
-  <script>
-    (function () {
-      const slides = document.querySelectorAll('.hanim-slide');
-      const total = slides.length;
-      const duration = 3000;
-      let cur = 0, timer = null, rafId = null, startTime = null;
+  <script src="js/index.js?v=3"></script>
 
-      const dotsEl = document.getElementById('hanimDots');
-      slides.forEach((_, i) => {
-        const d = document.createElement('div');
-        d.className = 'hanim-dot' + (i === 0 ? ' active' : '');
-        d.id = 'hd' + i;
-        d.onclick = () => { clearTimeout(timer); show(i); scheduleNext(); };
-        dotsEl.appendChild(d);
-      });
-
-      function show(idx) {
-        slides.forEach((s, i) => s.classList.toggle('active', i === idx));
-        document.querySelectorAll('.hanim-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
-        cur = idx;
-        if (rafId) cancelAnimationFrame(rafId);
-        const bar = document.getElementById('hanimBar');
-        bar.style.transition = 'none';
-        bar.style.width = '0%';
-        startTime = null;
-        function tick(now) {
-          if (!startTime) startTime = now;
-          const pct = Math.min(100, ((now - startTime) / duration) * 100);
-          bar.style.width = pct + '%';
-          if (pct < 100) rafId = requestAnimationFrame(tick);
-        }
-        rafId = requestAnimationFrame(tick);
-      }
-
-      function scheduleNext() {
-        clearTimeout(timer);
-        timer = setTimeout(() => { show((cur + 1) % total); scheduleNext(); }, duration);
-      }
-
-      const animEl = document.getElementById('heroAnimation');
-      animEl.addEventListener('mouseenter', () => { clearTimeout(timer); if (rafId) cancelAnimationFrame(rafId); });
-      animEl.addEventListener('mouseleave', scheduleNext);
-
-      show(0);
-      scheduleNext();
-    })();
-  </script>
   <!-- Google Translate -->
   <div id="google_translate_element" style="display:none;"></div>
   <script>
@@ -509,58 +499,41 @@
   <!-- ── PUBLIC FOOTER ── -->
   <footer class="site-footer">
     <div class="footer-cols">
-
-      <!-- Company -->
       <div>
         <div class="footer-col-title">Company</div>
         <a href="/about" class="footer-col-link">About Us</a>
-        <a href="/terms" class="footer-col-link">Terms & Conditions</a>
+        <a href="/terms" class="footer-col-link">Terms &amp; Conditions</a>
         <a href="/privacy" class="footer-col-link">Privacy Policy</a>
       </div>
-
-      <!-- Follow Us -->
       <div>
         <div class="footer-col-title">Follow Us</div>
         <a href="https://www.instagram.com/olr_india" target="_blank" rel="noopener" class="footer-social-item">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-            <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.8" />
-            <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8" />
-            <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
+            <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.8"/>
+            <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/>
+            <circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
           </svg>
           Instagram
         </a>
         <a href="https://facebook.com/olrindia" target="_blank" rel="noopener" class="footer-social-item">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" stroke="currentColor"
-              stroke-width="1.8" stroke-linejoin="round" />
+            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
           </svg>
           Facebook
         </a>
       </div>
-
-      <!-- Contact -->
       <div>
         <div class="footer-col-title">Contact</div>
         <a href="mailto:support@olrindia.com" class="footer-contact-item">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor"
-              stroke-width="1.8" />
-            <path d="m22 6-10 7L2 6" stroke="currentColor" stroke-width="1.8" />
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.8"/>
+            <path d="m22 6-10 7L2 6" stroke="currentColor" stroke-width="1.8"/>
           </svg>
           support@olrindia.com
         </a>
-        <!-- <a href="tel:+919999999999" class="footer-contact-item">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.14 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.05 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 极简主义风格，注重功能性和简洁性，避免不必要的装饰和细节。极简主义设计通常使用大量的留白、简单的几何形状和有限的色彩搭配，以创造出干净、清晰且易于理解的视觉效果。这种设计风格强调“少即是多”的理念，通过去除冗余元素来突出核心内容，提升用户体验。
-          +91 99999 99999
-        </a>-->
       </div>
-
     </div>
-
     <hr class="footer-divider">
-
     <div class="footer-bottom">
       <div class="footer-bottom-top">
         <a class="footer-logo" href="/">
@@ -577,7 +550,7 @@
           <option value="kn">ಕನ್ನಡ (Kannada)</option>
           <option value="ml">മലയാളം (Malayalam)</option>
           <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
-          <option value="or">ଓਡ਼ਿਆ (Odia)</option>
+          <option value="or">ଓଡ଼ିଆ (Odia)</option>
           <option value="as">অসমীয়া (Assamese)</option>
           <option value="ur">اردو (Urdu)</option>
           <option value="ne">नेपाली (Nepali)</option>
@@ -596,5 +569,4 @@
 
   <script src="js/footer.js?v=1"></script>
 </body>
-
 </html>
