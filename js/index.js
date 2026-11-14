@@ -355,16 +355,10 @@ function productCardHTML(p) {
       ? `<span class="vendor-badge badge-growth">✓ Verified</span>`
       : '';
 
-  // Condition pill for sell listings
-  const conditionPill = (p.listing_type === 'sell' && p.condition)
-    ? `<span class="product-condition-pill">${conditionLabel(p.condition)}</span>`
-    : '';
-
   return `
     <div class="product-card" onclick="openProduct('${p.share_slug}','${p.category}','${p.city}')">
       ${img}
       ${badge}
-      ${conditionPill}
       <button class="product-wish-btn" onclick="event.stopPropagation();handleWish(this,${p.id})" title="Save to wishlist">♡</button>
       <div class="product-body">
         <div class="product-cat">${p.category || ''}</div>
@@ -502,7 +496,7 @@ document.addEventListener('keydown', e => {
 // ── Homepage: categories + featured products ──────────────────
 async function loadHomepage() {
   currentMode = 'home';
-  const label = activeTab === 'rent' ? 'Browse & Rent' : 'Buy / Sell';
+  const label = activeTab === 'rent' ? 'Browse & Rent' : 'Browse & Buy';
   document.getElementById('productsTitle').textContent = label;
   document.getElementById('productsCount').textContent = '';
   document.getElementById('productGrid').style.display = 'block';
@@ -518,7 +512,7 @@ async function loadHomepage() {
         </div>`).join('')}
     </div>
     <div id="homeProdSection">
-      <div class="home-prod-title">Featured ${activeTab === 'rent' ? 'Rentals' : 'Items for Sale'}</div>
+      <div class="home-prod-title">Featured ${activeTab === 'rent' ? 'Rentals' : 'Items to Buy'}</div>
       <div class="product-grid">
         ${Array(6).fill(skeletonCardHTML()).join('')}
       </div>
