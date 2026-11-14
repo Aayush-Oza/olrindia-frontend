@@ -185,76 +185,89 @@
   <!-- End Meta Pixel Code -->
 
   <style>
-    /* ── HERO (text-only, full-width centered, same theme) ── */
+    /* ── HERO: override index.css — text-only, centered ── */
     .hero {
-      background: linear-gradient(120deg, #f7931e 0%, #e8720c 35%, #1a9fb5 70%, #00b4d8 100%);
-      padding: 60px 24px 52px;
-      text-align: center;
+      background: var(--grad-brand) !important;
+      padding: 60px 24px 52px !important;
     }
     .hero-inner {
-      max-width: 600px;
-      margin: 0 auto;
+      display: block !important;        /* kill flex */
+      text-align: center !important;
+      max-width: 640px !important;
+      margin: 0 auto !important;
+      padding: 0 !important;
     }
-    .hero h1 {
-      font-family: var(--font-display, 'Poppins', sans-serif);
-      font-size: clamp(1.7rem, 4vw, 2.8rem);
-      font-weight: 700;
-      color: #fff;
-      margin: 0 0 14px;
-      line-height: 1.2;
+    /* hide the old two-column children if they ever render */
+    .hero-animation,
+    .hero-text-side { display: none !important; }
+
+    /* the actual h1 and p are direct children of .hero-inner in our new markup */
+    .hero-inner h1 {
+      font-family: var(--font-display, 'Poppins', sans-serif) !important;
+      font-size: clamp(1.9rem, 4.5vw, 3rem) !important;
+      font-weight: 700 !important;
+      color: #fff !important;
+      margin: 0 0 14px !important;
+      line-height: 1.18 !important;
     }
-    .hero p {
-      font-size: clamp(0.95rem, 2vw, 1.1rem);
-      color: rgba(255,255,255,0.85);
-      margin: 0;
+    .hero-inner p {
+      font-size: clamp(0.95rem, 2vw, 1.1rem) !important;
+      color: rgba(255,255,255,0.85) !important;
+      margin: 0 !important;
     }
-    .hero-location {
+    .hero-inner .hero-location {
       display: inline-flex;
       align-items: center;
       gap: 5px;
       font-size: 13px;
-      color: rgba(255,255,255,0.72);
-      margin-top: 10px;
+      color: rgba(255,255,255,0.75);
+      margin-top: 12px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 999px;
+      padding: 4px 12px;
     }
 
     /* ── RENT / BUY TABS ── */
     .listing-tabs {
-      display: flex;
-      justify-content: center;
-      gap: 0;
-      background: var(--surface, #fff);
-      border-bottom: 2px solid var(--border, #eee);
-      padding: 0;
-      position: sticky;
-      top: 56px;
-      z-index: 90;
+      display: flex !important;
+      justify-content: center !important;
+      background: #fff !important;
+      border-bottom: 2px solid var(--c-border-soft, #eee) !important;
+      padding: 0 !important;
+      position: sticky !important;
+      top: 68px !important;   /* navbar is 68px per index.css */
+      z-index: 150 !important;
     }
     .listing-tab {
-      padding: 14px 40px;
-      font-family: var(--font-display, 'Poppins', sans-serif);
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-muted, #888);
-      background: none;
-      border: none;
-      border-bottom: 3px solid transparent;
-      cursor: pointer;
-      transition: color 0.2s, border-color 0.2s;
-      margin-bottom: -2px;
+      padding: 14px 44px !important;
+      font-family: var(--font-display, 'Poppins', sans-serif) !important;
+      font-size: 15px !important;
+      font-weight: 600 !important;
+      color: var(--c-ink-faint, #888) !important;
+      background: none !important;
+      border: none !important;
+      border-bottom: 3px solid transparent !important;
+      cursor: pointer !important;
+      transition: color 0.2s, border-color 0.2s !important;
+      margin-bottom: -2px !important;
     }
     .listing-tab.active {
-      color: var(--brand, #f7931e);
-      border-bottom-color: var(--brand, #f7931e);
+      color: #f7931e !important;
+      border-bottom-color: #f7931e !important;
     }
     .listing-tab:hover:not(.active) {
-      color: var(--text-main, #222);
+      color: var(--c-ink, #222) !important;
     }
 
-    /* ── FILTER SHEET → RIGHT SIDE ── */
-    .filter-sheet {
-      right: 0 !important;
-      left: auto !important;
-      border-radius: 16px 0 0 16px !important;
+    /* ── FILTER SHEET → RIGHT, with gap ── */
+    @media (min-width: 861px) {
+      .filter-sheet {
+        left: auto !important;
+        right: 20px !important;
+        top: 180px !important;   /* below navbar + tabs + filter row */
+        border-radius: var(--r-lg, 14px) !important;
+      }
     }
   </style>
 </head>
