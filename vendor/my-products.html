@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="../css/footer.css?v=1">
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <style>
-    /* ── Plans modal overrides for monthly + yearly layout ── */
+    /* ── Plans modal ── */
     .plans-modal {
       max-width: 860px;
       width: 95vw;
@@ -114,47 +114,113 @@
       color: var(--c-blue-deep);
       line-height: 1.1;
     }
-    .plan-sub {
-      font-size: 12px;
-      color: var(--c-ink-faint);
+    .plan-sub { font-size: 12px; color: var(--c-ink-faint); }
+    .plan-posts { font-size: 12px; font-weight: 600; color: var(--c-ink-soft); margin-top: 2px; }
+    .plan-yearly-discount { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+    .plan-original-price { font-size: 12px; color: var(--c-ink-faint); text-decoration: line-through; }
+    .plan-save-badge { background: #dcfce7; color: #15803d; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+    .plan-saving-amount { font-size: 12px; color: #15803d; font-weight: 600; }
+    .plan-select-btn { width: 100%; padding: 10px; font-size: 13px; margin-top: auto; }
+
+    /* ── Listing type toggle ── */
+    .listing-type-toggle {
+      display: flex;
+      background: var(--c-bg, #f3f4f6);
+      border-radius: 10px;
+      padding: 4px;
+      gap: 4px;
+      margin-bottom: 4px;
     }
-    .plan-posts {
-      font-size: 12px;
+    .listing-type-toggle button {
+      flex: 1;
+      padding: 10px 0;
+      border: none;
+      border-radius: 7px;
+      font-size: 14px;
       font-weight: 600;
-      color: var(--c-ink-soft);
-      margin-top: 2px;
+      cursor: pointer;
+      background: transparent;
+      color: var(--c-ink-soft, #6b7280);
+      transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
     }
-    .plan-yearly-discount {
+    .listing-type-toggle button.active {
+      background: #fff;
+      color: var(--c-blue-deep, #1e3a8a);
+      box-shadow: 0 1px 6px rgba(0,0,0,0.10);
+    }
+    .listing-type-toggle button.active.sell-active {
+      color: #15803d;
+    }
+    .listing-type-locked {
       display: flex;
       align-items: center;
       gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--c-ink-soft);
+      background: var(--c-bg, #f3f4f6);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 4px;
+    }
+    .listing-type-locked .lt-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--c-blue-mid, #2563eb);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+    .listing-type-locked .lt-pill.sell {
+      background: #16a34a;
+    }
+
+    /* ── Condition select ── */
+    .condition-grid {
+      display: flex;
       flex-wrap: wrap;
+      gap: 8px;
       margin-top: 4px;
     }
-    .plan-original-price {
-      font-size: 12px;
-      color: var(--c-ink-faint);
-      text-decoration: line-through;
+    .condition-chip {
+      padding: 7px 14px;
+      border-radius: 20px;
+      border: 1.5px solid var(--c-border-soft, #e5e7eb);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      background: var(--c-surface, #fff);
+      color: var(--c-ink-soft, #374151);
+      transition: border-color 0.13s, background 0.13s, color 0.13s;
+      user-select: none;
     }
-    .plan-save-badge {
-      background: #dcfce7;
+    .condition-chip.selected {
+      border-color: #16a34a;
+      background: #f0fdf4;
       color: #15803d;
+      font-weight: 600;
+    }
+
+    /* ── Product card type badge ── */
+    .product-type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
       font-size: 11px;
       font-weight: 700;
       padding: 2px 8px;
       border-radius: 20px;
+      margin-bottom: 4px;
     }
-    .plan-saving-amount {
-      font-size: 12px;
-      color: #15803d;
-      font-weight: 600;
-    }
-    .plan-select-btn {
-      width: 100%;
-      padding: 10px;
-      font-size: 13px;
-      margin-top: auto;
-    }
+    .product-type-badge.rent { background: #eff6ff; color: #1d4ed8; }
+    .product-type-badge.sell { background: #f0fdf4; color: #15803d; }
   </style>
 </head>
 <body>
@@ -204,19 +270,16 @@
         </div>
         <button class="nav-btn nav-btn-ghost" id="logoutBtn">Log out</button>
       </div>
-      <!-- Mobile: globe -->
       <div class="nav-lang-wrap" id="navLangWrapMobile">
         <button class="nav-wish-btn" id="navLangBtnMobile" title="Language">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M3 12h18M12 3c2.4 2.6 3.8 5.9 3.8 9s-1.4 6.4-3.8 9c-2.4-2.6-3.8-5.9-3.8-9S9.6 5.6 12 3Z" stroke="currentColor" stroke-width="1.8"/></svg>
         </button>
         <div class="nav-lang-menu" id="navLangMenuMobile"></div>
       </div>
-      <!-- Mobile: hamburger -->
       <button class="nav-hamburger" id="hamburgerBtn" aria-label="Menu">
         <span></span><span></span><span></span>
       </button>
     </div>
-    <!-- Mobile dropdown -->
     <div class="nav-mobile-menu" id="mobileMenu">
       <div class="mobile-user-row">
         <div class="nav-avatar" id="navUserAvatarMobile"></div>
@@ -276,7 +339,7 @@
         <div class="stat-card">
           <div class="stat-label">Live now</div>
           <div class="stat-value" id="statActive">0</div>
-          <div class="stat-sub">visible to renters right now</div>
+          <div class="stat-sub">visible to buyers & renters</div>
         </div>
         <div class="stat-card stat-card-highlight">
           <div class="stat-label">People interested</div>
@@ -306,6 +369,28 @@
     </div>
     <div class="product-modal-body">
       <form id="productForm" novalidate>
+
+        <!-- ── Listing type toggle (add) / locked display (edit) ── -->
+        <div class="field" id="listingTypeField">
+          <label class="label">Listing type</label>
+          <!-- Toggle shown when adding -->
+          <div class="listing-type-toggle" id="listingTypeToggle">
+            <button type="button" id="toggleRent" class="active" onclick="setListingType('rent')">
+              🔑 For Rent
+            </button>
+            <button type="button" id="toggleSell" onclick="setListingType('sell')">
+              🏷️ For Sale
+            </button>
+          </div>
+          <!-- Locked display shown when editing -->
+          <div class="listing-type-locked" id="listingTypeLocked" style="display:none;">
+            <span>Listing type:</span>
+            <span class="lt-pill" id="listingTypeLockedPill">For Rent</span>
+            <span style="font-size:12px;color:var(--c-ink-faint);">Cannot be changed after creation</span>
+          </div>
+        </div>
+
+        <!-- ── Photos ── -->
         <div class="field">
           <label class="label">Photos <span style="font-weight:400;color:var(--c-ink-faint)">(up to 5 - original size, no cropping)</span></label>
           <label for="bulkImageInput" class="btn btn-secondary" style="width:auto;padding:8px 16px;margin-bottom:10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
@@ -322,6 +407,8 @@
           </div>
           <div class="field-hint" style="margin-top:6px;">Tap "Select photos" to pick several at once, or tap any box to fill that slot individually.</div>
         </div>
+
+        <!-- ── Category ── -->
         <div class="field-row">
           <div class="field">
             <label class="label" for="modalCategory">Category</label>
@@ -332,25 +419,50 @@
             <select class="input" id="modalSubcategory" name="subcategory"><option value="">Select subcategory</option></select>
           </div>
         </div>
+
+        <!-- ── Name & description ── -->
         <div class="field">
           <label class="label" for="modalName">Product name</label>
           <input class="input" type="text" id="modalName" name="name" placeholder="e.g. Canon EOS 90D DSLR">
         </div>
         <div class="field">
           <label class="label" for="modalDesc">Description</label>
-          <textarea class="input" id="modalDesc" name="description" rows="3" placeholder="Describe condition, what's included, availability…" style="resize:vertical;"></textarea>
+          <textarea class="input" id="modalDesc" name="description" rows="3" placeholder="Describe what's included, availability…" style="resize:vertical;"></textarea>
         </div>
-        <div class="field-hint" style="margin-bottom:4px;">Fill the rent rates available for this item based on your category.</div>
-        <div class="field-row-3">
-          <div class="field" id="rentWrap_hour"><label class="label" for="modalRentHour">Rent / hour (₹)</label><input class="input" type="number" id="modalRentHour" name="rent_per_hour" placeholder="e.g. 99" min="0"></div>
-          <div class="field" id="rentWrap_km"><label class="label" for="modalRentKm">Rent / km (₹)</label><input class="input" type="number" id="modalRentKm" name="rent_per_km" placeholder="e.g. 12" min="0"></div>
-          <div class="field" id="rentWrap_day"><label class="label" for="modalRentDay">Rent / day (₹)</label><input class="input" type="number" id="modalRentDay" name="rent_per_day" placeholder="e.g. 299" min="0"></div>
-          <div class="field" id="rentWrap_month"><label class="label" for="modalRentMonth">Rent / month (₹)</label><input class="input" type="number" id="modalRentMonth" name="rent_per_month" placeholder="e.g. 4999" min="0"></div>
+
+        <!-- ── RENT FIELDS ── -->
+        <div id="rentFieldsSection">
+          <div class="field-hint" style="margin-bottom:4px;">Fill the rent rates available for this item.</div>
+          <div class="field-row-3">
+            <div class="field" id="rentWrap_hour"><label class="label" for="modalRentHour">Rent / hour (₹)</label><input class="input" type="number" id="modalRentHour" name="rent_per_hour" placeholder="e.g. 99" min="0"></div>
+            <div class="field" id="rentWrap_km"><label class="label" for="modalRentKm">Rent / km (₹)</label><input class="input" type="number" id="modalRentKm" name="rent_per_km" placeholder="e.g. 12" min="0"></div>
+            <div class="field" id="rentWrap_day"><label class="label" for="modalRentDay">Rent / day (₹)</label><input class="input" type="number" id="modalRentDay" name="rent_per_day" placeholder="e.g. 299" min="0"></div>
+            <div class="field" id="rentWrap_month"><label class="label" for="modalRentMonth">Rent / month (₹)</label><input class="input" type="number" id="modalRentMonth" name="rent_per_month" placeholder="e.g. 4999" min="0"></div>
+          </div>
+          <div class="field" style="max-width:220px;">
+            <label class="label" for="modalDeposit">Security deposit (₹) <span style="font-weight:400;color:var(--c-ink-faint)">optional</span></label>
+            <input class="input" type="number" id="modalDeposit" name="security_deposit" placeholder="e.g. 2000" min="0">
+          </div>
         </div>
-        <div class="field" style="max-width:220px;">
-          <label class="label" for="modalDeposit">Security deposit (₹) <span style="font-weight:400;color:var(--c-ink-faint)">optional</span></label>
-          <input class="input" type="number" id="modalDeposit" name="security_deposit" placeholder="e.g. 2000" min="0">
+
+        <!-- ── SELL FIELDS ── -->
+        <div id="sellFieldsSection" style="display:none;">
+          <div class="field-row">
+            <div class="field">
+              <label class="label" for="modalSellingPrice">Selling price (₹)</label>
+              <input class="input" type="number" id="modalSellingPrice" name="selling_price" placeholder="e.g. 15000" min="0">
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Item condition</label>
+            <div class="condition-grid" id="conditionGrid">
+              <!-- filled by JS from GET /conditions -->
+            </div>
+            <input type="hidden" id="modalCondition" name="condition">
+          </div>
         </div>
+
+        <!-- ── Location ── -->
         <div class="profile-section-label" style="margin-top:8px;">Location <span style="font-weight:400;text-transform:none;letter-spacing:0;">(auto-filled from your profile - edit if different)</span></div>
         <div class="field-row">
           <div class="field"><label class="label" for="modalPincode">Pincode</label><input class="input" type="text" id="modalPincode" name="pincode" placeholder="6-digit pincode" maxlength="6"><div class="field-hint" id="modalPincodeStatus"></div></div>
@@ -360,6 +472,7 @@
           <div class="field"><label class="label" for="modalCity">City</label><input class="input" type="text" id="modalCity" name="city" placeholder="City"></div>
           <div class="field"><label class="label" for="modalState">State</label><input class="input" type="text" id="modalState" name="state" placeholder="State"></div>
         </div>
+
       </form>
     </div>
     <div class="product-modal-foot">
@@ -395,7 +508,6 @@
       <button class="modal-close" id="upgradeModalCancel">✕</button>
     </div>
     <div class="plans-current-bar" id="plansCurrentBar"></div>
-    <!-- Plans rendered dynamically by renderPlanCards() in my-products.js -->
     <div id="plansContainer"></div>
   </div>
 </div>
@@ -518,6 +630,6 @@
 <script src="../js/helpers.js?v=2"></script>
 <script src="../js/firebase-chat-auth.js?v=1"></script>
 <script src="../js/vendor/vendor-auth.js?v=1"></script>
-<script src="../js/vendor/vendor-products.js?v=4"></script>
+<script src="../js/vendor/vendor-products.js?v=5"></script>
 </body>
 </html>

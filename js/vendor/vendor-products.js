@@ -1,12 +1,14 @@
 /* ============================================================
-   OLR INDIA – VENDOR PRODUCTS JS  (my-products.html)
+   OLR INDIA – VENDOR PRODUCTS JS  (my-products.html)  v5
    ============================================================ */
 
 // ── State ─────────────────────────────────────────────────────
 let allProducts = [];
 let CATEGORIES = {};
+let CONDITIONS = [];          // from GET /conditions
 let vendorProfile = null;
 let editingId = null;
+let currentListingType = 'rent';   // 'rent' | 'sell'  — active in modal
 const slotFiles = {};
 const slotUrls = {};
 let previewProductId = null;
@@ -117,6 +119,37 @@ async function loadCategories() {
   });
 }
 
+// ── Load conditions ───────────────────────────────────────────
+async function loadConditions() {
+  try {
+    const res = await apiRequest('/auth/vendor/conditions', 'GET');
+    if (res.success && Array.isArray(res.conditions)) {
+      CONDITIONS = res.conditions;
+    }
+  } catch (_) {
+    // fallback: render common conditions statically
+    CONDITIONS = ['Brand New', 'Like New', 'Good', 'Fair', 'For Parts'];
+  }
+  renderConditionChips();
+}
+
+function renderConditionChips(selectedValue = '') {
+  const grid = document.getElementById('conditionGrid');
+  if (!grid) return;
+  grid.innerHTML = CONDITIONS.map(c =>
+    `<button type="button" class="condition-chip${c === selectedValue ? ' selected' : ''}"
+      onclick="selectCondition('${c}')">${c}</button>`
+  ).join('');
+  document.getElementById('modalCondition').value = selectedValue;
+}
+
+function selectCondition(val) {
+  document.querySelectorAll('.condition-chip').forEach(chip => {
+    chip.classList.toggle('selected', chip.textContent === val);
+  });
+  document.getElementById('modalCondition').value = val;
+}
+
 document.getElementById('modalCategory')?.addEventListener('change', function () {
   const subSel = document.getElementById('modalSubcategory');
   subSel.innerHTML = '<option value="">Select subcategory (optional)</option>';
@@ -127,6 +160,34 @@ document.getElementById('modalCategory')?.addEventListener('change', function ()
   });
   updateRentFields();
 });
+
+// ── Listing type toggle ───────────────────────────────────────
+function setListingType(type) {
+  currentListingType = type;
+  const rentBtn = document.getElementById('toggleRent');
+  const sellBtn = document.getElementById('toggleSell');
+  if (rentBtn) {
+    rentBtn.classList.toggle('active', type === 'rent');
+    rentBtn.classList.remove('sell-active');
+  }
+  if (sellBtn) {
+    sellBtn.classList.toggle('active', type === 'sell');
+    if (type === 'sell') sellBtn.classList.add('sell-active');
+  }
+  document.getElementById('rentFieldsSection').style.display = type === 'rent' ? '' : 'none';
+  document.getElementById('sellFieldsSection').style.display = type === 'sell' ? '' : 'none';
+  // Clear irrelevant fields when switching
+  if (type === 'sell') {
+    ['rent_per_hour','rent_per_km','rent_per_day','rent_per_month','security_deposit'].forEach(n => {
+      const el = document.querySelector(`[name="${n}"]`);
+      if (el) el.value = '';
+    });
+  } else {
+    const sp = document.getElementById('modalSellingPrice');
+    if (sp) sp.value = '';
+    renderConditionChips('');
+  }
+}
 
 // ── Rent field visibility ─────────────────────────────────────
 const RENT_FIELDS_BY_CATEGORY = {
@@ -187,10 +248,15 @@ function updateStats() {
   if (clicksEl) clicksEl.textContent = allProducts.reduce((s, p) => s + (p.click_count || 0), 0);
 }
 
-function rentLine(p) {
-  if (p.rent_per_hour) return `₹${p.rent_per_hour} <span>/ hour</span>`;
-  if (p.rent_per_km)   return `₹${p.rent_per_km} <span>/ km</span>`;
-  if (p.rent_per_day)  return `₹${p.rent_per_day} <span>/ day</span>`;
+function priceLine(p) {
+  if (p.listing_type === 'sell') {
+    return p.selling_price
+      ? `₹${Number(p.selling_price).toLocaleString('en-IN')} <span>selling price</span>`
+      : `<span style="font-size:12px;color:var(--c-ink-faint);">Price not set</span>`;
+  }
+  if (p.rent_per_hour)  return `₹${p.rent_per_hour} <span>/ hour</span>`;
+  if (p.rent_per_km)    return `₹${p.rent_per_km} <span>/ km</span>`;
+  if (p.rent_per_day)   return `₹${p.rent_per_day} <span>/ day</span>`;
   if (p.rent_per_month) return `₹${p.rent_per_month} <span>/ month</span>`;
   return `<span style="font-size:12px;color:var(--c-ink-faint);">Price not set</span>`;
 }
@@ -216,7 +282,7 @@ function renderProducts() {
       <div class="empty-state" style="grid-column:1/-1">
         <div class="empty-state-icon">📦</div>
         <h3>No products listed yet</h3>
-        <p>Add your first product to start getting rental enquiries.</p>
+        <p>Add your first product to start getting enquiries.</p>
         <button class="btn btn-primary" onclick="openAddModal()" style="width:auto;padding:10px 24px;display:inline-flex;margin-top:8px;">Add first product</button>
       </div>`;
     return;
@@ -230,6 +296,16 @@ function renderProducts() {
       : 'Not viewed yet';
     const isAdminFlagged = p.deactivated_by === 'admin';
     const daysLeft = p.edit_days_remaining ?? 0;
+
+    // listing type badge
+    const isSell = p.listing_type === 'sell';
+    const typeBadge = `<span class="product-type-badge ${isSell ? 'sell' : 'rent'}">${isSell ? '🏷️ For Sale' : '🔑 For Rent'}</span>`;
+
+    // condition chip (sell only)
+    const conditionBadge = isSell && p.condition
+      ? `<span style="font-size:11px;background:#f0fdf4;color:#15803d;border-radius:20px;padding:2px 8px;font-weight:600;">${p.condition}</span>`
+      : '';
+
     const strikeBanner = isAdminFlagged ? `
       <div style="background:#fff7ed;border:1px solid #f97316;color:#9a3412;padding:10px 12px;border-radius:6px;margin:8px 0;font-size:13px;">
         ⚠️ <strong>Removed by Admin</strong><br>
@@ -252,11 +328,15 @@ function renderProducts() {
         </button>
         <div class="product-body">
           ${strikeBanner}${expiredBanner}
-          <div class="product-cat">${p.category || ''}</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;">
+            <div class="product-cat">${p.category || ''}</div>
+            ${typeBadge}
+            ${conditionBadge}
+          </div>
           <div class="product-title">${p.name}</div>
           <div class="product-desc">${p.description || 'No description.'}</div>
           <div class="product-meta">
-            <div class="product-price">${rentLine(p)}</div>
+            <div class="product-price">${priceLine(p)}</div>
             <div class="product-interest">${interestText}</div>
           </div>
         </div>
@@ -276,7 +356,7 @@ async function toggleProductStatus(productId, newStatus) {
   }
   const res = await apiRequest(`/auth/vendor/products/${productId}/status`, 'PUT', { is_active: newStatus });
   if (res.success) {
-    toastSuccess(newStatus ? 'Product reactivated.' : 'Marked as rented.');
+    toastSuccess(newStatus ? 'Product reactivated.' : 'Marked as inactive.');
     await loadProducts();
     if (previewProductId === productId) renderPreviewModal(productId);
   } else {
@@ -302,18 +382,38 @@ function renderPreviewModal(productId) {
   const body = document.getElementById('previewModalBody');
   const foot = document.getElementById('previewModalFoot');
   if (!p || !body || !foot) return;
+
   const images = p.images && p.images.length ? p.images : [];
   const imagesHtml = images.length
     ? `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-bottom:16px;">
         ${images.map(url => `<img src="${url}" alt="${p.name}" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--r-md);border:1px solid var(--c-border-soft);">`).join('')}
        </div>`
     : `<div class="product-img-placeholder" style="border-radius:var(--r-md);margin-bottom:16px;">📦</div>`;
-  const priceRows = [
-    p.rent_per_hour  ? `₹${p.rent_per_hour} / hour`  : null,
-    p.rent_per_km    ? `₹${p.rent_per_km} / km`      : null,
-    p.rent_per_day   ? `₹${p.rent_per_day} / day`    : null,
-    p.rent_per_month ? `₹${p.rent_per_month} / month` : null,
-  ].filter(Boolean).join(' &nbsp;•&nbsp; ');
+
+  const isSell = p.listing_type === 'sell';
+  const typeBadgeHtml = `<span class="product-type-badge ${isSell ? 'sell' : 'rent'}" style="position:static;">${isSell ? '🏷️ For Sale' : '🔑 For Rent'}</span>`;
+
+  let priceHtml = '';
+  if (isSell) {
+    priceHtml = p.selling_price
+      ? `<div style="font-size:15px;font-weight:700;color:#15803d;margin-bottom:4px;">₹${Number(p.selling_price).toLocaleString('en-IN')} <span style="font-size:13px;font-weight:500;">selling price</span></div>`
+      : '<div style="font-size:13px;color:var(--c-ink-faint);margin-bottom:4px;">Price not set</div>';
+    if (p.condition) {
+      priceHtml += `<div style="font-size:13px;margin-bottom:6px;">Condition: <span style="font-weight:600;color:#15803d;">${p.condition}</span></div>`;
+    }
+  } else {
+    const rows = [
+      p.rent_per_hour  ? `₹${p.rent_per_hour} / hour`  : null,
+      p.rent_per_km    ? `₹${p.rent_per_km} / km`      : null,
+      p.rent_per_day   ? `₹${p.rent_per_day} / day`    : null,
+      p.rent_per_month ? `₹${p.rent_per_month} / month` : null,
+    ].filter(Boolean).join(' &nbsp;•&nbsp; ');
+    priceHtml = `<div style="font-size:15px;font-weight:700;color:var(--c-blue-deep);margin-bottom:4px;">${rows || 'Price not set'}</div>`;
+    if (p.security_deposit) {
+      priceHtml += `<div style="font-size:13px;color:var(--c-ink-faint);margin-bottom:6px;">Security deposit: ₹${p.security_deposit}</div>`;
+    }
+  }
+
   body.innerHTML = `
     ${p.deactivated_by === 'admin' ? `
     <div style="background:#fff7ed;border:1px solid #f97316;color:#9a3412;padding:12px 14px;border-radius:6px;margin-bottom:12px;font-size:13px;">
@@ -321,24 +421,28 @@ function renderPreviewModal(productId) {
       Reason: ${p.strike_reason || 'Policy violation'}<br>
       <strong>${p.edit_days_remaining ?? 0} day(s) left</strong> - edit to bring it back live, or it will be permanently deleted.
     </div>` : ''}
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
       <span class="product-status-badge ${p.is_active ? '' : 'inactive'}" style="position:static;">${p.is_active ? 'Live' : 'Inactive'}</span>
+      ${typeBadgeHtml}
       <span class="product-cat" style="margin:0;">${p.category || ''}${p.subcategory ? ' · ' + p.subcategory : ''}</span>
     </div>
     ${imagesHtml}
     <h3 style="margin:0 0 6px;font-size:18px;">${p.name}</h3>
     <p style="font-size:13.5px;color:var(--c-ink-soft);line-height:1.5;margin-bottom:12px;">${p.description || 'No description.'}</p>
-    <div style="font-size:15px;font-weight:700;color:var(--c-blue-deep);margin-bottom:6px;">${priceRows || 'Price not set'}</div>
-    ${p.security_deposit ? `<div style="font-size:13px;color:var(--c-ink-faint);margin-bottom:6px;">Security deposit: ₹${p.security_deposit}</div>` : ''}
+    ${priceHtml}
     <div style="font-size:13px;color:var(--c-ink-faint);margin-bottom:6px;">${[p.area,p.city,p.state,p.pincode].filter(Boolean).join(', ')}</div>
     <div style="font-size:13px;color:#B5790A;font-weight:600;">
       ${(p.click_count || 0) > 0 ? `🔥 ${p.click_count} ${p.click_count === 1 ? 'person has' : 'people have'} viewed this` : 'Not viewed yet'}
     </div>`;
+
+  const deactivateLabel = isSell ? 'Mark as Sold' : 'Deactivate';
+  const reactivateLabel = isSell ? 'Relist' : 'Reactivate';
+
   foot.innerHTML = `
     <button class="btn btn-secondary" style="width:auto;padding:10px 16px;" onclick="openShareModal(${p.id})">Share</button>
     ${p.deactivated_by !== 'admin' && p.deactivated_by !== 'plan_expired' ? `
       <button class="btn btn-secondary" style="width:auto;padding:10px 16px;" onclick="toggleProductStatus(${p.id},${!p.is_active})">
-        ${p.is_active ? 'Deactivate' : 'Reactivate'}
+        ${p.is_active ? deactivateLabel : reactivateLabel}
       </button>` : ''}
     ${p.deactivated_by === 'plan_expired' ? `
       <button class="btn btn-primary" style="width:auto;padding:10px 16px;" onclick="closePreviewModal();openUpgradeModal('Renew your plan to reactivate this product.')">
@@ -388,7 +492,6 @@ function renderPlanCards() {
   const current = vendorProfile.subscription_plan || 'free';
   const expires = vendorProfile.subscription_expires_at;
 
-  // ── Current plan bar ───────────────────────────────────────
   const bar = document.getElementById('plansCurrentBar');
   if (bar) {
     const planName = PLAN_LABELS[current] || current;
@@ -400,83 +503,27 @@ function renderPlanCards() {
     bar.innerHTML = `You're on <strong>${planName}</strong>${expiryText}`;
   }
 
-  // ── Plan rank for disable logic ────────────────────────────
-  const rankMap = {
-    free: 0,
-    starter: 1, starter_yearly: 1,
-    growth: 2,  growth_yearly: 2,
-    premium: 3, premium_yearly: 3,
-  };
+  const rankMap = { free:0, starter:1, starter_yearly:1, growth:2, growth_yearly:2, premium:3, premium_yearly:3 };
   const currentRank = rankMap[current] ?? 0;
 
-  // ── Plan definitions with full feature lists ───────────────
   const monthlyPlans = [
-    {
-      key: 'free', label: 'Free', price: '₹0', sub: 'Forever free', posts: '5 listings', badge: '',
-      features: [
-        { text: '5 active listings',       yes: true  },
-        { text: 'Basic visibility',         yes: true  },
-        { text: 'No badge',                 yes: false },
-        { text: 'No priority listing',      yes: false },
-      ],
-    },
-    {
-      key: 'starter', label: 'Starter', price: '₹249', sub: 'per month', posts: '10 listings', badge: '',
-      features: [
-        { text: '10 active listings',       yes: true  },
-        { text: 'Priority over free vendors',yes: true  },
-        { text: 'No badge',                 yes: false },
-        { text: 'Email support',            yes: true  },
-      ],
-    },
-    {
-      key: 'growth', label: 'Growth', price: '₹449', sub: 'per month', posts: '20 listings', badge: '✓ Verified',
-      features: [
-        { text: '20 active listings',       yes: true  },
-        { text: 'Higher priority ranking',  yes: true  },
-        { text: 'Verified badge ✓',         yes: true  },
-        { text: 'Priority support',         yes: true  },
-      ],
-    },
-    {
-      key: 'premium', label: 'Premium', price: '₹999', sub: 'per month', posts: 'Unlimited', badge: '★ Featured',
-      features: [
-        { text: 'Unlimited listings',       yes: true  },
-        { text: 'Highest priority ranking', yes: true  },
-        { text: 'Featured badge ★',         yes: true  },
-        { text: 'Dedicated support',        yes: true  },
-      ],
-    },
+    { key:'free',    label:'Free',    price:'₹0',   sub:'Forever free',  posts:'5 listings',   badge:'',
+      features:[{text:'5 active listings',yes:true},{text:'Basic visibility',yes:true},{text:'No badge',yes:false},{text:'No priority listing',yes:false}] },
+    { key:'starter', label:'Starter', price:'₹249', sub:'per month',      posts:'10 listings',  badge:'',
+      features:[{text:'10 active listings',yes:true},{text:'Priority over free vendors',yes:true},{text:'No badge',yes:false},{text:'Email support',yes:true}] },
+    { key:'growth',  label:'Growth',  price:'₹449', sub:'per month',      posts:'20 listings',  badge:'✓ Verified',
+      features:[{text:'20 active listings',yes:true},{text:'Higher priority ranking',yes:true},{text:'Verified badge ✓',yes:true},{text:'Priority support',yes:true}] },
+    { key:'premium', label:'Premium', price:'₹999', sub:'per month',      posts:'Unlimited',    badge:'★ Featured',
+      features:[{text:'Unlimited listings',yes:true},{text:'Highest priority ranking',yes:true},{text:'Featured badge ★',yes:true},{text:'Dedicated support',yes:true}] },
   ];
 
   const yearlyPlans = [
-    {
-      key: 'starter_yearly', label: 'Starter', price: '₹2,499', sub: 'per year', posts: '10 listings', badge: '',
-      features: [
-        { text: '10 active listings',       yes: true  },
-        { text: 'Priority over free vendors',yes: true  },
-        { text: 'No badge',                 yes: false },
-        { text: 'Email support',            yes: true  },
-      ],
-    },
-    {
-      key: 'growth_yearly', label: 'Growth', price: '₹4,499', sub: 'per year', posts: '20 listings', badge: '✓ Verified',
-      features: [
-        { text: '20 active listings',       yes: true  },
-        { text: 'Higher priority ranking',  yes: true  },
-        { text: 'Verified badge ✓',         yes: true  },
-        { text: 'Priority support',         yes: true  },
-      ],
-    },
-    {
-      key: 'premium_yearly', label: 'Premium', price: '₹9,999', sub: 'per year', posts: 'Unlimited', badge: '★ Featured',
-      features: [
-        { text: 'Unlimited listings',       yes: true  },
-        { text: 'Highest priority ranking', yes: true  },
-        { text: 'Featured badge ★',         yes: true  },
-        { text: 'Dedicated support',        yes: true  },
-      ],
-    },
+    { key:'starter_yearly', label:'Starter', price:'₹2,499', sub:'per year', posts:'10 listings', badge:'',
+      features:[{text:'10 active listings',yes:true},{text:'Priority over free vendors',yes:true},{text:'No badge',yes:false},{text:'Email support',yes:true}] },
+    { key:'growth_yearly',  label:'Growth',  price:'₹4,499', sub:'per year', posts:'20 listings', badge:'✓ Verified',
+      features:[{text:'20 active listings',yes:true},{text:'Higher priority ranking',yes:true},{text:'Verified badge ✓',yes:true},{text:'Priority support',yes:true}] },
+    { key:'premium_yearly', label:'Premium', price:'₹9,999', sub:'per year', posts:'Unlimited',   badge:'★ Featured',
+      features:[{text:'Unlimited listings',yes:true},{text:'Highest priority ranking',yes:true},{text:'Featured badge ★',yes:true},{text:'Dedicated support',yes:true}] },
   ];
 
   function planCardHtml(plan, isYearly) {
@@ -485,76 +532,45 @@ function renderPlanCards() {
     const isLower = rank < currentRank;
     const isPopular = plan.key === 'growth' || plan.key === 'growth_yearly';
     const discount = isYearly ? PLAN_YEARLY_DISCOUNT[plan.key] : null;
-
-    let btnLabel = `Get ${plan.label}`;
-    let btnDisabled = '';
-    let btnOpacity = '';
-    if (isCurrent) {
-      btnLabel = 'Current Plan';
-      btnDisabled = 'disabled';
-    } else if (isLower) {
-      btnLabel = 'Downgrade';
-      btnDisabled = 'disabled';
-      btnOpacity = 'style="opacity:0.35;"';
-    }
-
+    let btnLabel = `Get ${plan.label}`, btnDisabled = '', btnOpacity = '';
+    if (isCurrent) { btnLabel = 'Current Plan'; btnDisabled = 'disabled'; }
+    else if (isLower) { btnLabel = 'Downgrade'; btnDisabled = 'disabled'; btnOpacity = 'style="opacity:0.35;"'; }
     const discountHtml = discount ? `
       <div class="plan-yearly-discount">
         <span class="plan-original-price">₹${discount.original.toLocaleString('en-IN')}/yr</span>
         <span class="plan-save-badge">Save ${discount.percent}%</span>
       </div>
-      <div class="plan-saving-amount">You save ₹${discount.saving.toLocaleString('en-IN')}</div>
-    ` : '';
-
-    const currentTag = isCurrent ? `<div class="plan-current-tag">Current</div>` : '';
-    const popularTag = isPopular ? `<div class="plan-popular-tag">Most Popular</div>` : '';
-    const badgeHtml = plan.badge ? `<span class="plan-badge">${plan.badge}</span>` : '';
-
-    const featuresHtml = plan.features.map(f =>
-      `<li>${f.yes ? '✓' : '✗'} ${f.text}</li>`
-    ).join('');
-
+      <div class="plan-saving-amount">You save ₹${discount.saving.toLocaleString('en-IN')}</div>` : '';
     return `
       <div class="plan-card ${isCurrent ? 'plan-card-current' : ''} ${isPopular ? 'plan-card-popular' : ''}">
-        ${popularTag}
-        ${currentTag}
+        ${isPopular ? '<div class="plan-popular-tag">Most Popular</div>' : ''}
+        ${isCurrent ? '<div class="plan-current-tag">Current</div>' : ''}
         <div class="plan-card-top">
-          <div class="plan-label">${plan.label} ${badgeHtml}</div>
+          <div class="plan-label">${plan.label} ${plan.badge ? `<span class="plan-badge">${plan.badge}</span>` : ''}</div>
           <div class="plan-price">${plan.price}</div>
           <div class="plan-sub">${plan.sub}</div>
           ${discountHtml}
         </div>
-        <ul class="plan-features">${featuresHtml}</ul>
+        <ul class="plan-features">${plan.features.map(f => `<li>${f.yes ? '✓' : '✗'} ${f.text}</li>`).join('')}</ul>
         <button class="btn btn-primary plan-select-btn" ${btnDisabled} ${btnOpacity}
-          onclick="handlePlanSelect('${plan.key}')"
-          id="planBtn-${plan.key}">
-          <span class="btn-label">${btnLabel}</span>
-          <span class="spinner"></span>
+          onclick="handlePlanSelect('${plan.key}')" id="planBtn-${plan.key}">
+          <span class="btn-label">${btnLabel}</span><span class="spinner"></span>
         </button>
       </div>`;
   }
 
-  // ── Inject into container ──────────────────────────────────
   const container = document.getElementById('plansContainer');
   if (!container) return;
-
   container.innerHTML = `
     <div class="plans-section">
-      <div class="plans-section-heading">
-        <span>Monthly</span>
-      </div>
-      <div class="plans-grid plans-grid-monthly">
-        ${monthlyPlans.map(p => planCardHtml(p, false)).join('')}
-      </div>
+      <div class="plans-section-heading"><span>Monthly</span></div>
+      <div class="plans-grid plans-grid-monthly">${monthlyPlans.map(p => planCardHtml(p, false)).join('')}</div>
     </div>
     <div class="plans-section" style="margin-top:28px;">
       <div class="plans-section-heading plans-section-heading-yearly">
-        <span>Yearly</span>
-        <span class="plans-yearly-tag">🏷️ Save up to 17%</span>
+        <span>Yearly</span><span class="plans-yearly-tag">🏷️ Save up to 17%</span>
       </div>
-      <div class="plans-grid plans-grid-yearly">
-        ${yearlyPlans.map(p => planCardHtml(p, true)).join('')}
-      </div>
+      <div class="plans-grid plans-grid-yearly">${yearlyPlans.map(p => planCardHtml(p, true)).join('')}</div>
     </div>`;
 }
 
@@ -707,6 +723,15 @@ function openAddModal() {
   editingId = null;
   document.getElementById('modalTitle').textContent = 'Add new product';
   document.getElementById('productForm').reset();
+
+  // Show toggle, hide locked
+  document.getElementById('listingTypeToggle').style.display = '';
+  document.getElementById('listingTypeLocked').style.display = 'none';
+
+  // Default to rent
+  setListingType('rent');
+  renderConditionChips('');
+
   const account = getSessionAccount('vendor');
   if (account) {
     const f = document.getElementById('productForm');
@@ -728,29 +753,57 @@ async function openEditModal(productId) {
   document.getElementById('modalTitle').textContent = 'Edit product';
   const form = document.getElementById('productForm');
   form.reset();
+
+  // listing_type is locked on edit — show locked pill, hide toggle
+  const lt = p.listing_type || 'rent';
+  currentListingType = lt;
+  document.getElementById('listingTypeToggle').style.display = 'none';
+  document.getElementById('listingTypeLocked').style.display = '';
+  const pill = document.getElementById('listingTypeLockedPill');
+  if (pill) {
+    pill.textContent = lt === 'sell' ? '🏷️ For Sale' : '🔑 For Rent';
+    pill.className = 'lt-pill' + (lt === 'sell' ? ' sell' : '');
+  }
+
+  // Show/hide correct sections
+  document.getElementById('rentFieldsSection').style.display = lt === 'rent' ? '' : 'none';
+  document.getElementById('sellFieldsSection').style.display = lt === 'sell' ? '' : 'none';
+
+  // Fill common fields
   form.querySelector('[name="name"]').value = p.name || '';
   form.querySelector('[name="description"]').value = p.description || '';
-  form.querySelector('[name="rent_per_hour"]').value = p.rent_per_hour || '';
-  form.querySelector('[name="rent_per_km"]').value = p.rent_per_km || '';
-  form.querySelector('[name="rent_per_day"]').value = p.rent_per_day || '';
-  form.querySelector('[name="rent_per_month"]').value = p.rent_per_month || '';
-  form.querySelector('[name="security_deposit"]').value = p.security_deposit || '';
   form.querySelector('[name="pincode"]').value = p.pincode || '';
   form.querySelector('[name="area"]').value = p.area || '';
   form.querySelector('[name="city"]').value = p.city || '';
   form.querySelector('[name="state"]').value = p.state || '';
+
+  if (lt === 'rent') {
+    form.querySelector('[name="rent_per_hour"]').value = p.rent_per_hour || '';
+    form.querySelector('[name="rent_per_km"]').value = p.rent_per_km || '';
+    form.querySelector('[name="rent_per_day"]').value = p.rent_per_day || '';
+    form.querySelector('[name="rent_per_month"]').value = p.rent_per_month || '';
+    form.querySelector('[name="security_deposit"]').value = p.security_deposit || '';
+  } else {
+    document.getElementById('modalSellingPrice').value = p.selling_price || '';
+    renderConditionChips(p.condition || '');
+  }
+
   originalProductSnapshot = {
     name: p.name || '', description: p.description || '',
+    listing_type: lt,
     rent_per_hour: String(p.rent_per_hour || ''), rent_per_km: String(p.rent_per_km || ''),
     rent_per_day: String(p.rent_per_day || ''), rent_per_month: String(p.rent_per_month || ''),
-    security_deposit: String(p.security_deposit || ''), category: p.category || '',
-    subcategory: p.subcategory || '', pincode: p.pincode || '', area: p.area || '',
-    city: p.city || '', state: p.state || '',
+    security_deposit: String(p.security_deposit || ''),
+    selling_price: String(p.selling_price || ''), condition: p.condition || '',
+    category: p.category || '', subcategory: p.subcategory || '',
+    pincode: p.pincode || '', area: p.area || '', city: p.city || '', state: p.state || '',
   };
+
   const catSel = document.getElementById('modalCategory');
   catSel.value = p.category || '';
   catSel.dispatchEvent(new Event('change'));
   setTimeout(() => { document.getElementById('modalSubcategory').value = p.subcategory || ''; }, 50);
+
   for (let i = 1; i <= 5; i++) {
     delete slotFiles[i];
     const url = p.images && p.images[i - 1] ? p.images[i - 1] : null;
@@ -771,32 +824,54 @@ document.getElementById('productForm')?.addEventListener('submit', async e => {
   const form = e.target;
   const saveBtn = document.getElementById('modalSaveBtn');
   const name = form.querySelector('[name="name"]').value.trim();
-  const rentHour = form.querySelector('[name="rent_per_hour"]').value.trim();
-  const rentKm = form.querySelector('[name="rent_per_km"]').value.trim();
-  const rentDay = form.querySelector('[name="rent_per_day"]').value.trim();
-  const rentMonth = form.querySelector('[name="rent_per_month"]').value.trim();
   const category = document.getElementById('modalCategory').value;
+  const lt = currentListingType;
 
   if (editingId === null) {
+    // ── ADD ──
     if (!name) { toastError('Please enter a product name.'); return; }
     if (!category) { toastError('Please select a category.'); return; }
-    if (!(rentHour || rentKm || rentDay || rentMonth)) { toastError('Please enter at least one rent price.'); return; }
     if (Object.keys(slotFiles).length === 0) { toastError('Please upload at least one photo.'); return; }
+
+    if (lt === 'rent') {
+      const rh = form.querySelector('[name="rent_per_hour"]').value.trim();
+      const rk = form.querySelector('[name="rent_per_km"]').value.trim();
+      const rd = form.querySelector('[name="rent_per_day"]').value.trim();
+      const rm = form.querySelector('[name="rent_per_month"]').value.trim();
+      if (!(rh || rk || rd || rm)) { toastError('Please enter at least one rent price.'); return; }
+    } else {
+      const sp = document.getElementById('modalSellingPrice').value.trim();
+      if (!sp) { toastError('Please enter a selling price.'); return; }
+      const cond = document.getElementById('modalCondition').value;
+      if (!cond) { toastError('Please select the item condition.'); return; }
+    }
+
     const fd = new FormData();
     fd.append('name', name);
     fd.append('description', form.querySelector('[name="description"]').value.trim());
-    fd.append('rent_per_hour', rentHour); fd.append('rent_per_km', rentKm);
-    fd.append('rent_per_day', rentDay); fd.append('rent_per_month', rentMonth);
-    fd.append('security_deposit', form.querySelector('[name="security_deposit"]').value.trim());
     fd.append('category', category);
     fd.append('subcategory', document.getElementById('modalSubcategory').value);
+    fd.append('listing_type', lt);
     fd.append('pincode', form.querySelector('[name="pincode"]').value.trim());
     fd.append('area', form.querySelector('[name="area"]').value.trim());
     fd.append('city', form.querySelector('[name="city"]').value.trim());
     fd.append('state', form.querySelector('[name="state"]').value.trim());
+
+    if (lt === 'rent') {
+      fd.append('rent_per_hour', form.querySelector('[name="rent_per_hour"]').value.trim());
+      fd.append('rent_per_km', form.querySelector('[name="rent_per_km"]').value.trim());
+      fd.append('rent_per_day', form.querySelector('[name="rent_per_day"]').value.trim());
+      fd.append('rent_per_month', form.querySelector('[name="rent_per_month"]').value.trim());
+      fd.append('security_deposit', form.querySelector('[name="security_deposit"]').value.trim());
+    } else {
+      fd.append('selling_price', document.getElementById('modalSellingPrice').value.trim());
+      fd.append('condition', document.getElementById('modalCondition').value);
+    }
+
     for (let i = 1; i <= 5; i++) {
       if (slotFiles[i]) { const c = await compressImage(slotFiles[i]); fd.append(`image${i}`, c); }
     }
+
     setButtonLoading(saveBtn, true);
     const resp = await fetch(API_BASE + '/auth/vendor/products', { method: 'POST', body: fd, credentials: 'include' });
     let res;
@@ -805,32 +880,71 @@ document.getElementById('productForm')?.addEventListener('submit', async e => {
     if (res.success) { toastSuccess('Product listed!'); closeProductModal(); await loadProducts(); }
     else if (res.message?.toLowerCase().includes('limit')) { closeProductModal(); openUpgradeModal(res.message); }
     else toastError(res.message || 'Failed to add product.');
+
   } else {
-    const n = name, rh = rentHour, rk = rentKm, rd = rentDay, rm = rentMonth;
-    const sd = form.querySelector('[name="security_deposit"]').value.trim();
-    const cat = category, sub = document.getElementById('modalSubcategory').value;
+    // ── EDIT ──
+    const snap = originalProductSnapshot;
+    const lt = snap.listing_type;  // locked — use from snapshot
     const desc = form.querySelector('[name="description"]').value.trim();
+    const cat = category;
+    const sub = document.getElementById('modalSubcategory').value;
     const pincode = form.querySelector('[name="pincode"]').value.trim();
     const area = form.querySelector('[name="area"]').value.trim();
     const city = form.querySelector('[name="city"]').value.trim();
     const state = form.querySelector('[name="state"]').value.trim();
+
     const data = {
-      name: n || undefined, category: cat || undefined,
+      name: name || undefined,
+      category: cat || undefined,
       description: desc === '' ? null : desc,
-      rent_per_hour: rh === '' ? null : rh, rent_per_km: rk === '' ? null : rk,
-      rent_per_day: rd === '' ? null : rd, rent_per_month: rm === '' ? null : rm,
-      security_deposit: sd === '' ? null : sd, subcategory: sub === '' ? null : sub,
-      pincode: pincode === '' ? null : pincode, area: area === '' ? null : area,
-      city: city === '' ? null : city, state: state === '' ? null : state,
+      subcategory: sub === '' ? null : sub,
+      pincode: pincode === '' ? null : pincode,
+      area: area === '' ? null : area,
+      city: city === '' ? null : city,
+      state: state === '' ? null : state,
     };
+
+    if (lt === 'rent') {
+      const rh = form.querySelector('[name="rent_per_hour"]').value.trim();
+      const rk = form.querySelector('[name="rent_per_km"]').value.trim();
+      const rd = form.querySelector('[name="rent_per_day"]').value.trim();
+      const rm = form.querySelector('[name="rent_per_month"]').value.trim();
+      const sd = form.querySelector('[name="security_deposit"]').value.trim();
+      data.rent_per_hour = rh === '' ? null : rh;
+      data.rent_per_km   = rk === '' ? null : rk;
+      data.rent_per_day  = rd === '' ? null : rd;
+      data.rent_per_month = rm === '' ? null : rm;
+      data.security_deposit = sd === '' ? null : sd;
+    } else {
+      const sp = document.getElementById('modalSellingPrice').value.trim();
+      const cond = document.getElementById('modalCondition').value;
+      data.selling_price = sp === '' ? null : sp;
+      data.condition = cond === '' ? null : cond;
+    }
+
     Object.keys(data).forEach(k => data[k] === undefined && delete data[k]);
-    const snap = originalProductSnapshot;
+
     const hasImageChange = Object.keys(slotFiles).length > 0;
-    const hasFieldChange = n !== snap.name || desc !== snap.description || rd !== snap.rent_per_day ||
-      rh !== snap.rent_per_hour || rk !== snap.rent_per_km || rm !== snap.rent_per_month ||
-      sd !== snap.security_deposit || cat !== snap.category || sub !== snap.subcategory ||
+    let hasFieldChange = name !== snap.name || desc !== snap.description ||
+      cat !== snap.category || sub !== snap.subcategory ||
       pincode !== snap.pincode || area !== snap.area || city !== snap.city || state !== snap.state;
-    if (!hasFieldChange && !hasImageChange) { toastError('No changes detected.'); setButtonLoading(saveBtn, false); return; }
+
+    if (lt === 'rent') {
+      const rh = form.querySelector('[name="rent_per_hour"]').value.trim();
+      const rk = form.querySelector('[name="rent_per_km"]').value.trim();
+      const rd = form.querySelector('[name="rent_per_day"]').value.trim();
+      const rm = form.querySelector('[name="rent_per_month"]').value.trim();
+      const sd = form.querySelector('[name="security_deposit"]').value.trim();
+      hasFieldChange = hasFieldChange || rh !== snap.rent_per_hour || rk !== snap.rent_per_km ||
+        rd !== snap.rent_per_day || rm !== snap.rent_per_month || sd !== snap.security_deposit;
+    } else {
+      const sp = document.getElementById('modalSellingPrice').value.trim();
+      const cond = document.getElementById('modalCondition').value;
+      hasFieldChange = hasFieldChange || sp !== snap.selling_price || cond !== snap.condition;
+    }
+
+    if (!hasFieldChange && !hasImageChange) { toastError('No changes detected.'); return; }
+
     setButtonLoading(saveBtn, true);
     const res = await apiRequest(`/auth/vendor/products/${editingId}`, 'PUT', data);
     for (let i = 1; i <= 5; i++) {
@@ -865,7 +979,7 @@ async function confirmDelete(productId) {
   else toastError(res.message || 'Delete failed.');
 }
 
-// ── Hamburger ─────────────────────────────────────────────────
+// ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('hamburgerBtn')?.addEventListener('click', () => {
     document.getElementById('mobileMenu').classList.toggle('open');
@@ -874,6 +988,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initImageSlots();
   initModalPincodeAutofill();
   loadCategories();
+  loadConditions();
   loadProducts();
 });
 
