@@ -213,27 +213,26 @@ function renderListingChip(listingType) {
   const isRent = listingType !== 'sell';
   const chip = document.getElementById('listingTypeChip');
   if (!chip) return;
-  if (isRent) {
-    chip.textContent = '🔑 For Rent';
-    chip.style.cssText = `
-      display:inline-flex;align-items:center;gap:5px;
-      background:#EAF3FF;color:#1d4ed8;
-      border:1.5px solid #bfdbfe;
-      font-size:12px;font-weight:700;
-      padding:5px 12px;border-radius:999px;
-      font-family:var(--font-display);letter-spacing:.02em;
-    `;
-  } else {
-    chip.textContent = '🏷️ For Sale';
-    chip.style.cssText = `
-      display:inline-flex;align-items:center;gap:5px;
-      background:#f0fdf4;color:#15803d;
-      border:1.5px solid #bbf7d0;
-      font-size:12px;font-weight:700;
-      padding:5px 12px;border-radius:999px;
-      font-family:var(--font-display);letter-spacing:.02em;
-    `;
-  }
+  chip.style.cssText = `margin:14px 0 6px;`;
+  chip.innerHTML = isRent
+    ? `<span style="
+        display:inline-flex;align-items:center;
+        background:#EAF3FF;color:#1d4ed8;
+        border:1.5px solid #bfdbfe;
+        font-size:12.5px;font-weight:700;
+        padding:5px 14px;border-radius:999px;
+        font-family:var(--font-display);letter-spacing:.03em;
+        text-transform:uppercase;
+      ">For Rent</span>`
+    : `<span style="
+        display:inline-flex;align-items:center;
+        background:#f0fdf4;color:#15803d;
+        border:1.5px solid #bbf7d0;
+        font-size:12.5px;font-weight:700;
+        padding:5px 14px;border-radius:999px;
+        font-family:var(--font-display);letter-spacing:.03em;
+        text-transform:uppercase;
+      ">For Sale</span>`;
 }
 
 /* ── Render pricing rows ─────────────────────────────────── */
@@ -311,7 +310,7 @@ async function loadRelatedProducts(category, listingType, excludeId) {
         <h2 style="font-size:17px;font-weight:700;color:var(--c-ink);font-family:var(--font-display);margin:0 0 16px;">
           Related ${typeLabel} Listings
         </h2>
-        <div class="product-grid" id="relatedGrid" style="grid-template-columns:repeat(4,1fr);gap:20px;">
+        <div class="product-grid" id="relatedGrid">
           ${related.map(p => buildRelatedCard(p, listingType)).join('')}
         </div>
       </div>
