@@ -442,7 +442,8 @@ body {
   z-index: 401;
   background: #fff;
   top: 112px;
-  left: 20px;
+  right: 20px;
+  left: auto;
   width: 340px;
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-lg);
