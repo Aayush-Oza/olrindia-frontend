@@ -20,7 +20,6 @@
 
 .nav-logo img {
   height: 52px;
-  /* was 38px */
   width: auto;
   display: block;
   flex-shrink: 0;
@@ -236,7 +235,7 @@
 .hero-animation {
   flex: 0 0 55%;
   aspect-ratio: 16/9;
-    background: #000;
+  background: #000;
   border-radius: 14px;
   overflow: hidden;
   position: relative;
@@ -436,6 +435,41 @@
   }
 }
 
+/* ── Rent / Buy tabs ─────────────────────────────────────────── */
+.listing-tabs {
+  display: flex;
+  justify-content: center;
+  background: #fff;
+  border-bottom: 2px solid var(--c-border-soft);
+  padding: 0;
+  position: sticky;
+  top: 68px;
+  z-index: 150;
+}
+
+.listing-tab {
+  padding: 13px 44px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--c-ink-faint);
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  transition: color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+}
+
+.listing-tab.active {
+  color: #f7931e;
+  border-bottom-color: #f7931e;
+}
+
+.listing-tab:hover:not(.active) {
+  color: var(--c-ink);
+}
+
 /* ── Filter row ──────────────────────────────────────────────── */
 .filter-row {
   background: #fff;
@@ -514,7 +548,6 @@
   font-weight: 700;
 }
 
-/* Active filter chips */
 .active-filters {
   display: flex;
   gap: 8px;
@@ -565,9 +598,9 @@
   position: fixed;
   z-index: 401;
   background: #fff;
-  /* Desktop: dropdown from top-left */
   top: 112px;
-  left: 20px;
+  right: 20px;
+  left: auto;
   width: 340px;
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-lg);
@@ -1092,9 +1125,7 @@
 .auth-modal-logo img {
   width: auto;
   height: 64px;
-  /* was 30px */
   border-radius: 0;
-  /* was 50% - circle clips the new logo badly */
   object-fit: contain;
   background: #fff;
   padding: 2px;
@@ -1113,7 +1144,7 @@
   margin-bottom: 4px;
 }
 
-.auth-modal>p {
+.auth-modal > p {
   font-size: 13.5px;
   color: var(--c-ink-faint);
   margin-bottom: 20px;
@@ -1204,34 +1235,14 @@
   animation: shimmer 1.4s infinite;
 }
 
-.skeleton-line-sm {
-  height: 10px;
-  width: 45%;
-}
-
-.skeleton-line-md {
-  height: 13px;
-  width: 80%;
-}
-
-.skeleton-line-lg {
-  height: 17px;
-  width: 55%;
-}
-
-.skeleton-line-xs {
-  height: 11px;
-  width: 35%;
-}
+.skeleton-line-sm  { height: 10px; width: 45%; }
+.skeleton-line-md  { height: 13px; width: 80%; }
+.skeleton-line-lg  { height: 17px; width: 55%; }
+.skeleton-line-xs  { height: 11px; width: 35%; }
 
 @keyframes shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-
-  100% {
-    background-position: -200% 0;
-  }
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 /* ── Scroll sentinel ─────────────────────────────────────────── */
@@ -1319,7 +1330,6 @@
 
 /* ── Responsive ──────────────────────────────────────────────── */
 @media (max-width: 860px) {
-
   /* Filter sheet → bottom sheet on mobile */
   .filter-sheet {
     top: auto;
