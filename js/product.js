@@ -213,7 +213,7 @@ function renderListingChip(listingType) {
   const isRent = listingType !== 'sell';
   const chip = document.getElementById('listingTypeChip');
   if (!chip) return;
-  chip.style.cssText = `margin:14px 0 6px;`;
+  chip.style.cssText = '';
   chip.innerHTML = isRent
     ? `<span style="
         display:inline-flex;align-items:center;
