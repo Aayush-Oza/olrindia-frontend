@@ -33,14 +33,10 @@ function showImage(idx) {
   }
   img.src = images[idx];
 
-  // Arrows
   document.getElementById('gPrev').classList.toggle('hidden', idx === 0);
   document.getElementById('gNext').classList.toggle('hidden', idx === images.length - 1);
 
-  // Dots
   document.querySelectorAll('.g-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
-
-  // Thumbs
   document.querySelectorAll('.g-thumb').forEach((t, i) => t.classList.toggle('active', i === idx));
 }
 
@@ -48,7 +44,6 @@ function buildGallery(imgs) {
   images = imgs;
   if (!imgs.length) return;
 
-  // Dots
   const dotsEl = document.getElementById('galleryDots');
   if (imgs.length > 1) {
     dotsEl.innerHTML = imgs.map((_, i) =>
@@ -56,7 +51,6 @@ function buildGallery(imgs) {
     ).join('');
   }
 
-  // Thumbs (only if >1 image)
   const thumbsEl = document.getElementById('galleryThumbs');
   if (imgs.length > 1) {
     thumbsEl.innerHTML = imgs.map((url, i) => `
@@ -83,17 +77,14 @@ function renderCTA(loggedIn) {
         </div>
       </div>`;
   document.getElementById('ctaSection').innerHTML = chatBtn;
-
 }
 
 let currentProduct = null;
 let currentVendor = null;
-/* ── Wishlist (p.html) ───────────────────────────────────── */
 let isWished = false;
 
 function toggleProductWish() {
   if (!isLoggedIn()) { window.location.href = '/user/login'; return; }
-
   const isVendorAcct = !!sessionStorage.getItem('olr_vendor');
   if (isVendorAcct) {
     toastError("Vendors can't use wishlist. Log in with a user account.");
@@ -135,6 +126,7 @@ async function loadWishStatus() {
     document.getElementById('pWishIcon').setAttribute('fill', '#e53935');
   }
 }
+
 async function startChat() {
   chatContext = 'product';
   if (!isLoggedIn()) { openLoginPopup(); return; }
@@ -145,7 +137,6 @@ async function startChat() {
     return;
   }
 
-  // Check profile complete before allowing chat
   const profileRes = await apiRequest('/auth/user/profile', 'GET');
   if (profileRes.success && !profileRes.user.profile_complete) {
     openProfileCompleteModal(() => startChat());
@@ -217,6 +208,176 @@ function shareProduct() {
   });
 }
 
+/* ── Render listing type chip ────────────────────────────── */
+function renderListingChip(listingType) {
+  const isRent = listingType !== 'sell';
+  const chip = document.getElementById('listingTypeChip');
+  if (!chip) return;
+  if (isRent) {
+    chip.textContent = '🔑 For Rent';
+    chip.style.cssText = `
+      display:inline-flex;align-items:center;gap:5px;
+      background:#EAF3FF;color:#1d4ed8;
+      border:1.5px solid #bfdbfe;
+      font-size:12px;font-weight:700;
+      padding:5px 12px;border-radius:999px;
+      font-family:var(--font-display);letter-spacing:.02em;
+    `;
+  } else {
+    chip.textContent = '🏷️ For Sale';
+    chip.style.cssText = `
+      display:inline-flex;align-items:center;gap:5px;
+      background:#f0fdf4;color:#15803d;
+      border:1.5px solid #bbf7d0;
+      font-size:12px;font-weight:700;
+      padding:5px 12px;border-radius:999px;
+      font-family:var(--font-display);letter-spacing:.02em;
+    `;
+  }
+}
+
+/* ── Render pricing rows ─────────────────────────────────── */
+function renderPricing(p) {
+  let ph = '';
+  if (p.listing_type === 'sell') {
+    if (p.selling_price) ph += priceRow('Selling price', `₹${p.selling_price}`);
+    if (p.condition)     ph += priceRow('Condition', p.condition);
+  } else {
+    if (p.rent_per_hour)    ph += priceRow('Per hour',         `₹${p.rent_per_hour}`);
+    if (p.rent_per_km)      ph += priceRow('Per km',           `₹${p.rent_per_km}`);
+    if (p.rent_per_day)     ph += priceRow('Per day',          `₹${p.rent_per_day}`);
+    if (p.rent_per_month)   ph += priceRow('Per month',        `₹${p.rent_per_month}`);
+    if (p.security_deposit) ph += priceRow('Security deposit', `₹${p.security_deposit}`, true);
+  }
+  document.getElementById('priceRows').innerHTML = ph;
+}
+
+/* ── Render vendor store button ──────────────────────────── */
+function renderVendorStoreBtn(vendorId, vendorName) {
+  const el = document.getElementById('vendorStoreBtn');
+  if (!el) return;
+  el.innerHTML = `
+    <button
+      onclick="toastInfo('Vendor store coming soon! 🚀')"
+      style="
+        display:inline-flex;align-items:center;gap:7px;
+        margin-top:10px;
+        padding:9px 18px;
+        border-radius:999px;
+        border:1.5px solid var(--c-border);
+        background:transparent;
+        font-size:13px;font-weight:600;
+        font-family:var(--font-display);
+        color:var(--c-ink-soft);
+        cursor:pointer;
+        transition:all .15s ease;
+      "
+      onmouseover="this.style.borderColor='var(--c-blue)';this.style.color='var(--c-blue)';"
+      onmouseout="this.style.borderColor='var(--c-border)';this.style.color='var(--c-ink-soft)';"
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        <polyline points="9 22 9 12 15 12 15 22" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      </svg>
+      Visit ${vendorName ? vendorName.split(' ')[0] : 'Vendor'}'s Store
+    </button>
+  `;
+}
+
+/* ── Related products ────────────────────────────────────── */
+async function loadRelatedProducts(category, listingType, excludeId) {
+  const section = document.getElementById('relatedProductsSection');
+  if (!section) return;
+
+  try {
+    const res = await apiRequest(
+      `/products/public?category=${encodeURIComponent(category)}&listing_type=${listingType}&per_page=5`,
+      'GET'
+    );
+    if (!res.success || !res.products || !res.products.length) {
+      section.style.display = 'none';
+      return;
+    }
+
+    const related = res.products.filter(p => p.id !== excludeId).slice(0, 4);
+    if (!related.length) {
+      section.style.display = 'none';
+      return;
+    }
+
+    const typeLabel = listingType === 'sell' ? 'For Sale' : 'For Rent';
+    section.innerHTML = `
+      <div style="max-width:1180px;margin:0 auto;padding:32px 20px 48px;">
+        <h2 style="font-size:17px;font-weight:700;color:var(--c-ink);font-family:var(--font-display);margin:0 0 16px;">
+          Related ${typeLabel} Listings
+        </h2>
+        <div class="product-grid" id="relatedGrid" style="grid-template-columns:repeat(4,1fr);gap:20px;">
+          ${related.map(p => buildRelatedCard(p, listingType)).join('')}
+        </div>
+      </div>
+    `;
+  } catch (e) {
+    section.style.display = 'none';
+  }
+}
+
+function buildRelatedCard(p, listingType) {
+  const imgHtml = (p.images && p.images[0])
+    ? `<img class="product-img" src="${p.images[0]}" alt="${p.name}" loading="lazy">`
+    : `<div class="product-img-placeholder">📦</div>`;
+
+  const badgeHtml = p.vendor_badge === 'featured'
+    ? `<span class="vendor-badge badge-premium">★ Top Vendor</span>`
+    : p.vendor_badge === 'verified'
+      ? `<span class="vendor-badge badge-growth">✓ Verified</span>`
+      : '';
+
+  let priceHtml = '';
+  if (listingType === 'sell') {
+    priceHtml = p.selling_price
+      ? `<div class="product-price">₹${p.selling_price}</div>`
+      : '';
+  } else {
+    const rentVal = p.rent_per_day || p.rent_per_hour || p.rent_per_month || p.rent_per_km;
+    const rentLabel = p.rent_per_day ? '/day'
+      : p.rent_per_hour ? '/hr'
+      : p.rent_per_month ? '/mo'
+      : p.rent_per_km ? '/km' : '';
+    priceHtml = rentVal
+      ? `<div class="product-price">₹${rentVal}<span>${rentLabel}</span></div>`
+      : '';
+  }
+
+  const locHtml = (p.city || p.vendor_city)
+    ? `<div class="product-loc">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" stroke="currentColor" stroke-width="1.8"/>
+          <circle cx="12" cy="9" r="2.5" stroke="currentColor" stroke-width="1.8"/>
+        </svg>
+        ${p.city || p.vendor_city}
+      </div>`
+    : '';
+
+  const url = `/product/${slugify(p.category)}/${slugify(p.city || 'india')}/${p.share_slug}`;
+
+  return `
+    <div class="product-card" onclick="window.location.href='${url}'">
+      <div style="position:relative;">
+        ${imgHtml}
+        ${badgeHtml}
+      </div>
+      <div class="product-body">
+        <div class="product-cat">${p.category || ''}</div>
+        <div class="product-title">${p.name}</div>
+        <div class="product-bottom">
+          ${priceHtml}
+          ${locHtml}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 /* ── Load product ────────────────────────────────────────── */
 async function loadProduct() {
   const slug = getSlug();
@@ -233,70 +394,89 @@ async function loadProduct() {
     const v = res.vendor;
     currentProduct = p;
     currentVendor = v;
-    // ── Dynamic SEO update per product ──
+
+    const listingType = p.listing_type || 'rent';
+
+    // ── Dynamic SEO ──
     const productUrl = `https://olrindia.com/product/${slugify(p.category)}/${slugify(p.city || 'india')}/${p.share_slug}`;
     const cityText = p.city || 'India';
     const categoryText = p.category || 'Product';
-    const productTitle = `${p.name} for Rent in ${cityText} – OLR India`;
+    const typeWord = listingType === 'sell' ? 'Sale' : 'Rent';
+    const productTitle = `${p.name} for ${typeWord} in ${cityText} – OLR India`;
     const productDesc = p.description
-      ? `${p.description.slice(0, 130)}… Rent ${p.name} in ${cityText} from a trusted local vendor on OLR India. No middleman.`
-      : `Rent ${p.name} in ${cityText} from a trusted local vendor on OLR India. ${categoryText} available for rent - no middleman, direct chat.`;
+      ? `${p.description.slice(0, 130)}… ${listingType === 'sell' ? 'Buy' : 'Rent'} ${p.name} in ${cityText} from a trusted local vendor on OLR India. No middleman.`
+      : `${listingType === 'sell' ? 'Buy' : 'Rent'} ${p.name} in ${cityText} from a trusted local vendor on OLR India. ${categoryText} available - no middleman, direct chat.`;
     const productImg = (p.images && p.images[0]) ? p.images[0] : 'https://olrindia.com/assets/og-banner.jpg';
-    const productKeywords = `${p.name} on rent, ${p.name} for rent in ${cityText}, ${categoryText} on rent ${cityText}, rent ${p.name} india, OLR India, online rental ${cityText}`;
+    const productKeywords = `${p.name} ${listingType === 'sell' ? 'for sale' : 'on rent'}, ${p.name} in ${cityText}, ${categoryText} ${cityText}, OLR India`;
 
     document.title = productTitle;
     document.getElementById('metaDesc').setAttribute('content', productDesc);
     document.getElementById('metaKeywords').setAttribute('content', productKeywords);
     document.getElementById('metaCanonical').setAttribute('href', productUrl);
-
     document.getElementById('ogTitle').setAttribute('content', productTitle);
     document.getElementById('ogDesc').setAttribute('content', productDesc);
     document.getElementById('ogImage').setAttribute('content', productImg);
-    document.getElementById('ogImageAlt').setAttribute('content', `${p.name} for rent in ${cityText} – OLR India`);
+    document.getElementById('ogImageAlt').setAttribute('content', `${p.name} for ${typeWord} in ${cityText} – OLR India`);
     document.getElementById('ogUrl').setAttribute('content', productUrl);
-
     document.getElementById('twTitle').setAttribute('content', productTitle);
     document.getElementById('twDesc').setAttribute('content', productDesc);
     document.getElementById('twImage').setAttribute('content', productImg);
-    document.getElementById('twImageAlt').setAttribute('content', `${p.name} for rent – OLR India`);
+    document.getElementById('twImageAlt').setAttribute('content', `${p.name} for ${typeWord} – OLR India`);
 
-    // ── Upgraded Product Schema ──
+    // ── Schema ──
+    const schemaOffers = listingType === 'sell'
+      ? {
+          "@type": "Offer",
+          "priceCurrency": "INR",
+          "price": p.selling_price || 0,
+          "availability": "https://schema.org/InStock",
+          "itemCondition": p.condition === 'New'
+            ? "https://schema.org/NewCondition"
+            : "https://schema.org/UsedCondition",
+          "areaServed": { "@type": "City", "name": cityText },
+          "seller": {
+            "@type": "Organization",
+            "name": p.vendor_name || "OLR India Vendor",
+            "member": { "@id": "https://olrindia.com/#organization" }
+          }
+        }
+      : {
+          "@type": "Offer",
+          "priceCurrency": "INR",
+          "price": p.rent_per_day || p.rent_per_hour || p.rent_per_month || 0,
+          "priceSpecification": [
+            p.rent_per_hour  && { "@type": "UnitPriceSpecification", "price": p.rent_per_hour,  "priceCurrency": "INR", "unitText": "per hour" },
+            p.rent_per_day   && { "@type": "UnitPriceSpecification", "price": p.rent_per_day,   "priceCurrency": "INR", "unitText": "per day" },
+            p.rent_per_month && { "@type": "UnitPriceSpecification", "price": p.rent_per_month, "priceCurrency": "INR", "unitText": "per month" }
+          ].filter(Boolean),
+          "availability": "https://schema.org/InStock",
+          "areaServed": { "@type": "City", "name": cityText },
+          "seller": {
+            "@type": "Organization",
+            "name": p.vendor_name || "OLR India Vendor",
+            "member": { "@id": "https://olrindia.com/#organization" }
+          }
+        };
+
     document.getElementById('productSchema').textContent = JSON.stringify({
       "@context": "https://schema.org",
       "@type": "Product",
       "name": p.name,
-      "description": p.description || `${p.name} available for rent in ${cityText} on OLR India`,
+      "description": p.description || `${p.name} available for ${listingType === 'sell' ? 'sale' : 'rent'} in ${cityText} on OLR India`,
       "image": p.images || [],
       "url": productUrl,
-      "category": p.category || "Rental Product",
-      "itemCondition": "https://schema.org/UsedCondition",
-      "brand": {
-        "@type": "Brand",
-        "name": "OLR India"
-      },
-      "offers": {
-        "@type": "Offer",
-        "priceCurrency": "INR",
-        "price": p.rent_per_day || p.rent_per_hour || p.rent_per_month || 0,
-        "priceSpecification": [
-          p.rent_per_hour && { "@type": "UnitPriceSpecification", "price": p.rent_per_hour, "priceCurrency": "INR", "unitText": "per hour" },
-          p.rent_per_day && { "@type": "UnitPriceSpecification", "price": p.rent_per_day, "priceCurrency": "INR", "unitText": "per day" },
-          p.rent_per_month && { "@type": "UnitPriceSpecification", "price": p.rent_per_month, "priceCurrency": "INR", "unitText": "per month" }
-        ].filter(Boolean),
-        "availability": "https://schema.org/InStock",
-        "areaServed": {
-          "@type": "City",
-          "name": cityText
-        },
-        "seller": {
-          "@type": "Organization",
-          "name": p.vendor_name || "OLR India Vendor",
-          "member": { "@id": "https://olrindia.com/#organization" }
-        }
-      }
+      "category": p.category || "Product",
+      "brand": { "@type": "Brand", "name": "OLR India" },
+      "offers": schemaOffers
     });
+
+    // ── Gallery ──
     buildGallery(p.images || []);
 
+    // ── Listing type chip (below gallery) ──
+    renderListingChip(listingType);
+
+    // ── Info ──
     document.getElementById('infoCat').textContent =
       p.category + (p.subcategory ? ' · ' + p.subcategory : '');
     document.getElementById('infoName').textContent = p.name;
@@ -307,19 +487,21 @@ async function loadProduct() {
       document.getElementById('infoDescSection').style.display = 'none';
     }
 
-    // Pricing
-    let ph = '';
-    if (p.rent_per_hour) ph += priceRow('Per hour', `₹${p.rent_per_hour}`);
-    if (p.rent_per_km) ph += priceRow('Per km', `₹${p.rent_per_km}`);
-    if (p.rent_per_day) ph += priceRow('Per day', `₹${p.rent_per_day}`);
-    if (p.rent_per_month) ph += priceRow('Per month', `₹${p.rent_per_month}`);
-    if (p.security_deposit) ph += priceRow('Security deposit', `₹${p.security_deposit}`, true);
-    document.getElementById('priceRows').innerHTML = ph;
+    // ── Pricing (rent or sell) ──
+    renderPricing(p);
 
+    // ── Location ──
     document.getElementById('infoLocation').textContent =
       [p.area, p.city, p.state, p.pincode].filter(Boolean).join(', ');
 
-    // Vendor
+    // ── Vendor ──
+    function getInitials(name) {
+      if (!name) return 'V';
+      const parts = name.trim().split(/\s+/);
+      if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+      return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+    }
+
     const av = document.getElementById('vendorAvatar');
     if (v.profile_photo) {
       av.innerHTML = `<img src="${v.profile_photo}" alt="${v.name}">`;
@@ -333,33 +515,42 @@ async function loadProduct() {
         : '';
     document.getElementById('vendorName').innerHTML = (v.name) + vendorBadgeHtml;
     document.getElementById('vendorSub').textContent = v.city ? `Based in ${v.city}` : 'OLR India Vendor';
-    function getInitials(name) {
-      if (!name) return 'V';
-      const parts = name.trim().split(/\s+/);
-      if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
-      return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
-    }
+
+    // ── Vendor store button ──
+    renderVendorStoreBtn(v.id, v.name);
+
+    // ── Views ──
     document.getElementById('infoViews').textContent =
       (p.click_count || 0) > 0
         ? `${p.click_count} ${p.click_count === 1 ? 'person has' : 'people have'} viewed this listing`
         : 'Be the first to view this listing';
+
+    // ── Admin details ──
     if (isAdminView && res.admin_meta) {
       renderAdminDetails(res.admin_meta);
     }
+
+    // ── CTA ──
     if (isAdminView) {
       renderAdminCTA();
       hideAdminChrome();
     } else if (sessionStorage.getItem('olr_vendor')) {
       hideVendorChrome();
     } else {
-      const loggedIn = isLoggedIn();
-      renderCTA(loggedIn);
+      renderCTA(isLoggedIn());
       loadWishStatus();
     }
+
     apiRequest(`/auth/vendor/products/${p.id}/click`, 'POST').catch(() => { });
 
     document.getElementById('pageLoader').style.display = 'none';
     document.getElementById('pageContent').style.display = 'block';
+
+    // ── Related products (after content shown) ──
+    if (!isAdminView) {
+      loadRelatedProducts(p.category, listingType, p.id);
+    }
+
   } catch (err) {
     showError('Failed to load product. Please try again.');
   }
@@ -385,7 +576,6 @@ function showError(msg) {
 }
 
 function openProfileCompleteModal(onSuccess) {
-  // Remove any existing modal first
   document.getElementById('profileCompleteModal')?.remove();
 
   const modal = document.createElement('div');
@@ -420,7 +610,6 @@ function openProfileCompleteModal(onSuccess) {
   `;
   document.body.appendChild(modal);
 
-  // Pincode autofill
   document.getElementById('pcPincode').addEventListener('input', async function () {
     if (this.value.length !== 6) return;
     try {
@@ -438,14 +627,8 @@ function openProfileCompleteModal(onSuccess) {
     const city = document.getElementById('pcCity').value.trim();
     const pincode = document.getElementById('pcPincode').value.trim();
 
-    if (!mobile || !city) {
-      toastError('Please fill in mobile and city.');
-      return;
-    }
-    if (mobile.length !== 10) {
-      toastError('Mobile must be 10 digits.');
-      return;
-    }
+    if (!mobile || !city) { toastError('Please fill in mobile and city.'); return; }
+    if (mobile.length !== 10) { toastError('Mobile must be 10 digits.'); return; }
 
     const res = await apiRequest('/auth/user/profile', 'PUT', { mobile, city, pincode });
     if (res.success) {
@@ -457,65 +640,42 @@ function openProfileCompleteModal(onSuccess) {
     }
   });
 
-  // Close on backdrop click
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) modal.remove();
-  });
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
 }
 
 function hideAdminChrome() {
   const wishBtn = document.getElementById('pWishBtn');
   if (wishBtn) wishBtn.style.display = 'none';
 }
+
 function hideVendorChrome() {
-  // No wishlist for vendor accounts - they're not buyers
   const wishBtn = document.getElementById('pWishBtn');
   if (wishBtn) wishBtn.style.display = 'none';
-
-  // No chat CTA either - replace with a neutral note instead of a locked/login state
   document.getElementById('ctaSection').innerHTML = `
     <div class="cta-locked">
       <div class="cta-locked-icon">🏪</div>
       <p>You're viewing this as a vendor account. Log in with a user account to chat or save this listing.</p>
     </div>`;
 }
+
 /* ── Back navigation ─────────────────────────────────────── */
 function goBack() {
-  if (isAdminView) {
-    window.location.href = '/admin/dashboard#products';
-    return;
-  }
+  if (isAdminView) { window.location.href = '/admin/dashboard#products'; return; }
   const cameFromSameSite = document.referrer && document.referrer.startsWith(window.location.origin);
-  if (cameFromSameSite && history.length > 1) {
-    history.back();
-  } else {
-    window.location.href = '/';
-  }
+  if (cameFromSameSite && history.length > 1) { history.back(); }
+  else { window.location.href = '/'; }
 }
 
 window.addEventListener('pageshow', (event) => {
-  if (event.persisted && currentProduct) {
-    loadWishStatus();
-  }
+  if (event.persisted && currentProduct) loadWishStatus();
 });
 
-/* ============================================================
-   ADD TO product.js
-   Detects ?admin=1 in URL, verifies real admin session via
-   /auth/admin/profile, and if valid shows a Remove button
-   instead of the normal chat/login CTA.
-   ============================================================ */
-
+/* ── Admin ───────────────────────────────────────────────── */
 let isAdminView = false;
 
 async function checkAdminView() {
   const params = new URLSearchParams(window.location.search);
   if (params.get('admin') !== '1') return false;
-
-  // Verify this is really a logged-in admin, not just a guessed URL param.
-  // /auth/admin/profile only succeeds if the admin's httponly cookie is
-  // valid (cookie path already scoped to /auth/admin/ so this works
-  // regardless of which page the request is made from).
   const res = await apiRequest('/auth/admin/profile', 'GET');
   return !!res.success;
 }
@@ -536,64 +696,33 @@ function openAdminRemoveModal() {
 function closeAdminRemoveModal() {
   document.getElementById('adminRemoveModal').classList.remove('is-open');
 }
-/* ============================================================
-   ADD TO product.js - new function, plus one small change to loadProduct().
-   ============================================================ */
 
 function renderAdminDetails(adminMeta) {
   document.getElementById('adminDetailsSection').style.display = 'block';
-
   document.getElementById('adminStatusBadge').innerHTML = adminMeta.active
     ? `<span class="admin-badge admin-badge-live">Live</span>`
     : `<span class="admin-badge admin-badge-inactive">Inactive</span>`;
-
   document.getElementById('adminReviewedBadge').innerHTML = adminMeta.reviewed
     ? `<span class="admin-badge admin-badge-live">Viewed</span>`
     : `<span class="admin-badge admin-badge-flag">Unviewed</span>`;
-
   document.getElementById('adminClicksValue').textContent = adminMeta.clicks;
   document.getElementById('adminCreatedValue').textContent = adminMeta.created_at;
-
   document.getElementById('adminVendorPlanValue').textContent =
     adminMeta.vendor_plan.charAt(0).toUpperCase() + adminMeta.vendor_plan.slice(1);
-
   document.getElementById('adminVendorStatusBadge').innerHTML = adminMeta.vendor_active
     ? `<span class="admin-badge admin-badge-live">Active</span>`
     : `<span class="admin-badge admin-badge-suspended">Suspended</span>`;
-
   document.getElementById('adminVendorStrikesValue').textContent =
     adminMeta.vendor_strike_count > 0 ? `${adminMeta.vendor_strike_count} / 3` : 'None';
-
   document.getElementById('adminVendorEmailValue').textContent = adminMeta.vendor_email;
   document.getElementById('adminVendorMobileValue').textContent = adminMeta.vendor_mobile;
 }
 
-
-/* ============================================================
-   IN loadProduct(), right after this existing line:
-
-      const res = isAdminView
-        ? await apiRequest(`/auth/admin/products/slug/${slug}`, 'GET')
-        : await apiRequest(`/products/public/${slug}`, 'GET');
-
-      if(!res.success){showError(res.message||'Product not found.');return;}
-
-   ADD (still inside the same function, after the success check,
-   anywhere before the closing of loadProduct - a good spot is
-   right where you already call renderAdminCTA()):
-   ============================================================ */
-
-if (isAdminView && res.admin_meta) {
-  renderAdminDetails(res.admin_meta);
-}
 document.getElementById('adminRemoveCancel')?.addEventListener('click', closeAdminRemoveModal);
 
 document.getElementById('adminRemoveConfirm')?.addEventListener('click', async () => {
   const reason = document.getElementById('adminRemoveReasonInput').value.trim();
-  if (!reason) {
-    toastError('Please explain why this listing is being removed.');
-    return;
-  }
+  if (!reason) { toastError('Please explain why this listing is being removed.'); return; }
   if (!currentProduct) return;
 
   const res = await apiRequest(`/auth/admin/products/${currentProduct.id}/remove`, 'POST', { reason });
@@ -605,9 +734,7 @@ document.getElementById('adminRemoveConfirm')?.addEventListener('click', async (
         ? 'Product removed. Vendor reached 3 strikes and was auto-suspended.'
         : `Product removed. Vendor now has ${res.strike_count} strike(s).`
     );
-    setTimeout(() => {
-      window.location.href = '/admin/dashboard#products';
-    }, 1600);
+    setTimeout(() => { window.location.href = '/admin/dashboard#products'; }, 1600);
   } else {
     toastError(res.message || 'Failed to remove product.');
   }
