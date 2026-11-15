@@ -252,12 +252,13 @@ function renderPricing(p) {
 }
 
 /* ── Render vendor store button ──────────────────────────── */
-function renderVendorStoreBtn(vendorId, vendorName) {
+function renderVendorStoreBtn(vendorId, vendorName, storeSlug) {
   const el = document.getElementById('vendorStoreBtn');
   if (!el) return;
+  if (!storeSlug) { el.innerHTML = ''; return; }
   el.innerHTML = `
-    <button
-      onclick="toastInfo('Vendor store coming soon! 🚀')"
+    <a
+      href="/vendor/${storeSlug}"
       style="
         display:inline-flex;align-items:center;gap:7px;
         margin-top:10px;
@@ -269,6 +270,7 @@ function renderVendorStoreBtn(vendorId, vendorName) {
         font-family:var(--font-display);
         color:var(--c-ink-soft);
         cursor:pointer;
+        text-decoration:none;
         transition:all .15s ease;
       "
       onmouseover="this.style.borderColor='var(--c-blue)';this.style.color='var(--c-blue)';"
@@ -279,7 +281,7 @@ function renderVendorStoreBtn(vendorId, vendorName) {
         <polyline points="9 22 9 12 15 12 15 22" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
       </svg>
       Visit ${vendorName ? vendorName.split(' ')[0] : 'Vendor'}'s Store
-    </button>
+    </a>
   `;
 }
 
@@ -516,7 +518,7 @@ async function loadProduct() {
     document.getElementById('vendorSub').textContent = v.city ? `Based in ${v.city}` : 'OLR India Vendor';
 
     // ── Vendor store button ──
-    renderVendorStoreBtn(v.id, v.name);
+    renderVendorStoreBtn(v.id, v.name, v.store_slug);
 
     // ── Views ──
     document.getElementById('infoViews').textContent =

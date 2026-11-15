@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <base href="/">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ── GEO / LANGUAGE ── -->
+  <meta name="geo.region" content="IN">
+  <meta name="geo.placename" content="India">
+  <meta name="language" content="English">
+  <meta http-equiv="content-language" content="en-IN">
+  <meta name="rating" content="general">
+
+  <!-- ── PRIMARY SEO ── -->
+  <title id="pageTitle">Vendor Store – OLR India</title>
+  <meta name="description" id="metaDesc" content="Browse all listings from this vendor on OLR India.">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <link rel="canonical" href="https://olrindia.com" id="metaCanonical">
+
+  <!-- ── OPEN GRAPH ── -->
+  <meta property="og:type" content="profile">
+  <meta property="og:site_name" content="OLR India">
+  <meta property="og:locale" content="en_IN">
+  <meta property="og:title" id="ogTitle" content="Vendor Store – OLR India">
+  <meta property="og:description" id="ogDesc" content="Browse all listings from this vendor on OLR India.">
+  <meta property="og:image" id="ogImage" content="https://olrindia.com/assets/og-banner.jpg">
+  <meta property="og:url" id="ogUrl" content="https://olrindia.com">
+
+  <!-- ── TWITTER CARD ── -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@olrindia">
+  <meta name="twitter:title" id="twTitle" content="Vendor Store – OLR India">
+  <meta name="twitter:description" id="twDesc" content="Browse all listings from this vendor on OLR India.">
+  <meta name="twitter:image" id="twImage" content="https://olrindia.com/assets/og-banner.jpg">
+
+  <!-- ── SCHEMA ── -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": "https://olrindia.com/#organization",
+    "name": "OLR India",
+    "url": "https://olrindia.com",
+    "logo": "https://olrindia.com/assets/logo.png"
+  }
+  </script>
+  <script type="application/ld+json" id="vendorSchema">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "OLR India Vendor",
+    "url": "https://olrindia.com"
+  }
+  </script>
+
+  <!-- ── FAVICON & FONTS ── -->
+  <link rel="icon" href="assets/favicon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- ── SHARED CSS ── -->
+  <link rel="stylesheet" href="css/variables.css?v=1">
+  <link rel="stylesheet" href="css/base.css?v=1">
+  <link rel="stylesheet" href="css/components.css?v=1">
+  <link rel="stylesheet" href="css/index.css?v=1">
+  <link rel="stylesheet" href="css/footer.css?v=1">
+
+  <style>
+    /* ── Vendor store page styles ── */
+
+    .vs-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--c-bg);
+      border-bottom: 1px solid var(--c-border-soft);
+      padding: 0 20px;
+    }
+    .vs-nav-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .vs-back-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      color: var(--c-ink);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .vs-back-btn:hover { background: var(--c-bg-soft); }
+    .vs-nav-logo img { height: 28px; display: block; }
+
+    /* ── Loader ── */
+    #vsLoader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      gap: 12px;
+      color: var(--c-ink-soft);
+      font-size: 14px;
+    }
+    .loader-spinner {
+      width: 28px; height: 28px;
+      border: 3px solid var(--c-border-soft);
+      border-top-color: var(--c-blue);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Page content ── */
+    #vsContent { display: none; }
+
+    /* ── Hero / vendor profile ── */
+    .vs-hero {
+      background: var(--c-bg);
+      border-bottom: 1px solid var(--c-border-soft);
+      padding: 32px 20px 28px;
+    }
+    .vs-hero-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+    }
+    .vs-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--grad-brand);
+      color: #fff;
+      font-size: 26px;
+      font-weight: 700;
+      font-family: var(--font-display);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .vs-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .vs-hero-info { flex: 1; min-width: 0; }
+    .vs-vendor-name {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--c-ink);
+      font-family: var(--font-display);
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+    .vs-vendor-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      margin-bottom: 10px;
+    }
+    .vs-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      color: var(--c-ink-soft);
+    }
+    .vs-stats {
+      display: flex;
+      gap: 20px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    .vs-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .vs-stat-val {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--c-ink);
+      font-family: var(--font-display);
+    }
+    .vs-stat-label {
+      font-size: 11.5px;
+      color: var(--c-ink-soft);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    /* ── Filter tabs ── */
+    .vs-filters {
+      background: var(--c-bg);
+      border-bottom: 1px solid var(--c-border-soft);
+      padding: 0 20px;
+      position: sticky;
+      top: 56px;
+      z-index: 90;
+    }
+    .vs-filters-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: flex;
+      gap: 0;
+    }
+    .vs-tab {
+      padding: 14px 18px;
+      font-size: 13.5px;
+      font-weight: 600;
+      font-family: var(--font-display);
+      color: var(--c-ink-soft);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: color .15s, border-color .15s;
+      white-space: nowrap;
+    }
+    .vs-tab:hover { color: var(--c-ink); }
+    .vs-tab.active {
+      color: var(--c-blue);
+      border-bottom-color: var(--c-blue);
+    }
+
+    /* ── Listings grid ── */
+    .vs-listings {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+    }
+    .vs-listings-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .vs-listings-count {
+      font-size: 13.5px;
+      color: var(--c-ink-soft);
+    }
+
+    /* ── Empty state ── */
+    .vs-empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--c-ink-soft);
+    }
+    .vs-empty-icon { font-size: 42px; margin-bottom: 12px; }
+    .vs-empty h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--c-ink);
+      margin-bottom: 6px;
+    }
+    .vs-empty p { font-size: 13.5px; }
+
+    /* ── Load more ── */
+    .vs-load-more {
+      display: flex;
+      justify-content: center;
+      margin-top: 28px;
+    }
+    .vs-load-more-btn {
+      padding: 11px 28px;
+      border-radius: 999px;
+      border: 1.5px solid var(--c-border);
+      background: transparent;
+      font-size: 13.5px;
+      font-weight: 600;
+      font-family: var(--font-display);
+      color: var(--c-ink);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .vs-load-more-btn:hover {
+      border-color: var(--c-blue);
+      color: var(--c-blue);
+    }
+
+    @media (max-width: 600px) {
+      .vs-hero { padding: 20px 16px; }
+      .vs-avatar { width: 56px; height: 56px; font-size: 20px; }
+      .vs-vendor-name { font-size: 18px; }
+      .vs-listings { padding: 20px 16px 40px; }
+      .vs-tab { padding: 12px 14px; font-size: 13px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── NAVBAR ── -->
+  <nav class="vs-nav">
+    <div class="vs-nav-inner">
+      <button class="vs-back-btn" onclick="goBack()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <a class="vs-nav-logo" href="/">
+        <img src="assets/logo.png?v=1" alt="OLR India">
+      </a>
+    </div>
+  </nav>
+
+  <!-- ── LOADER ── -->
+  <div id="vsLoader">
+    <div class="loader-spinner"></div>
+    <span>Loading store…</span>
+  </div>
+
+  <!-- ── PAGE CONTENT ── -->
+  <div id="vsContent">
+
+    <!-- Vendor hero -->
+    <div class="vs-hero">
+      <div class="vs-hero-inner">
+        <div class="vs-avatar" id="vsAvatar"></div>
+        <div class="vs-hero-info">
+          <div class="vs-vendor-name" id="vsVendorName"></div>
+          <div class="vs-vendor-meta" id="vsVendorMeta"></div>
+          <div class="vs-stats" id="vsStats"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter tabs -->
+    <div class="vs-filters">
+      <div class="vs-filters-inner">
+        <button class="vs-tab active" data-type="all" onclick="switchTab('all')">All Listings</button>
+        <button class="vs-tab" data-type="rent" onclick="switchTab('rent')">For Rent</button>
+        <button class="vs-tab" data-type="sell" onclick="switchTab('sell')">For Sale</button>
+      </div>
+    </div>
+
+    <!-- Listings -->
+    <div class="vs-listings">
+      <div class="vs-listings-header">
+        <div class="vs-listings-count" id="vsListingsCount"></div>
+      </div>
+      <div class="product-grid" id="vsGrid"></div>
+      <div class="vs-load-more" id="vsLoadMore" style="display:none;">
+        <button class="vs-load-more-btn" onclick="loadMore()">Load more listings</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="toast-container"></div>
+
+  <!-- ── FOOTER ── -->
+  <footer class="site-footer">
+    <div class="footer-cols">
+      <div>
+        <div class="footer-col-title">Company</div>
+        <a href="/about" class="footer-col-link">About Us</a>
+        <a href="/terms" class="footer-col-link">Terms & Conditions</a>
+        <a href="/privacy" class="footer-col-link">Privacy Policy</a>
+      </div>
+      <div>
+        <div class="footer-col-title">Follow Us</div>
+        <a href="https://www.instagram.com/olr_india" target="_blank" rel="noopener" class="footer-social-item">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.8"/>
+            <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/>
+            <circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
+          </svg>
+          Instagram
+        </a>
+        <a href="https://facebook.com/olrindia" target="_blank" rel="noopener" class="footer-social-item">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          </svg>
+          Facebook
+        </a>
+      </div>
+      <div>
+        <div class="footer-col-title">Contact</div>
+        <a href="mailto:support@olrindia.com" class="footer-contact-item">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.8"/>
+            <path d="m22 6-10 7L2 6" stroke="currentColor" stroke-width="1.8"/>
+          </svg>
+          support@olrindia.com
+        </a>
+      </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="footer-bottom">
+      <div class="footer-bottom-top">
+        <a class="footer-logo" href="/">
+          <img src="assets/logo.png?v=1" alt="OLR India">
+        </a>
+      </div>
+      <div class="footer-copyright">© 2026 OLR India. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script src="js/footer.js?v=1"></script>
+  <script type="module" src="js/firebase-config.js?v=1"></script>
+  <script src="js/api.js?v=1"></script>
+  <script src="js/ui.js?v=1"></script>
+  <script src="js/helpers.js?v=1"></script>
+  <script src="js/vendor.js?v=1"></script>
+
+</body>
+</html>
