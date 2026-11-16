@@ -294,7 +294,13 @@ function initModalPincodeAutofill() {
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('hamburgerBtn')?.addEventListener('click', () => document.getElementById('mobileMenu').classList.toggle('open'));
-  initProfilePincodeAutofill();
+  wirePincodeAutofill({
+  pincodeInput: document.getElementById('pincode'),
+  areaInput: document.getElementById('area'),
+  cityInput: document.getElementById('city'),
+  stateInput: document.getElementById('state'),
+  statusEl: document.getElementById('pincodeStatus'),
+});
   loadVendorProfile();
 });
 
