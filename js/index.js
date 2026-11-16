@@ -7,9 +7,6 @@ const PAGE_INITIAL = 20;
 const PAGE_MORE    = 10;
 
 // ── State ─────────────────────────────────────────────────────
-let allProducts    = [];
-let filteredProducts = [];
-let displayedCount = 0;
 let isLoadingMore  = false;
 let currentPage    = 1;
 let totalProducts  = 0;
@@ -17,9 +14,6 @@ let hasMore        = false;
 
 // 'rent' | 'sell'
 let activeTab = 'rent';
-
-// 'home' | 'filtered'
-let currentMode = 'home';
 
 let activeFilters = {
   category:  '',
@@ -126,8 +120,6 @@ async function loadProducts(reset = true) {
   document.getElementById('productGrid').style.display = 'grid';
   if (reset) {
     currentPage    = 1;
-    allProducts    = [];
-    displayedCount = 0;
     showSkeletons(PAGE_INITIAL);
   }
 
@@ -138,10 +130,7 @@ async function loadProducts(reset = true) {
     if (data.success) {
       totalProducts    = data.total;
       hasMore          = data.has_more;
-      allProducts      = data.products;
-      filteredProducts = data.products;
-      displayedCount   = data.products.length;
-      renderInitialBatch();
+      renderInitialBatch(data.products);
       updateFilterBadge();
     }
   } catch (e) {
@@ -246,7 +235,7 @@ document.getElementById('searchInput').addEventListener('input', function () {
 });
 
 // ── Render first batch ────────────────────────────────────────
-function renderInitialBatch() {
+function renderInitialBatch(filteredProducts) {
   const grid    = document.getElementById('productGrid');
   const countEl = document.getElementById('productsCount');
 
@@ -295,7 +284,6 @@ async function appendNextBatch() {
       data.products.forEach(p => {
         grid.insertAdjacentHTML('beforeend', productCardHTML(p));
       });
-      displayedCount += data.products.length;
       setTimeout(() => window.retranslateDynamic?.(), 600);
     }
   } catch {
@@ -333,13 +321,6 @@ function attachSentinel() {
   scrollObserver.observe(sentinel);
 }
 
-// ── Slugify ───────────────────────────────────────────────────
-function slugify(text) {
-  return (text || '').toLowerCase()
-    .replace(/&/g, 'and')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
-}
 
 // ── Product card HTML ─────────────────────────────────────────
 function productCardHTML(p) {
@@ -376,10 +357,6 @@ function productCardHTML(p) {
     </div>`;
 }
 
-function conditionLabel(val) {
-  const map = { new: 'New', like_new: 'Like New', good: 'Good', fair: 'Fair' };
-  return map[val] || val;
-}
 
 // ── Price label ───────────────────────────────────────────────
 function buildPriceLabel(p) {
@@ -495,7 +472,6 @@ document.addEventListener('keydown', e => {
 
 // ── Homepage: categories + featured products ──────────────────
 async function loadHomepage() {
-  currentMode = 'home';
   const label = activeTab === 'rent' ? 'Browse & Rent' : 'Browse & Buy';
   document.getElementById('productsTitle').textContent = label;
   document.getElementById('productsCount').textContent = '';
@@ -563,7 +539,6 @@ async function loadHomepage() {
 
 // ── Enter category view ───────────────────────────────────────
 function enterCategoryView(cat) {
-  currentMode = 'filtered';
   activeFilters.category = cat;
   document.getElementById('filterCategory').value = cat;
   document.getElementById('productsTitle').textContent = cat;
@@ -575,7 +550,6 @@ function enterCategoryView(cat) {
 
 // ── Enter filtered view ───────────────────────────────────────
 function enterFilteredView() {
-  currentMode = 'filtered';
   document.getElementById('productGrid').style.display = 'grid';
   document.getElementById('productsTitle').textContent = activeFilters.category || 'Search Results';
   loadProducts(true);

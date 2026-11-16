@@ -6,14 +6,6 @@
 const wishedIds = new Set();
 const wishedSlugs = new Map();
 
-// ── Slugify ───────────────────────────────────────────────────
-function slugify(text) {
-  return (text || '').toLowerCase()
-    .replace(/&/g, 'and')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
-}
-
 // ── Skeleton ──────────────────────────────────────────────────
 function skeletonCardHTML() {
   return `<div class="skeleton-card">
@@ -39,7 +31,7 @@ function productCardHTML(p) {
     ? `<img class="product-img" src="${p.images[0]}" alt="${p.name}" loading="lazy">`
     : `<div class="product-img-placeholder">📦</div>`;
 
-  const price = buildPriceLabel(p);
+  const price = buildPriceLabel(p, '');
   const wished = wishedIds.has(p.id);
   const badge = p.vendor_badge === 'featured'
     ? `<span class="vendor-badge badge-premium">★ Top Vendor</span>`
@@ -64,21 +56,6 @@ function productCardHTML(p) {
         </div>
       </div>
     </div>`;
-}
-
-// ── Price label ───────────────────────────────────────────────
-function buildPriceLabel(p) {
-  if (p.rent_per_day)   return `₹${p.rent_per_day} <span>/ day</span>`;
-  if (p.rent_per_hour)  return `₹${p.rent_per_hour} <span>/ hour</span>`;
-  if (p.rent_per_month) return `₹${p.rent_per_month} <span>/ month</span>`;
-  if (p.rent_per_km)    return `₹${p.rent_per_km} <span>/ km</span>`;
-  return `<span style="color:var(--c-ink-faint);font-size:12px;">Price not set</span>`;
-}
-
-// ── Open product ──────────────────────────────────────────────
-function openProduct(slug, category, city) {
-  if (!slug) return;
-  window.location.href = `/product/${slugify(category || '')}/${slugify(city || 'india')}/${slug}`;
 }
 
 // ── Wishlist badge ────────────────────────────────────────────

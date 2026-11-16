@@ -174,15 +174,6 @@ function routeServerError(message, formEl) {
   toastError(message || "Something went wrong. Please try again.");
 }
 
-function validateAadharFormat(aadhar) {
-  // 12 digits, no spaces
-  return /^\d{12}$/.test(aadhar.replace(/\s/g, ""));
-}
-
-function validatePANFormat(pan) {
-  // Standard Indian PAN: 5 letters, 4 digits, 1 letter (e.g. ABCDE1234F)
-  return /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan.toUpperCase());
-}
 
 function daysUntilExpiry(isoString) {
   if (!isoString) return null;

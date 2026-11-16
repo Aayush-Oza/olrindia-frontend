@@ -302,17 +302,6 @@ function stopChatListeners() {
 // ── Live unread badge (nav tab) ─────────────────────────────────
 let chatUnsubUnread = null;
 
-function listenToConversation(convId, onUpdate) {
-  if (chatUnsubConvo) chatUnsubConvo();
-
-  const convRef = window.fsDoc(window.db, 'conversations', convId);
-  chatUnsubConvo = window.fsOnSnapshot(convRef, snap => {
-    if (snap.exists()) onUpdate(snap.data());
-  }, error => {
-    console.warn('Chat listener error (likely auth transition):', error.message);
-  });
-}
-
 function listenToUnreadBadge() {
   const field = chatRole === 'user' ? 'user_uid' : 'vendor_uid';
   const unreadField = chatRole === 'user' ? 'unread_count_user' : 'unread_count_vendor';

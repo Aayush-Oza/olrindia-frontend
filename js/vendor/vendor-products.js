@@ -14,10 +14,6 @@ const slotUrls = {};
 let previewProductId = null;
 let originalProductSnapshot = null;
 
-function slugify(text) {
-  return (text || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-}
-
 const PLAN_LABELS = {
   free: 'Free',
   starter: 'Starter', starter_yearly: 'Starter Yearly',

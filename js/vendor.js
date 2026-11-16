@@ -1,24 +1,10 @@
 /* ── Helpers ─────────────────────────────────────────────── */
-function slugify(text) {
-  return (text || '')
-    .toLowerCase()
-    .replace(/&/g, 'and')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
-
 function getStoreSlug() {
   const parts = window.location.pathname.split('/').filter(Boolean);
   if (parts[0] === 'vendor' && parts[1]) return parts[1];
   return '';
 }
 
-function getInitials(name) {
-  if (!name) return 'V';
-  const parts = name.trim().split(/\s+/);
-  if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
-  return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
-}
 
 /* ── State ───────────────────────────────────────────────── */
 let currentVendor = null;

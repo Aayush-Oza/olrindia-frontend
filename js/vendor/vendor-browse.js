@@ -109,11 +109,6 @@ function vsSkeletonCardHTML() {
   </div>`;
 }
 
-// ── Slugify ───────────────────────────────────────────────────
-function slugify(text) {
-  return (text || '').toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-}
-
 // ── Product card ──────────────────────────────────────────────
 function vsProductCardHTML(p) {
   const img = p.images && p.images[0]

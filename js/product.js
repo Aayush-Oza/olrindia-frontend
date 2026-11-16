@@ -2,13 +2,6 @@
 function isLoggedIn() {
   return !!(sessionStorage.getItem('olr_user') || sessionStorage.getItem('olr_vendor'));
 }
-function slugify(text) {
-  return (text || '')
-    .toLowerCase()
-    .replace(/&/g, 'and')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
 function getSlug() {
   const parts = window.location.pathname.split('/').filter(Boolean);
   if (parts[0] === 'product' && parts.length === 4) return parts[3];
@@ -496,13 +489,6 @@ async function loadProduct() {
       [p.area, p.city, p.state, p.pincode].filter(Boolean).join(', ');
 
     // ── Vendor ──
-    function getInitials(name) {
-      if (!name) return 'V';
-      const parts = name.trim().split(/\s+/);
-      if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
-      return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
-    }
-
     const av = document.getElementById('vendorAvatar');
     if (v.profile_photo) {
       av.innerHTML = `<img src="${v.profile_photo}" alt="${v.name}">`;
