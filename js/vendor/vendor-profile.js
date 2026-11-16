@@ -4,6 +4,17 @@
 
 let vendorProfile = null;
 
+// ── Load & render profile ─────────────────────────────────────
+async function loadVendorProfile() {
+  const res = await apiRequest('/auth/vendor/profile', 'GET');
+  if (!res.success) return;
+  vendorProfile = res.vendor;
+  renderProfileFields();
+  renderProfileAvatar();
+  renderProfilePlanSection();
+  await loadBillingHistory();
+}
+
 function renderProfileFields() {
   const v = vendorProfile;
   const nameEl = document.getElementById('profileName');
