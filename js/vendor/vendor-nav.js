@@ -90,5 +90,9 @@ async function loadVendorProfile(onLoaded) {
   renderNavAvatar();
   renderSuspendedBanner();
   renderPlanUsageStrip();
+  renderProfileFields();
+  renderProfileAvatar();
+  renderProfilePlanSection();
+  await loadBillingHistory();
   if (typeof onLoaded === 'function') onLoaded();
 }
