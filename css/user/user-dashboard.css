@@ -437,68 +437,6 @@ body {
   display: block;
 }
 
-.filter-sheet {
-  position: fixed;
-  z-index: 401;
-  background: #fff;
-  top: 112px;
-  right: 20px;
-  left: auto;
-  width: 340px;
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--c-border-soft);
-  transform: translateY(-10px) scale(0.97);
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.2s var(--ease);
-}
-
-.filter-sheet.open {
-  transform: translateY(0) scale(1);
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.filter-sheet-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--c-border-soft);
-  font-size: 15px;
-  font-weight: 700;
-  font-family: var(--font-display);
-}
-
-.filter-sheet-close {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  color: var(--c-ink-faint);
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background var(--t-fast) var(--ease);
-}
-
-.filter-sheet-close:hover {
-  background: var(--c-bg);
-}
-
-.filter-sheet-body {
-  padding: 18px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  max-height: calc(90vh - 130px);
-  overflow-y: auto;
-}
-
 .filter-group {
   display: flex;
   flex-direction: column;
@@ -647,14 +585,6 @@ body {
 .filter-input.error {
   border-color: var(--c-error);
   background: #FDECEC;
-}
-
-.filter-sheet-foot {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  padding: 14px 20px;
-  border-top: 1px solid var(--c-border-soft);
 }
 
 .filter-clear-btn {
@@ -1327,23 +1257,6 @@ body {
 /* ══════════════════════════════════════════════════════════════
    RESPONSIVE
    ══════════════════════════════════════════════════════════════ */
-@media (max-width: 860px) {
-  .filter-sheet {
-    top: auto;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    border-radius: 20px 20px 0 0;
-    transform: translateY(30px);
-    max-height: 85vh;
-  }
-
-  .filter-sheet.open {
-    transform: translateY(0);
-  }
-}
-
 @media (max-width: 768px) {
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
