@@ -101,6 +101,7 @@ async function fetchPincodeDetails(pincode) {
  * Wires a pincode input to auto-fill state/city/area fields.
  */
 function wirePincodeAutofill({ pincodeInput, stateInput, cityInput, areaInput, statusEl }) {
+  if (!pincodeInput || !stateInput || !cityInput) return;
   let pincodeTimer = null;
   pincodeInput.addEventListener("input", () => {
     const val = pincodeInput.value.trim();
