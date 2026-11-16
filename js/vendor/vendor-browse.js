@@ -74,6 +74,28 @@ function vsBuildParams(page, perPage) {
   return params;
 }
 
+// ── Nav avatar ────────────────────────────────────────────────
+function renderNavAvatar() {
+  if (!vendorProfile) return;
+  const initial = getInitials(vendorProfile.name || 'V');
+  ['navUserAvatar','navUserAvatarMobile'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = vendorProfile.profile_photo ? `<img src="${vendorProfile.profile_photo}" alt="">` : initial;
+  });
+  const nameEl = document.getElementById('navUserName');
+  const nameElM = document.getElementById('navUserNameMobile');
+  if (nameEl) nameEl.textContent = vendorProfile.name || '';
+  if (nameElM) nameElM.textContent = vendorProfile.name || '';
+}
+
+async function loadVendorProfile() {
+  const res = await apiRequest('/auth/vendor/profile', 'GET');
+  if (!res.success) return;
+  vendorProfile = res.vendor;
+  renderNavAvatar();
+}
+
 // ── Skeleton ──────────────────────────────────────────────────
 function vsSkeletonCardHTML() {
   return `<div class="vendor-skeleton-card">
