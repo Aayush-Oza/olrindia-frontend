@@ -277,13 +277,17 @@ async function handlePlanSelect(plan) {
 }
 
 // ── Pincode autofill ──────────────────────────────────────────
-function initProfilePincodeAutofill() {
+function initModalPincodeAutofill() {
+  const pincodeInput = document.getElementById('modalPincode');
+
+  if (!pincodeInput) return;
+
   wirePincodeAutofill({
-    pincodeInput: document.getElementById('edit_pincode'),
-    areaInput: document.getElementById('edit_area'),
-    cityInput: document.getElementById('edit_city'),
-    stateInput: document.getElementById('edit_state'),
-    statusEl: document.getElementById('profilePincodeStatus'),
+    pincodeInput,
+    areaInput: document.getElementById('modalArea'),
+    cityInput: document.getElementById('modalCity'),
+    stateInput: document.getElementById('modalState'),
+    statusEl: document.getElementById('modalPincodeStatus'),
   });
 }
 
