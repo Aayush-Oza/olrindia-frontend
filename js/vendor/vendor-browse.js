@@ -68,7 +68,7 @@ async function vsLoadHomepage() {
 
   bsHasMore       = prodData?.has_more ?? false;
   bsTotalProducts = prodData?.total    ?? 0;
-
+  bsCurrentPage   = 1;
   bsRenderCatGrid(catGrid, catData?.categories, 'bsEnterCategory');
   bsRenderHomeProdGrid(homeProdGrid, prodData?.products);
 

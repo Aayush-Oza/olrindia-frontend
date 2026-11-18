@@ -146,7 +146,7 @@ async function bsAppendNextBatch() {
 
   bsCurrentPage++;
   try {
-    const res = await apiRequest(`/products/public?${bsBuildParams(bsCurrentPage, 10)}`, 'GET');
+    const res = await apiRequest(`/products/public?${bsBuildParams(bsCurrentPage, 20)}`, 'GET');
     skeletonWrapper.remove();
     if (res.success) {
       bsHasMore       = res.has_more;
