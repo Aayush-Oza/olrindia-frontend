@@ -1,268 +1,18 @@
 /* ============================================================
-   OLR INDIA - USER BROWSE JS  (v3)
-   Rent/Buy tabs, separate filter fields, infinite scroll
-   Requires: user-nav.js (loaded before this)
+   OLR INDIA - USER BROWSE JS  (v4)
+   Page-specific only. Shared browse logic → js/shared/browse.js
    ============================================================ */
 
-// ── State ─────────────────────────────────────────────────────
-let allProducts      = [];
-let filteredProducts = [];
-let displayedCount   = 0;
-let isLoadingMore    = false;
-let currentPage      = 1;
-let totalProducts    = 0;
-let hasMore          = false;
-let sentinel         = null;
-let scrollObserver   = null;
-const wishedIds      = new Set();
-const wishedSlugs    = new Map();
+const wishedIds  = new Set();
+const wishedSlugs = new Map();
 
-let activeTab = 'rent'; // 'rent' | 'sell'
-
-let activeFilters = {
-  category:  '',
-  city:      '',
-  priceType: '',  // rent only
-  condition: '',  // buy only
-  priceMin:  0,
-  priceMax:  Infinity,
-};
-
-// ── Tab switching ─────────────────────────────────────────────
-function switchTab(tab) {
-  if (tab === activeTab) return;
-  activeTab = tab;
-  document.getElementById('tabRent').classList.toggle('active', tab === 'rent');
-  document.getElementById('tabBuy').classList.toggle('active', tab === 'sell');
-  document.getElementById('filterGroupPriceType').style.display = tab === 'rent' ? '' : 'none';
-  document.getElementById('filterGroupCondition').style.display = tab === 'sell' ? '' : 'none';
-  resetFilters(false);
-  renderActiveFilterChips();
-  updateFilterBadge();
-  loadBrowseHomepage();
-}
-
-function resetFilters(reload = true) {
-  activeFilters = { category:'', city:'', priceType:'', condition:'', priceMin:0, priceMax:Infinity };
-  document.getElementById('filterCategory').value  = '';
-  document.getElementById('filterCity').value      = '';
-  document.getElementById('filterCondition').value = '';
-  document.getElementById('filterPriceMin').value  = '';
-  document.getElementById('filterPriceMax').value  = '';
-  document.getElementById('filterPriceHint').textContent = 'Enter a min or max to filter by price.';
-  document.getElementById('filterPriceHint').classList.remove('error');
-  document.querySelectorAll('.price-type-btn').forEach(b => b.classList.remove('active'));
-  if (reload) loadBrowseHomepage();
-}
-
-// ── Category dropdown ─────────────────────────────────────────
-function populateCategoryDropdown(categories) {
-  const sel = document.getElementById('filterCategory');
-  if (!sel) return;
-  sel.innerHTML = '<option value="">All categories</option>' +
-    categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-}
-
-// ── Skeleton ──────────────────────────────────────────────────
-function skeletonCardHTML() {
-  return `<div class="skeleton-card">
-    <div class="skeleton-img"></div>
-    <div class="skeleton-body">
-      <div class="skeleton-line skeleton-line-sm"></div>
-      <div class="skeleton-line skeleton-line-md"></div>
-      <div class="skeleton-line skeleton-line-lg"></div>
-      <div class="skeleton-line skeleton-line-xs"></div>
-    </div>
-  </div>`;
-}
-
-// ── Build API params ──────────────────────────────────────────
-function buildParams(page, perPage) {
-  const params = new URLSearchParams({ page, per_page: perPage, listing_type: activeTab });
-  if (activeFilters.category) params.set('category', activeFilters.category);
-  if (activeFilters.city)     params.set('city',     activeFilters.city);
-  if (activeTab === 'rent') {
-    if (activeFilters.priceType)           params.set('price_type', activeFilters.priceType);
-    if (activeFilters.priceMin > 0)        params.set('price_min',  activeFilters.priceMin);
-    if (activeFilters.priceMax < Infinity) params.set('price_max',  activeFilters.priceMax);
-  } else {
-    if (activeFilters.condition)           params.set('condition',  activeFilters.condition);
-    if (activeFilters.priceMin > 0)        params.set('price_min',  activeFilters.priceMin);
-    if (activeFilters.priceMax < Infinity) params.set('price_max',  activeFilters.priceMax);
-  }
-  const q = document.getElementById('searchInput').value.trim();
-  if (q) params.set('search', q);
-  return params;
-}
-
-// ── Filter sheet ──────────────────────────────────────────────
-document.getElementById('filterBtn').addEventListener('click', openFilterSheet);
-
-function openFilterSheet() {
-  document.getElementById('filterSheet').classList.add('open');
-  document.getElementById('filterOverlay').classList.add('open');
-}
-function closeFilterSheet() {
-  document.getElementById('filterSheet').classList.remove('open');
-  document.getElementById('filterOverlay').classList.remove('open');
-}
-
-document.querySelectorAll('.price-type-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.price-type-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  });
-});
-
-document.getElementById('filterLocateBtn').addEventListener('click', () => {
-  if (!navigator.geolocation) { toastError('Your browser does not support location.'); return; }
-  const locateBtn = document.getElementById('filterLocateBtn');
-  locateBtn.disabled = true; locateBtn.style.opacity = '0.5';
-  toastInfo('Looking for your location…');
-  navigator.geolocation.getCurrentPosition(async pos => {
-    try {
-      const res  = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json`, { headers: { 'Accept-Language': 'en' } });
-      const data = await res.json();
-      let city = data.address?.city || data.address?.town || data.address?.village || '';
-      if (!city) city = (data.address?.city_district || data.address?.state_district || '').split(' ')[0] || '';
-      if (city) document.getElementById('filterCity').value = city;
-      else toastError("Couldn't determine your city.");
-    } catch { toastError('Location lookup failed.'); }
-    finally { locateBtn.disabled = false; locateBtn.style.opacity = '1'; }
-  }, err => {
-    const msgs = { 1:'Location permission denied.', 2:'Location unavailable.', 3:'Request timed out.' };
-    toastError(msgs[err.code] || 'Could not get your location.');
-    locateBtn.disabled = false; locateBtn.style.opacity = '1';
-  });
-});
-
-document.getElementById('filterApplyBtn').addEventListener('click', () => {
-  const selectedType = document.querySelector('.price-type-btn.active')?.dataset.type || '';
-  const priceMin     = parseFloat(document.getElementById('filterPriceMin').value) || 0;
-  const priceMax     = parseFloat(document.getElementById('filterPriceMax').value) || Infinity;
-  document.getElementById('filterPriceHint').textContent = 'Enter a min or max to filter by price.';
-  document.getElementById('filterPriceHint').classList.remove('error');
-  activeFilters.category = document.getElementById('filterCategory').value;
-  activeFilters.city     = document.getElementById('filterCity').value.trim().toLowerCase();
-  activeFilters.priceMin = priceMin;
-  activeFilters.priceMax = priceMax;
-  if (activeTab === 'rent') {
-    activeFilters.priceType = selectedType;
-    activeFilters.condition = '';
-  } else {
-    activeFilters.condition = document.getElementById('filterCondition').value;
-    activeFilters.priceType = '';
-  }
-  closeFilterSheet();
-  applyFilters();
-  renderActiveFilterChips();
-});
-
-document.getElementById('filterClearBtn').addEventListener('click', () => {
-  resetFilters(false);
-  closeFilterSheet();
-  renderActiveFilterChips();
-  updateFilterBadge();
-  loadBrowseHomepage();
-});
-
-let searchDebounceTimer = null;
-document.getElementById('searchInput').addEventListener('input', function () {
-  clearTimeout(searchDebounceTimer);
-  searchDebounceTimer = setTimeout(() => {
-    const homeSection = document.getElementById('browseHomeSection');
-    if (homeSection) homeSection.style.display = 'none';
-    document.getElementById('productGrid').style.display = 'grid';
-    document.getElementById('productsTitle').textContent = 'Search Results';
-    applyFilters();
-  }, 400);
-});
-
-// ── Apply filters ─────────────────────────────────────────────
-function applyFilters() {
-  const homeSection = document.getElementById('browseHomeSection');
-  if (homeSection) homeSection.style.display = 'none';
-  document.getElementById('productGrid').style.display = 'grid';
-  document.getElementById('productsTitle').textContent =
-    activeFilters.category || (document.getElementById('searchInput').value.trim() ? 'Search Results' : 'All Products');
-  loadBrowseProducts(true);
-}
-
-// ── Load products ─────────────────────────────────────────────
-async function loadBrowseProducts(reset = true) {
-  if (reset) {
-    currentPage = 1; allProducts = []; displayedCount = 0;
-    document.getElementById('productGrid').innerHTML = Array(20).fill(skeletonCardHTML()).join('');
-  }
-  try {
-    const res = await apiRequest(`/products/public?${buildParams(currentPage, 20)}`, 'GET');
-    if (!res.success) { document.getElementById('productGrid').innerHTML = `<div class="grid-empty"><div style="font-size:40px">😕</div><p>Failed to load products.</p></div>`; return; }
-    totalProducts = res.total; hasMore = res.has_more;
-    allProducts = filteredProducts = res.products; displayedCount = res.products.length;
-    renderProducts(); attachSentinel(); updateFilterBadge();
-  } catch { document.getElementById('productGrid').innerHTML = `<div class="grid-empty"><div style="font-size:40px">😕</div><p>Failed to load products. Please refresh.</p></div>`; }
-}
-
-// ── Append next batch ─────────────────────────────────────────
-async function appendNextBatch() {
-  if (isLoadingMore || !hasMore) return;
-  isLoadingMore = true;
-  document.getElementById('scrollSentinel')?.remove();
-  document.querySelector('.scroll-end-msg')?.remove();
-  const grid = document.getElementById('homeProdGrid') || document.getElementById('productGrid');
-  const skeletonWrapper = document.createElement('div');
-  skeletonWrapper.id = 'skeletonBatch'; skeletonWrapper.style.cssText = 'display:contents';
-  skeletonWrapper.innerHTML = Array(10).fill(skeletonCardHTML()).join('');
-  grid.appendChild(skeletonWrapper);
-  currentPage++;
-  try {
-    const res = await apiRequest(`/products/public?${buildParams(currentPage, 10)}`, 'GET');
-    skeletonWrapper.remove();
-    if (res.success) {
-      hasMore = res.has_more; totalProducts = res.total;
-      res.products.forEach(p => grid.insertAdjacentHTML('beforeend', productCardHTML(p)));
-      displayedCount += res.products.length;
-    }
-  } catch { skeletonWrapper.remove(); currentPage--; toastError('Failed to load more products.'); }
-  isLoadingMore = false;
-  attachSentinel();
-}
-
-// ── Sentinel ──────────────────────────────────────────────────
-function attachSentinel() {
-  if (scrollObserver) { scrollObserver.disconnect(); scrollObserver = null; }
-  sentinel?.remove();
-  const grid = document.getElementById('homeProdGrid') || document.getElementById('productGrid');
-  if (!hasMore) {
-    if (totalProducts > 20) grid.insertAdjacentHTML('beforeend', `<div class="scroll-end-msg" style="grid-column:1/-1;text-align:center;padding:18px;font-size:13px;color:var(--c-ink-faint);">✓ All ${totalProducts} products loaded</div>`);
-    return;
-  }
-  grid.insertAdjacentHTML('beforeend', `<div id="scrollSentinel" style="grid-column:1/-1;height:40px;"></div>`);
-  sentinel = document.getElementById('scrollSentinel');
-  scrollObserver = new IntersectionObserver(entries => { if (entries[0].isIntersecting) appendNextBatch(); }, { rootMargin: '200px' });
-  scrollObserver.observe(sentinel);
-}
-
-// ── Render products ───────────────────────────────────────────
-function renderProducts() {
-  const grid    = document.getElementById('productGrid');
-  const countEl = document.getElementById('productsCount');
-  if (filteredProducts.length === 0) {
-    countEl.textContent = '';
-    grid.innerHTML = `<div class="grid-empty"><div style="font-size:44px;margin-bottom:10px;">🔍</div><h3>No products found</h3><p>Try different filters or search terms.</p><button onclick="clearAllFilters()" style="margin-top:12px;padding:9px 22px;border-radius:var(--r-md);background:var(--grad-brand);color:#fff;border:none;font-weight:600;cursor:pointer;font-family:var(--font-display);">Clear filters</button></div>`;
-    return;
-  }
-  countEl.textContent = `${totalProducts} product${totalProducts !== 1 ? 's' : ''}`;
-  grid.innerHTML = filteredProducts.map(p => productCardHTML(p)).join('');
-}
-
-// ── Product card ──────────────────────────────────────────────
+// ── Product card HTML ─────────────────────────────────────────
 function productCardHTML(p) {
   if (p.id && p.share_slug) wishedSlugs.set(p.id, p.share_slug);
   const img = p.images && p.images[0]
     ? `<img class="product-img" src="${p.images[0]}" alt="${p.name}" loading="lazy">`
     : `<div class="product-img-placeholder">📦</div>`;
-  const price  = buildPriceLabel(p, activeFilters.priceType);
+  const price  = bsBuildPriceLabel(p);
   const wished = wishedIds.has(p.id);
   const badge  = p.vendor_badge === 'featured'
     ? `<span class="vendor-badge badge-premium">★ Top Vendor</span>`
@@ -270,7 +20,7 @@ function productCardHTML(p) {
       ? `<span class="vendor-badge badge-growth">✓ Verified</span>`
       : '';
   return `
-    <div class="product-card" onclick="openProduct('${p.share_slug}','${p.category || ''}','${p.city || ''}')">
+    <div class="product-card" onclick="bsOpenProduct('${p.share_slug}','${p.category || ''}','${p.city || ''}')">
       ${img}${badge}
       <button class="product-wish-btn ${wished ? 'active' : ''}" onclick="event.stopPropagation();toggleWish(this,${p.id})" title="Save to wishlist">${wished ? '♥' : '♡'}</button>
       <div class="product-body">
@@ -287,50 +37,42 @@ function productCardHTML(p) {
     </div>`;
 }
 
-// ── Clear all filters ─────────────────────────────────────────
-function clearAllFilters() {
-  document.getElementById('searchInput').value = '';
-  resetFilters(false);
-  renderActiveFilterChips();
-  updateFilterBadge();
-  loadBrowseHomepage();
+// ── Load products (passed to browseSharedInit) ────────────────
+async function loadProducts(reset = true) {
+  const grid = document.getElementById('productGrid');
+  grid.style.display = 'grid';
+  if (reset) {
+    bsCurrentPage = 1;
+    grid.innerHTML = Array(20).fill(bsSkeletonCardHTML()).join('');
+  }
+  try {
+    const res = await apiRequest(`/products/public?${bsBuildParams(bsCurrentPage, 20)}`, 'GET');
+    if (!res.success) { grid.innerHTML = `<div class="grid-empty"><div style="font-size:40px">😕</div><p>Failed to load products.</p></div>`; return; }
+    bsTotalProducts = res.total;
+    bsHasMore       = res.has_more;
+    bsRenderProducts(res.products);
+    bsUpdateFilterBadge();
+    bsAttachSentinel();
+  } catch {
+    grid.innerHTML = `<div class="grid-empty"><div style="font-size:40px">😕</div><p>Failed to load products. Please refresh.</p></div>`;
+  }
 }
 
-// ── Filter badge + chips ──────────────────────────────────────
-function updateFilterBadge() {
-  let count = 0;
-  if (activeFilters.category)  count++;
-  if (activeFilters.city)      count++;
-  if (activeFilters.priceType) count++;
-  if (activeFilters.condition) count++;
-  if (activeFilters.priceMin > 0 || activeFilters.priceMax < Infinity) count++;
-  const badge = document.getElementById('filterCountBadge');
-  badge.style.display = count ? 'inline-flex' : 'none';
-  badge.textContent   = count;
-  document.getElementById('filterBtn').classList.toggle('has-filters', count > 0);
-}
+// ── Load homepage (passed to browseSharedInit) ────────────────
+async function loadHomepage() {
+  const { catGrid, homeProdGrid } = bsRenderHomepageShell();
 
-function renderActiveFilterChips() {
-  const el    = document.getElementById('activeFilters');
-  const chips = [];
-  if (activeFilters.category)  chips.push({ label: activeFilters.category, key: 'category' });
-  if (activeFilters.city)      chips.push({ label: `📍 ${activeFilters.city}`, key: 'city' });
-  if (activeFilters.priceType) chips.push({ label: `⏱ ${activeFilters.priceType}`, key: 'priceType' });
-  if (activeFilters.condition) chips.push({ label: conditionLabel(activeFilters.condition), key: 'condition' });
-  if (activeFilters.priceMin > 0 || activeFilters.priceMax < Infinity)
-    chips.push({ label: `₹${activeFilters.priceMin}–${activeFilters.priceMax === Infinity ? '∞' : activeFilters.priceMax}`, key: 'price' });
-  el.innerHTML = chips.map(c => `<button class="active-chip" onclick="removeFilter('${c.key}')">${c.label} ✕</button>`).join('');
-}
+  const [catData, prodData] = await Promise.all([
+    apiRequest(`/products/categories?listing_type=${bsActiveTab}`, 'GET').catch(() => null),
+    apiRequest(`/products/public?page=1&per_page=20&listing_type=${bsActiveTab}`, 'GET').catch(() => null),
+  ]);
 
-function removeFilter(key) {
-  if (key === 'category')  { activeFilters.category  = ''; document.getElementById('filterCategory').value  = ''; }
-  if (key === 'city')      { activeFilters.city       = ''; document.getElementById('filterCity').value      = ''; }
-  if (key === 'priceType') { activeFilters.priceType  = ''; document.querySelectorAll('.price-type-btn').forEach(b => b.classList.remove('active')); }
-  if (key === 'condition') { activeFilters.condition  = ''; document.getElementById('filterCondition').value = ''; }
-  if (key === 'price')     { activeFilters.priceMin = 0; activeFilters.priceMax = Infinity; document.getElementById('filterPriceMin').value = ''; document.getElementById('filterPriceMax').value = ''; }
-  renderActiveFilterChips(); updateFilterBadge();
-  const hasAny = activeFilters.category || activeFilters.city || activeFilters.priceType || activeFilters.condition || activeFilters.priceMin > 0 || activeFilters.priceMax < Infinity || document.getElementById('searchInput').value.trim();
-  if (!hasAny) loadBrowseHomepage(); else applyFilters();
+  bsHasMore       = prodData?.has_more ?? false;
+  bsTotalProducts = prodData?.total    ?? 0;
+
+  bsRenderCatGrid(catGrid, catData?.categories, 'bsEnterCategory');
+  bsRenderHomeProdGrid(homeProdGrid, prodData?.products);
+  if (bsHasMore) bsAttachSentinel();
 }
 
 // ── Wishlist ──────────────────────────────────────────────────
@@ -373,87 +115,51 @@ async function loadWishlist() {
   updateWishlistBadge();
 }
 
-// ── Homepage ──────────────────────────────────────────────────
-async function loadBrowseHomepage() {
-  const grid    = document.getElementById('productGrid');
-  const countEl = document.getElementById('productsCount');
-  countEl.textContent = '';
-  document.getElementById('productsTitle').textContent = activeTab === 'rent' ? 'Browse & Rent' : 'Browse & Buy';
-  grid.style.display = 'none';
-
-  let homeSection = document.getElementById('browseHomeSection');
-  if (!homeSection) {
-    homeSection = document.createElement('div');
-    homeSection.id = 'browseHomeSection';
-    grid.parentNode.insertBefore(homeSection, grid);
-  }
-  homeSection.style.display = 'block';
-  homeSection.innerHTML = `
-    <div id="catCardGrid" class="cat-card-grid">
-      ${Array(8).fill(`<div class="cat-card skeleton-cat-card"><div class="skeleton-img" style="height:100%;width:100%;border-radius:var(--r-md);"></div></div>`).join('')}
-    </div>
-    <div id="homeProdSection">
-      <div class="home-prod-title">Featured ${activeTab === 'rent' ? 'Rentals' : 'Items to Buy'}</div>
-      <div class="product-grid" id="homeProdGrid">
-        ${Array(8).fill(skeletonCardHTML()).join('')}
-      </div>
-    </div>`;
-
-  const [catData, prodData] = await Promise.all([
-    apiRequest(`/products/categories?listing_type=${activeTab}`, 'GET').catch(() => null),
-    apiRequest(`/products/public?page=1&per_page=20&listing_type=${activeTab}`, 'GET').catch(() => null),
-  ]);
-
-  hasMore = prodData?.has_more ?? false;
-  totalProducts = prodData?.total ?? 0;
-
-  const catGrid = document.getElementById('catCardGrid');
-  if (catGrid) {
-    if (catData?.success && catData.categories.length > 0) {
-      populateCategoryDropdown(catData.categories);
-      catGrid.innerHTML = catData.categories.map(cat => `
-        <div class="cat-card" onclick="enterBrowseCategory('${cat.name.replace(/'/g,"\\'")}')">
-          <img class="cat-card-img" src="${cat.image_url}" alt="${cat.name}" loading="lazy">
-          <div class="cat-card-name">${cat.name}</div>
-        </div>`).join('');
-    } else {
-      catGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:36px 20px;"><div style="font-size:48px;margin-bottom:12px;">🏪</div><h3>No categories live yet</h3></div>`;
-    }
-  }
-
-  const homeProdGrid = document.getElementById('homeProdGrid');
-  if (homeProdGrid) {
-    if (prodData?.success && prodData.products.length > 0) {
-      homeProdGrid.innerHTML = prodData.products.map(p => productCardHTML(p)).join('');
-      if (hasMore) attachSentinel();
-    } else {
-      homeProdGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:36px 20px;"><div style="font-size:48px;margin-bottom:12px;">📦</div><h3>No products listed yet</h3></div>`;
-    }
-  }
-}
-
-function enterBrowseCategory(cat) {
-  activeFilters.category = cat;
-  document.getElementById('filterCategory').value = cat;
-  document.getElementById('productsCount').textContent = '';
-  const homeSection = document.getElementById('browseHomeSection');
-  if (homeSection) homeSection.style.display = 'none';
-  document.getElementById('productGrid').style.display = 'grid';
-  document.getElementById('productsTitle').textContent = cat;
-  renderActiveFilterChips(); updateFilterBadge(); loadBrowseProducts(true);
-}
+// ── Tab switching (HTML onclick wrapper) ──────────────────────
+function switchTab(tab) { bsSwitchTab(tab); }
 
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  browseSharedInit({
+    tabRentId:               'tabRent',
+    tabBuyId:                'tabBuy',
+    filterGroupPriceTypeId:  'filterGroupPriceType',
+    filterGroupConditionId:  'filterGroupCondition',
+    filterCategoryId:        'filterCategory',
+    filterCityId:            'filterCity',
+    filterConditionId:       'filterCondition',
+    filterPriceMinId:        'filterPriceMin',
+    filterPriceMaxId:        'filterPriceMax',
+    filterPriceHintId:       'filterPriceHint',
+    filterBtnId:             'filterBtn',
+    filterOverlayId:         'filterOverlay',
+    filterSheetId:           'filterSheet',
+    filterApplyBtnId:        'filterApplyBtn',
+    filterClearBtnId:        'filterClearBtn',
+    filterLocateBtnId:       'filterLocateBtn',
+    filterCountBadgeId:      'filterCountBadge',
+    activeFiltersId:         'activeFilters',
+    activeChipClass:         'active-chip',
+    priceTypeBtnSelector:    '.price-type-btn',
+    searchId:                'searchInput',
+    productGridId:           'productGrid',
+    productsCountId:         'productsCount',
+    productsTitleId:         'productsTitle',
+  }, {
+    loadHomepage:    loadHomepage,
+    loadProducts:    loadProducts,
+    productCardHTML: productCardHTML,
+  });
+
   loadNavUser();
-  loadBrowseHomepage();
+  loadHomepage();
   loadWishlist().catch(err => console.error('Wishlist load failed:', err));
 
   const urlParams = new URLSearchParams(window.location.search);
   const catParam  = urlParams.get('category');
-  if (catParam) enterBrowseCategory(catParam);
+  if (catParam) bsEnterCategory(catParam);
 });
 
 window.addEventListener('pageshow', (event) => {
-  if (event.persisted) { loadBrowseHomepage(); loadWishlist().catch(() => {}); }
+  if (event.persisted) { loadHomepage(); loadWishlist().catch(() => {}); }
 });
