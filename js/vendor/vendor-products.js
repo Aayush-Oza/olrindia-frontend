@@ -1,55 +1,20 @@
 /* ============================================================
    OLR INDIA – VENDOR PRODUCTS JS  (my-products.html)  v5
+   Requires: vendor-nav.js, vendor-upgrade.js
    ============================================================ */
 
 // ── State ─────────────────────────────────────────────────────
 let allProducts = [];
 let CATEGORIES = {};
-let CONDITIONS = [];          // from GET /conditions
-let vendorProfile = null;
+let CONDITIONS = [];
 let editingId = null;
-let currentListingType = 'rent';   // 'rent' | 'sell'  — active in modal
+let currentListingType = 'rent';
 const slotFiles = {};
 const slotUrls = {};
 let previewProductId = null;
 let originalProductSnapshot = null;
 
-const PLAN_LABELS = {
-  free: 'Free',
-  starter: 'Starter', starter_yearly: 'Starter Yearly',
-  growth: 'Growth',   growth_yearly: 'Growth Yearly',
-  premium: 'Premium', premium_yearly: 'Premium Yearly',
-};
-
-const PLAN_PRICES = {
-  starter: 249, growth: 449, premium: 999,
-  starter_yearly: 2499, growth_yearly: 4499, premium_yearly: 9999,
-};
-
-const PLAN_YEARLY_DISCOUNT = {
-  starter_yearly: { original: 2988,  saving: 489,  percent: 16 },
-  growth_yearly:  { original: 5388,  saving: 889,  percent: 17 },
-  premium_yearly: { original: 11988, saving: 1989, percent: 17 },
-};
-
-// ── Nav avatar / name ─────────────────────────────────────────
-function renderNavAvatar() {
-  if (!vendorProfile) return;
-  const initial = getInitials(vendorProfile.name || 'V');
-  ['navUserAvatar', 'navUserAvatarMobile'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.innerHTML = vendorProfile.profile_photo
-      ? `<img src="${vendorProfile.profile_photo}" alt="">`
-      : initial;
-  });
-  const nameEl = document.getElementById('navUserName');
-  const nameElM = document.getElementById('navUserNameMobile');
-  if (nameEl) nameEl.textContent = vendorProfile.name || '';
-  if (nameElM) nameElM.textContent = vendorProfile.name || '';
-}
-
-// ── Suspended banner ──────────────────────────────────────────
+// ── Suspended banner (products-specific selectors) ────────────
 function renderSuspendedBanner() {
   if (!vendorProfile) return;
   const banner = document.getElementById('suspendedBanner');
@@ -59,9 +24,7 @@ function renderSuspendedBanner() {
     document.querySelectorAll('#addProductBtn, #planUsageUpgradeBtn').forEach(btn => {
       btn.disabled = true; btn.style.opacity = '0.4'; btn.style.cursor = 'not-allowed';
     });
-  } else {
-    banner.style.display = 'none';
-  }
+  } else { banner.style.display = 'none'; }
 }
 
 // ── Plan usage strip ──────────────────────────────────────────
@@ -79,13 +42,11 @@ function renderPlanUsageStrip() {
   const limit = v.max_active_posts;
   if (limit === null || limit === undefined) {
     textEl.textContent = `${used} active listings - unlimited on your plan`;
-    fillEl.style.width = '8%';
-    fillEl.classList.remove('danger');
+    fillEl.style.width = '8%'; fillEl.classList.remove('danger');
   } else {
     textEl.textContent = `${used} of ${limit} active listings used`;
     const pct = limit > 0 ? Math.min(100, (used / limit) * 100) : 100;
-    fillEl.style.width = pct + '%';
-    fillEl.classList.toggle('danger', pct >= 90);
+    fillEl.style.width = pct + '%'; fillEl.classList.toggle('danger', pct >= 90);
   }
 }
 
@@ -100,6 +61,7 @@ async function loadVendorProfile() {
   renderSuspendedBanner();
   renderPlanUsageStrip();
 }
+
 
 // ── Load categories ───────────────────────────────────────────
 async function loadCategories() {
@@ -470,159 +432,6 @@ document.getElementById('shareLinkCopyBtn')?.addEventListener('click', async () 
 });
 
 // ── Upgrade modal ─────────────────────────────────────────────
-function openUpgradeModal(message) {
-  const sub = document.getElementById('upgradeModalText');
-  if (sub) sub.textContent = message || 'Upgrade your plan to list more products and get better visibility.';
-  renderPlanCards();
-  document.getElementById('upgradeModalOverlay').classList.add('open');
-}
-
-document.getElementById('upgradeModalCancel')?.addEventListener('click', () => document.getElementById('upgradeModalOverlay').classList.remove('open'));
-document.getElementById('upgradeModalOverlay')?.addEventListener('click', e => {
-  if (e.target === document.getElementById('upgradeModalOverlay')) document.getElementById('upgradeModalOverlay').classList.remove('open');
-});
-
-// ── Render plan cards ─────────────────────────────────────────
-function renderPlanCards() {
-  if (!vendorProfile) return;
-  const current = vendorProfile.subscription_plan || 'free';
-  const expires = vendorProfile.subscription_expires_at;
-
-  const bar = document.getElementById('plansCurrentBar');
-  if (bar) {
-    const planName = PLAN_LABELS[current] || current;
-    let expiryText = '';
-    if (expires && current !== 'free') {
-      const d = new Date(expires);
-      expiryText = ` · renews ${d.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })}`;
-    }
-    bar.innerHTML = `You're on <strong>${planName}</strong>${expiryText}`;
-  }
-
-  const rankMap = { free:0, starter:1, starter_yearly:1, growth:2, growth_yearly:2, premium:3, premium_yearly:3 };
-  const currentRank = rankMap[current] ?? 0;
-
-  const monthlyPlans = [
-    { key:'free',    label:'Free',    price:'₹0',   sub:'Forever free',  posts:'5 listings',   badge:'',
-      features:[{text:'5 active listings',yes:true},{text:'Basic visibility',yes:true},{text:'No badge',yes:false},{text:'No priority listing',yes:false}] },
-    { key:'starter', label:'Starter', price:'₹249', sub:'per month',      posts:'10 listings',  badge:'',
-      features:[{text:'10 active listings',yes:true},{text:'Priority over free vendors',yes:true},{text:'No badge',yes:false},{text:'Email support',yes:true}] },
-    { key:'growth',  label:'Growth',  price:'₹449', sub:'per month',      posts:'20 listings',  badge:'✓ Verified',
-      features:[{text:'20 active listings',yes:true},{text:'Higher priority ranking',yes:true},{text:'Verified badge ✓',yes:true},{text:'Priority support',yes:true}] },
-    { key:'premium', label:'Premium', price:'₹999', sub:'per month',      posts:'Unlimited',    badge:'★ Featured',
-      features:[{text:'Unlimited listings',yes:true},{text:'Highest priority ranking',yes:true},{text:'Featured badge ★',yes:true},{text:'Dedicated support',yes:true}] },
-  ];
-
-  const yearlyPlans = [
-    { key:'starter_yearly', label:'Starter', price:'₹2,499', sub:'per year', posts:'10 listings', badge:'',
-      features:[{text:'10 active listings',yes:true},{text:'Priority over free vendors',yes:true},{text:'No badge',yes:false},{text:'Email support',yes:true}] },
-    { key:'growth_yearly',  label:'Growth',  price:'₹4,499', sub:'per year', posts:'20 listings', badge:'✓ Verified',
-      features:[{text:'20 active listings',yes:true},{text:'Higher priority ranking',yes:true},{text:'Verified badge ✓',yes:true},{text:'Priority support',yes:true}] },
-    { key:'premium_yearly', label:'Premium', price:'₹9,999', sub:'per year', posts:'Unlimited',   badge:'★ Featured',
-      features:[{text:'Unlimited listings',yes:true},{text:'Highest priority ranking',yes:true},{text:'Featured badge ★',yes:true},{text:'Dedicated support',yes:true}] },
-  ];
-
-  function planCardHtml(plan, isYearly) {
-    const isCurrent = plan.key === current;
-    const rank = rankMap[plan.key] ?? 0;
-    const isLower = rank < currentRank;
-    const isPopular = plan.key === 'growth' || plan.key === 'growth_yearly';
-    const discount = isYearly ? PLAN_YEARLY_DISCOUNT[plan.key] : null;
-    let btnLabel = `Get ${plan.label}`, btnDisabled = '', btnOpacity = '';
-    if (isCurrent) { btnLabel = 'Current Plan'; btnDisabled = 'disabled'; }
-    else if (isLower) { btnLabel = 'Downgrade'; btnDisabled = 'disabled'; btnOpacity = 'style="opacity:0.35;"'; }
-    const discountHtml = discount ? `
-      <div class="plan-yearly-discount">
-        <span class="plan-original-price">₹${discount.original.toLocaleString('en-IN')}/yr</span>
-        <span class="plan-save-badge">Save ${discount.percent}%</span>
-      </div>
-      <div class="plan-saving-amount">You save ₹${discount.saving.toLocaleString('en-IN')}</div>` : '';
-    return `
-      <div class="plan-card ${isCurrent ? 'plan-card-current' : ''} ${isPopular ? 'plan-card-popular' : ''}">
-        ${isPopular ? '<div class="plan-popular-tag">Most Popular</div>' : ''}
-        ${isCurrent ? '<div class="plan-current-tag">Current</div>' : ''}
-        <div class="plan-card-top">
-          <div class="plan-label">${plan.label} ${plan.badge ? `<span class="plan-badge">${plan.badge}</span>` : ''}</div>
-          <div class="plan-price">${plan.price}</div>
-          <div class="plan-sub">${plan.sub}</div>
-          ${discountHtml}
-        </div>
-        <ul class="plan-features">${plan.features.map(f => `<li>${f.yes ? '✓' : '✗'} ${f.text}</li>`).join('')}</ul>
-        <button class="btn btn-primary plan-select-btn" ${btnDisabled} ${btnOpacity}
-          onclick="handlePlanSelect('${plan.key}')" id="planBtn-${plan.key}">
-          <span class="btn-label">${btnLabel}</span><span class="spinner"></span>
-        </button>
-      </div>`;
-  }
-
-  const container = document.getElementById('plansContainer');
-  if (!container) return;
-  container.innerHTML = `
-    <div class="plans-section">
-      <div class="plans-section-heading"><span>Monthly</span></div>
-      <div class="plans-grid plans-grid-monthly">${monthlyPlans.map(p => planCardHtml(p, false)).join('')}</div>
-    </div>
-    <div class="plans-section" style="margin-top:28px;">
-      <div class="plans-section-heading plans-section-heading-yearly">
-        <span>Yearly</span><span class="plans-yearly-tag">🏷️ Save up to 17%</span>
-      </div>
-      <div class="plans-grid plans-grid-yearly">${yearlyPlans.map(p => planCardHtml(p, true)).join('')}</div>
-    </div>`;
-}
-
-// ── Handle plan select ────────────────────────────────────────
-async function handlePlanSelect(planKey) {
-  const btn = document.getElementById(`planBtn-${planKey}`);
-  try {
-    setButtonLoading(btn, true);
-    const isYearly = planKey.endsWith('_yearly');
-    const basePlan = planKey.replace('_yearly', '');
-    const billing_cycle = isYearly ? 'yearly' : 'monthly';
-    const res = await apiRequest('/auth/vendor/subscribe', 'POST', { plan: basePlan, billing_cycle });
-    if (!res.success) { toastError(res.message || 'Could not start payment.'); setButtonLoading(btn, false); return; }
-    setButtonLoading(btn, false);
-    const durationLabel = isYearly ? '365 days' : '30 days';
-    const options = {
-      key: res.key_id, amount: res.amount, currency: res.currency,
-      name: 'OLR India', description: `${res.plan_label} Plan · ${durationLabel}`, order_id: res.order_id,
-      prefill: { name: res.vendor?.name || '', email: res.vendor?.email || '' },
-      theme: { color: '#2563eb' },
-      handler: async function (response) {
-        document.getElementById('upgradeModalOverlay').classList.remove('open');
-        await verifyAndActivatePlan({ razorpay_order_id: response.razorpay_order_id, razorpay_payment_id: response.razorpay_payment_id, razorpay_signature: response.razorpay_signature });
-      },
-      modal: { ondismiss: () => setButtonLoading(btn, false) },
-    };
-    const rzp = new Razorpay(options);
-    rzp.on('payment.failed', r => { toastError(`Payment failed: ${r.error.description || 'Try again.'}`); setButtonLoading(btn, false); });
-    rzp.open();
-  } catch (err) {
-    toastError('Something went wrong.'); if (btn) setButtonLoading(btn, false);
-  }
-}
-
-async function verifyAndActivatePlan({ razorpay_order_id, razorpay_payment_id, razorpay_signature }) {
-  try {
-    const res = await apiRequest('/auth/vendor/payment/verify', 'POST', { razorpay_order_id, razorpay_payment_id, razorpay_signature });
-    if (res.success) { toastSuccess(`🎉 ${res.message}`); await loadVendorProfile(); await loadProducts(); }
-    else toastError(res.message || 'Payment verification failed. Contact support.');
-  } catch (err) { showPaymentRetryBanner({ razorpay_order_id, razorpay_payment_id, razorpay_signature }); }
-}
-
-function showPaymentRetryBanner({ razorpay_order_id, razorpay_payment_id, razorpay_signature }) {
-  let el = document.getElementById('paymentRetryBanner');
-  if (!el) { el = document.createElement('div'); el.id = 'paymentRetryBanner'; document.getElementById('panel-products')?.insertBefore(el, document.getElementById('panel-products').firstChild); }
-  el.style.cssText = `display:flex;align-items:center;justify-content:space-between;background:#fff7ed;border:1px solid #f97316;color:#9a3412;padding:14px 16px;border-radius:8px;margin-bottom:16px;font-size:13.5px;gap:12px;flex-wrap:wrap;`;
-  el.innerHTML = `<span>⚠️ Payment was deducted but your plan is being activated. Click Retry or contact <a href="mailto:support@olrindia.com" style="color:#9a3412;font-weight:600;">support@olrindia.com</a> with payment ID: <strong>${razorpay_payment_id}</strong></span>
-    <button class="btn btn-primary" style="width:auto;padding:8px 16px;flex-shrink:0;font-size:13px;" id="paymentRetryBtn">Retry Activation</button>`;
-  document.getElementById('paymentRetryBtn').addEventListener('click', async () => {
-    el.innerHTML = `<span>⏳ Retrying...</span>`;
-    await verifyAndActivatePlan({ razorpay_order_id, razorpay_payment_id, razorpay_signature });
-    el.remove();
-  });
-}
-
-// ── Image slots ───────────────────────────────────────────────
 function setSlotImage(i, src) {
   const slot = document.getElementById(`slot${i}`);
   if (!slot) return;
@@ -977,9 +786,6 @@ async function confirmDelete(productId) {
 
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('hamburgerBtn')?.addEventListener('click', () => {
-    document.getElementById('mobileMenu').classList.toggle('open');
-  });
   document.getElementById('addProductBtn')?.addEventListener('click', openAddModal);
   initImageSlots();
   initModalPincodeAutofill();
@@ -994,8 +800,4 @@ document.addEventListener('keydown', e => {
   if (document.getElementById('previewModalOverlay')?.classList.contains('open')) closePreviewModal();
   document.getElementById('shareModalOverlay')?.classList.remove('open');
   document.getElementById('upgradeModalOverlay')?.classList.remove('open');
-});
-
-window.addEventListener('resize', () => {
-  if (window.innerWidth > 860) document.getElementById('mobileMenu')?.classList.remove('open');
 });

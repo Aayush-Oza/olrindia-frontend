@@ -1,39 +1,7 @@
 /* ============================================================
    OLR INDIA – VENDOR PROFILE JS  (profile.html)
+   Requires: vendor-nav.js, vendor-upgrade.js
    ============================================================ */
-
-let vendorProfile = null;
-const PLAN_LABELS = { free: 'Free', starter: 'Starter', growth: 'Growth', premium: 'Premium' };
-
-// ── Nav avatar ────────────────────────────────────────────────
-function renderNavAvatar() {
-  if (!vendorProfile) return;
-  const initial = getInitials(vendorProfile.name || 'V');
-  ['navUserAvatar', 'navUserAvatarMobile'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.innerHTML = vendorProfile.profile_photo ? `<img src="${vendorProfile.profile_photo}" alt="">` : initial;
-  });
-  const nameEl = document.getElementById('navUserName');
-  const nameElM = document.getElementById('navUserNameMobile');
-  if (nameEl) nameEl.textContent = vendorProfile.name || '';
-  if (nameElM) nameElM.textContent = vendorProfile.name || '';
-}
-
-// ── Suspended banner ──────────────────────────────────────────
-function renderSuspendedBanner() {
-  if (!vendorProfile) return;
-  const banner = document.getElementById('suspendedBanner');
-  if (!banner) return;
-  if (!vendorProfile.is_active) {
-    banner.style.display = 'block';
-    document.querySelectorAll('#profileForm button[type="submit"], #profileAvatarEditBtn, #profileAvatarRemoveBtn').forEach(btn => {
-      btn.disabled = true; btn.style.opacity = '0.4'; btn.style.cursor = 'not-allowed';
-    });
-  } else {
-    banner.style.display = 'none';
-  }
-}
 
 // ── Load & render profile ─────────────────────────────────────
 async function loadVendorProfile() {
@@ -41,12 +9,13 @@ async function loadVendorProfile() {
   if (!res.success) return;
   vendorProfile = res.vendor;
   renderNavAvatar();
-  renderSuspendedBanner();
+  renderSuspendedBanner('#profileForm button[type="submit"], #profileAvatarEditBtn, #profileAvatarRemoveBtn');
   renderProfileFields();
   renderProfileAvatar();
   renderProfilePlanSection();
   await loadBillingHistory();
 }
+
 
 function renderProfileFields() {
   const v = vendorProfile;
@@ -205,77 +174,6 @@ document.getElementById('profileForm')?.addEventListener('submit', async e => {
 });
 
 // ── Upgrade modal ─────────────────────────────────────────────
-function openUpgradeModal(message) {
-  const sub = document.getElementById('upgradeModalText');
-  if (sub) sub.textContent = message || 'Upgrade your plan to list more products and get better visibility.';
-  renderPlanCards();
-  document.getElementById('upgradeModalOverlay').classList.add('open');
-}
-
-document.getElementById('upgradeModalCancel')?.addEventListener('click', () => document.getElementById('upgradeModalOverlay').classList.remove('open'));
-document.getElementById('upgradeModalOverlay')?.addEventListener('click', e => {
-  if (e.target === document.getElementById('upgradeModalOverlay')) document.getElementById('upgradeModalOverlay').classList.remove('open');
-});
-
-function renderPlanCards() {
-  if (!vendorProfile) return;
-  const current = vendorProfile.subscription_plan || 'free';
-  const expires = vendorProfile.subscription_expires_at;
-  const bar = document.getElementById('plansCurrentBar');
-  if (bar) {
-    const planName = PLAN_LABELS[current] || current;
-    let expiryText = '';
-    if (expires && current !== 'free') {
-      expiryText = ` · renews ${parseExpiryDate(expires).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })}`;
-    }
-    bar.innerHTML = `You're on <strong>${planName}</strong>${expiryText}`;
-  }
-  const order = ['free', 'starter', 'growth', 'premium'];
-  const currentIdx = order.indexOf(current);
-  order.forEach((plan, idx) => {
-    const card = document.getElementById(`planCard-${plan}`);
-    const tag = document.getElementById(`planTag-${plan}`);
-    const btn = document.getElementById(`planBtn-${plan}`);
-    if (!card) return;
-    if (plan === 'free') { card.style.display = current !== 'free' ? 'flex' : 'none'; return; }
-    card.style.display = 'flex'; card.style.flexDirection = 'column';
-    const isCurrent = plan === current, isLower = idx < currentIdx;
-    if (tag) tag.style.display = isCurrent ? 'block' : 'none';
-    if (btn) {
-      if (isCurrent) { btn.disabled = true; btn.querySelector('.btn-label').textContent = 'Current plan'; }
-      else if (isLower) { btn.disabled = true; btn.querySelector('.btn-label').textContent = 'Downgrade'; btn.style.opacity = '0.35'; }
-      else { btn.disabled = false; btn.style.opacity = '1'; btn.querySelector('.btn-label').textContent = `Get ${plan.charAt(0).toUpperCase() + plan.slice(1)}`; }
-      setButtonLoading(btn, false);
-    }
-  });
-}
-
-async function handlePlanSelect(plan) {
-  const btn = document.getElementById(`planBtn-${plan}`);
-  try {
-    setButtonLoading(btn, true);
-    const res = await apiRequest('/auth/vendor/subscribe', 'POST', { plan });
-    if (!res.success) { toastError(res.message || 'Could not start payment.'); setButtonLoading(btn, false); return; }
-    setButtonLoading(btn, false);
-    const options = {
-      key: res.key_id, amount: res.amount, currency: res.currency,
-      name: 'OLR India', description: `${res.plan_label} Plan · 30 days`, order_id: res.order_id,
-      prefill: { name: res.vendor?.name || '', email: res.vendor?.email || '' },
-      theme: { color: '#2563eb' },
-      handler: async function (response) {
-        document.getElementById('upgradeModalOverlay').classList.remove('open');
-        const vRes = await apiRequest('/auth/vendor/payment/verify', 'POST', { razorpay_order_id: response.razorpay_order_id, razorpay_payment_id: response.razorpay_payment_id, razorpay_signature: response.razorpay_signature });
-        if (vRes.success) { toastSuccess(`🎉 ${vRes.message}`); await loadVendorProfile(); }
-        else toastError(vRes.message || 'Payment verification failed. Contact support.');
-      },
-      modal: { ondismiss: () => setButtonLoading(btn, false) },
-    };
-    const rzp = new Razorpay(options);
-    rzp.on('payment.failed', r => { toastError(`Payment failed: ${r.error.description || 'Try again.'}`); setButtonLoading(btn, false); });
-    rzp.open();
-  } catch (err) { toastError('Something went wrong.'); if (btn) setButtonLoading(btn, false); }
-}
-
 // ── Pincode autofill ──────────────────────────────────────────
 function initModalPincodeAutofill() {
   const pincodeInput = document.getElementById('modalPincode');
@@ -293,17 +191,12 @@ function initModalPincodeAutofill() {
 
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('hamburgerBtn')?.addEventListener('click', () => document.getElementById('mobileMenu').classList.toggle('open'));
   wirePincodeAutofill({
-  pincodeInput: document.getElementById('pincode'),
-  areaInput: document.getElementById('area'),
-  cityInput: document.getElementById('city'),
-  stateInput: document.getElementById('state'),
-  statusEl: document.getElementById('pincodeStatus'),
-});
+    pincodeInput: document.getElementById('pincode'),
+    areaInput: document.getElementById('area'),
+    cityInput: document.getElementById('city'),
+    stateInput: document.getElementById('state'),
+    statusEl: document.getElementById('pincodeStatus'),
+  });
   loadVendorProfile();
-});
-
-window.addEventListener('resize', () => {
-  if (window.innerWidth > 860) document.getElementById('mobileMenu')?.classList.remove('open');
 });
