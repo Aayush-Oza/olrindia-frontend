@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products - OLR Admin</title>
+  <link rel="icon" href="../assets/favicon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/variables.css?v=10">
+  <link rel="stylesheet" href="../css/base.css?v=10">
+  <link rel="stylesheet" href="../css/components.css?v=10">
+  <link rel="stylesheet" href="../css/admin/admin-dashboard.css?v=10">
+</head>
+<body>
+  <div id="dashRoot">
+
+    <nav class="dash-nav">
+      <div class="dash-nav-inner">
+        <a class="dash-nav-logo" href="/admin/overview"><img src="../assets/logo.png?v=10" alt="OLR India"></a>
+        <div class="dash-nav-links">
+          <a class="nav-link" href="/admin/overview">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/></svg>
+            Overview
+          </a>
+          <a class="nav-link active" href="/admin/products">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M21 8v13H3V8M1 3h22v5H1V3ZM10 12h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Products
+            <span class="nav-badge" id="pendingBadge" style="display:none;"></span>
+          </a>
+          <a class="nav-link" href="/admin/users">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 21v-1a7 7 0 0 1 14 0v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="11" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/></svg>
+            Users
+          </a>
+          <a class="nav-link" href="/admin/vendors">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M3 9.5 12 3l9 6.5M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Vendors
+          </a>
+        </div>
+        <div class="dash-nav-right">
+          <div class="dash-nav-user">
+            <div class="nav-avatar" id="navAdminAvatar"></div>
+            <span class="name" id="navAdminName"></span>
+          </div>
+          <button class="nav-btn nav-btn-ghost" id="logoutBtn">Log out</button>
+        </div>
+        <button class="nav-hamburger" id="hamburgerBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+      </div>
+      <div class="nav-mobile-menu" id="mobileMenu">
+        <a class="mobile-nav-link" href="/admin/overview">Overview</a>
+        <a class="mobile-nav-link active" href="/admin/products">Products</a>
+        <a class="mobile-nav-link" href="/admin/users">Users</a>
+        <a class="mobile-nav-link" href="/admin/vendors">Vendors</a>
+        <button class="nav-btn nav-btn-ghost" id="logoutBtnMobile" style="width:100%;justify-content:center;margin-top:4px;">Log out</button>
+      </div>
+    </nav>
+
+    <div class="dash-page">
+      <div class="dash-panel active" id="panel-products">
+        <div class="panel-head"><h2>Products</h2></div>
+        <div class="filter-row-inner" style="padding:0 0 10px;">
+          <div class="nav-search">
+            <svg class="nav-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+              <path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <input type="text" id="productSearch" placeholder="Search by name or vendor…">
+          </div>
+          <button class="filter-main-btn" id="productFilterBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M3 5h18M6 12h12M10 19h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Filters
+            <span class="filter-count-badge" id="productFilterCount" style="display:none;">0</span>
+          </button>
+        </div>
+        <div class="active-filters" id="productActiveFilters"></div>
+
+        <div class="filter-overlay" id="productFilterOverlay"></div>
+        <div class="filter-sheet" id="productFilterSheet">
+          <div class="filter-sheet-head">
+            Filters
+            <button class="filter-sheet-close" id="productFilterClose">✕</button>
+          </div>
+          <div class="filter-sheet-body">
+            <div class="filter-group">
+              <span class="filter-group-label">Status</span>
+              <select class="filter-select" id="productStatusFilter">
+                <option value="">All statuses</option>
+                <option value="active">Live</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <span class="filter-group-label">Reviewed</span>
+              <select class="filter-select" id="productReviewedFilter">
+                <option value="">All products</option>
+                <option value="viewed">Viewed</option>
+                <option value="unviewed">Unviewed</option>
+              </select>
+            </div>
+          </div>
+          <div class="filter-sheet-foot">
+            <button class="filter-clear-btn" id="productFilterClear">Clear all</button>
+            <button class="btn btn-primary" id="productFilterApply" style="width:auto;padding:9px 20px;">Apply</button>
+          </div>
+        </div>
+
+        <div id="productListBody">
+          <div class="admin-empty">Loading products…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── REMOVE PRODUCT MODAL ───────────────────────────────── -->
+  <div class="product-modal-overlay" id="removeProductModal">
+    <div class="product-modal-box">
+      <h3 class="product-modal-title">Remove this product?</h3>
+      <p class="product-modal-text">This will hide it from public listings and issue a strike to the vendor. Explain why - this message is emailed to them.</p>
+      <textarea class="input" id="removeReasonInput" rows="4" placeholder="e.g. Listing photos contain inappropriate content that violates our platform policy." style="margin:12px 0;"></textarea>
+      <div class="product-modal-actions">
+        <button class="btn btn-secondary" id="removeProductCancel">Cancel</button>
+        <button class="btn btn-primary" id="removeProductConfirm" style="background:var(--c-error);">Remove & notify vendor</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CONFIRM MODAL ─────────────────────────────────────── -->
+  <div class="product-modal-overlay" id="confirmModal">
+    <div class="product-modal-box">
+      <h3 class="product-modal-title" id="confirmTitle"></h3>
+      <p class="product-modal-text" id="confirmText"></p>
+      <div class="product-modal-actions">
+        <button class="btn btn-secondary" id="confirmCancel"></button>
+        <button class="btn btn-primary" id="confirmOk"></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="../js/api.js?v=10"></script>
+  <script src="../js/ui.js?v=10"></script>
+  <script src="../js/helpers.js?v=10"></script>
+  <script src="../js/admin/admin-nav.js?v=10"></script>
+  <script src="../js/admin/admin_products.js?v=10"></script>
+</body>
+</html>
