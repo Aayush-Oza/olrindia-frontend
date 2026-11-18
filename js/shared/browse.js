@@ -339,20 +339,61 @@ function bsRenderHomepageShell(skeletonCount = 8) {
 
 // ── Render category grid ──────────────────────────────────────
 function bsRenderCatGrid(catGrid, categories, onCatClick) {
-  if (categories && categories.length > 0) {
-    bsPopulateCategoryDropdown(categories);
-    catGrid.innerHTML = categories.map(cat => `
-      <div class="cat-card" onclick="${onCatClick}('${cat.name.replace(/'/g, "\\'")}')">
-        <img class="cat-card-img" src="${cat.image_url}" alt="${cat.name}" loading="lazy">
-        <div class="cat-card-name">${cat.name}</div>
-      </div>`).join('');
-  } else {
+  if (!categories || categories.length === 0) {
     catGrid.innerHTML = `
       <div style="grid-column:1/-1;text-align:center;padding:36px 20px;">
         <div style="font-size:48px;margin-bottom:12px;">🏪</div>
         <h3 style="margin:0 0 8px;font-family:var(--font-display);color:var(--text-main);">No categories live yet</h3>
         <p style="margin:0;color:var(--text-muted);font-size:14px;">Vendors are setting up — products will appear here soon.</p>
       </div>`;
+    return;
+  }
+
+  bsPopulateCategoryDropdown(categories);
+
+  const DESKTOP_VISIBLE = 16; // 2 rows x 8
+  const MOBILE_VISIBLE  = 8;  // 2 rows x 4
+  const isMobile = window.innerWidth < 768;
+  const visibleCount = isMobile ? MOBILE_VISIBLE : DESKTOP_VISIBLE;
+
+  const visible = categories.slice(0, visibleCount);
+  const hidden  = categories.slice(visibleCount);
+
+  function catCardHTML(cat) {
+    const iconUrl = `https://api.iconify.design/${cat.icon.replace(':', '/')}.svg?height=56`;
+    return `
+      <div class="cat-card" onclick="${onCatClick}('${cat.name.replace(/'/g, "\\'")}')">
+        <div class="cat-card-icon-wrap">
+          <img src="${iconUrl}" alt="${cat.name}" width="56" height="56" loading="lazy">
+        </div>
+        <div class="cat-card-name">${cat.name}</div>
+      </div>`;
+  }
+
+  catGrid.innerHTML = visible.map(catCardHTML).join('');
+
+  if (hidden.length > 0) {
+    const showMoreBtn = document.createElement('div');
+    showMoreBtn.style.cssText = 'grid-column:1/-1;display:flex;justify-content:center;margin-top:12px;';
+    showMoreBtn.innerHTML = `
+      <button id="bsCatShowMore" style="
+        padding:10px 32px;
+        border:1.5px solid var(--brand, #f97316);
+        border-radius:var(--r-md, 8px);
+        background:#fff;
+        color:var(--brand, #f97316);
+        font-weight:600;
+        font-size:14px;
+        cursor:pointer;
+        font-family:var(--font-display);
+        transition:background 0.15s,color 0.15s;
+      ">Show more categories ▾</button>`;
+    catGrid.appendChild(showMoreBtn);
+
+    document.getElementById('bsCatShowMore').addEventListener('click', function() {
+      this.closest('div').remove();
+      catGrid.insertAdjacentHTML('beforeend', hidden.map(catCardHTML).join(''));
+    });
   }
 }
 
