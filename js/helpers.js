@@ -153,11 +153,6 @@ function clearSessionAccount(role) {
   sessionStorage.removeItem(`olr_${role}`);
 }
 
-function getInitials(name) {
-  if (!name) return "?";
-  return name.trim().split(/\s+/).slice(0, 2).map(w => w[0].toUpperCase()).join("");
-}
-
 // ── Routes a backend error message to the right field, or a toast ─
 // Used so duplicate-email / duplicate-mobile errors land under the
 // right input instead of a generic toast, matching the backend's
