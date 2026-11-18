@@ -160,7 +160,7 @@ async function bsAppendNextBatch() {
     toastError('Failed to load more products.');
   }
   bsIsLoadingMore = false;
-  bsAttachSentinel();
+  setTimeout(() => bsAttachSentinel(), 300);
 }
 
 // ── Sentinel ──────────────────────────────────────────────────
