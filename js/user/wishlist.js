@@ -1,9 +1,10 @@
 /* ============================================================
    OLR INDIA - WISHLIST JS
+   Requires: user-nav.js (loaded before this)
    ============================================================ */
 
 // ── State ─────────────────────────────────────────────────────
-const wishedIds = new Set();
+const wishedIds  = new Set();
 const wishedSlugs = new Map();
 
 // ── Skeleton ──────────────────────────────────────────────────
@@ -19,26 +20,19 @@ function skeletonCardHTML() {
   </div>`;
 }
 
-// ── Hamburger ─────────────────────────────────────────────────
-document.getElementById('hamburgerBtn').addEventListener('click', () => {
-  document.getElementById('mobileMenu').classList.toggle('open');
-});
-
 // ── Product card ──────────────────────────────────────────────
 function productCardHTML(p) {
   if (p.id && p.share_slug) wishedSlugs.set(p.id, p.share_slug);
   const img = p.images && p.images[0]
     ? `<img class="product-img" src="${p.images[0]}" alt="${p.name}" loading="lazy">`
     : `<div class="product-img-placeholder">📦</div>`;
-
-  const price = buildPriceLabel(p, '');
+  const price  = buildPriceLabel(p, '');
   const wished = wishedIds.has(p.id);
-  const badge = p.vendor_badge === 'featured'
+  const badge  = p.vendor_badge === 'featured'
     ? `<span class="vendor-badge badge-premium">★ Top Vendor</span>`
     : p.vendor_badge === 'verified'
       ? `<span class="vendor-badge badge-growth">✓ Verified</span>`
       : '';
-
   return `
     <div class="product-card" onclick="openProduct('${p.share_slug}','${p.category || ''}','${p.city || ''}')">
       ${img}
@@ -64,7 +58,7 @@ function updateWishlistBadge() {
     const badge = document.getElementById(id);
     if (!badge) return;
     badge.style.display = wishedIds.size > 0 ? 'inline' : 'none';
-    badge.textContent = wishedIds.size;
+    badge.textContent   = wishedIds.size;
   });
 }
 
@@ -72,7 +66,7 @@ function updateWishlistBadge() {
 async function toggleWish(btn, productId) {
   const isWished = wishedIds.has(productId);
   if (isWished) { wishedIds.delete(productId); toastSuccess('Removed from wishlist'); }
-  else { wishedIds.add(productId); toastSuccess('Added to wishlist'); }
+  else          { wishedIds.add(productId);    toastSuccess('Added to wishlist'); }
 
   document.querySelectorAll('.product-wish-btn').forEach(b => {
     const match = b.getAttribute('onclick')?.match(/toggleWish\(this,(\d+)\)/);
@@ -84,23 +78,22 @@ async function toggleWish(btn, productId) {
   updateWishlistBadge();
 
   if (isWished) {
-    const wishlistCard = document.querySelector(`#wishlistContent [onclick*="toggleWish(this,${productId})"]`)?.closest('.product-card');
-    if (wishlistCard) {
-      wishlistCard.style.transition = 'opacity 0.2s, transform 0.2s';
-      wishlistCard.style.opacity = '0';
-      wishlistCard.style.transform = 'scale(0.95)';
+    const card = document.querySelector(`#wishlistContent [onclick*="toggleWish(this,${productId})"]`)?.closest('.product-card');
+    if (card) {
+      card.style.transition = 'opacity 0.2s, transform 0.2s';
+      card.style.opacity    = '0';
+      card.style.transform  = 'scale(0.95)';
       setTimeout(() => {
-        wishlistCard.remove();
-        const remaining = document.querySelectorAll('#wishlistContent .product-card');
-        if (remaining.length === 0) renderWishlistPanel();
+        card.remove();
+        if (document.querySelectorAll('#wishlistContent .product-card').length === 0) renderWishlistPanel();
       }, 200);
     }
   }
 
   try {
     if (isWished) await apiRequest(`/auth/user/wishlist/${productId}`, 'DELETE');
-    else await apiRequest('/auth/user/wishlist', 'POST', { product_id: productId });
-  } catch (e) {
+    else          await apiRequest('/auth/user/wishlist', 'POST', { product_id: productId });
+  } catch {
     if (isWished) wishedIds.add(productId); else wishedIds.delete(productId);
     document.querySelectorAll('.product-wish-btn').forEach(b => {
       const match = b.getAttribute('onclick')?.match(/toggleWish\(this,(\d+)\)/);
@@ -137,7 +130,7 @@ async function renderWishlistPanel() {
       return;
     }
     el.innerHTML = `<div class="product-grid">${products.map(p => productCardHTML(p)).join('')}</div>`;
-  } catch (e) {
+  } catch {
     el.innerHTML = `
       <div class="empty-state">
         <div class="empty-state-icon">😕</div>
@@ -147,53 +140,8 @@ async function renderWishlistPanel() {
   }
 }
 
-// ── Nav avatar ────────────────────────────────────────────────
-async function loadNavUser() {
-  const res = await apiRequest('/auth/user/profile', 'GET');
-  if (!res.success) return;
-  const u = res.user;
-  const html = u.profile_photo
-    ? `<img class="avatar-img-sm" src="${u.profile_photo}" alt="${u.name || ''}">`
-    : `<span>${getInitials(u.name)}</span>`;
-  document.getElementById('navUserAvatar').innerHTML = html;
-  document.getElementById('navUserAvatarMobile').innerHTML = html;
-  document.getElementById('navUserName').textContent = u.name || '';
-  document.getElementById('navUserNameMobile').textContent = u.name || '';
-}
-
-// ── Logout ────────────────────────────────────────────────────
-['logoutBtn', 'logoutBtnMobile'].forEach(id => {
-  const btn = document.getElementById(id);
-  if (!btn) return;
-  btn.addEventListener('click', async () => {
-    const confirmed = await showConfirm({
-      title: 'Log out?',
-      text: "You'll need to sign in again to access your account.",
-      confirmLabel: 'Log out', cancelLabel: 'Stay logged in',
-    });
-    if (!confirmed) return;
-    await apiRequest('/auth/user/logout', 'POST');
-    clearSessionAccount('user');
-    window.location.href = '/user/login';
-  });
-});
-
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   loadNavUser();
   renderWishlistPanel();
-
-  document.addEventListener('visibilitychange', async () => {
-    if (document.visibilityState === 'visible') {
-      const res = await apiRequest('/auth/user/profile', 'GET');
-      if (!res.success && res.httpStatus === 401) {
-        clearSessionAccount('user');
-        window.location.href = '/user/login';
-      }
-    }
-  });
-});
-
-window.addEventListener('resize', () => {
-  if (window.innerWidth > 860) document.getElementById('mobileMenu').classList.remove('open');
 });

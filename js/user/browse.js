@@ -1,20 +1,21 @@
 /* ============================================================
    OLR INDIA - USER BROWSE JS  (v3)
    Rent/Buy tabs, separate filter fields, infinite scroll
+   Requires: user-nav.js (loaded before this)
    ============================================================ */
 
 // ── State ─────────────────────────────────────────────────────
-let allProducts    = [];
+let allProducts      = [];
 let filteredProducts = [];
-let displayedCount = 0;
-let isLoadingMore  = false;
-let currentPage    = 1;
-let totalProducts  = 0;
-let hasMore        = false;
-let sentinel       = null;
-let scrollObserver = null;
-const wishedIds    = new Set();
-const wishedSlugs  = new Map();
+let displayedCount   = 0;
+let isLoadingMore    = false;
+let currentPage      = 1;
+let totalProducts    = 0;
+let hasMore          = false;
+let sentinel         = null;
+let scrollObserver   = null;
+const wishedIds      = new Set();
+const wishedSlugs    = new Map();
 
 let activeTab = 'rent'; // 'rent' | 'sell'
 
@@ -31,14 +32,10 @@ let activeFilters = {
 function switchTab(tab) {
   if (tab === activeTab) return;
   activeTab = tab;
-
   document.getElementById('tabRent').classList.toggle('active', tab === 'rent');
   document.getElementById('tabBuy').classList.toggle('active', tab === 'sell');
-
-  // toggle filter fields
   document.getElementById('filterGroupPriceType').style.display = tab === 'rent' ? '' : 'none';
   document.getElementById('filterGroupCondition').style.display = tab === 'sell' ? '' : 'none';
-
   resetFilters(false);
   renderActiveFilterChips();
   updateFilterBadge();
@@ -85,23 +82,18 @@ function buildParams(page, perPage) {
   if (activeFilters.category) params.set('category', activeFilters.category);
   if (activeFilters.city)     params.set('city',     activeFilters.city);
   if (activeTab === 'rent') {
-    if (activeFilters.priceType)        params.set('price_type', activeFilters.priceType);
-    if (activeFilters.priceMin > 0)     params.set('price_min',  activeFilters.priceMin);
-    if (activeFilters.priceMax < Infinity) params.set('price_max', activeFilters.priceMax);
+    if (activeFilters.priceType)           params.set('price_type', activeFilters.priceType);
+    if (activeFilters.priceMin > 0)        params.set('price_min',  activeFilters.priceMin);
+    if (activeFilters.priceMax < Infinity) params.set('price_max',  activeFilters.priceMax);
   } else {
-    if (activeFilters.condition)        params.set('condition',  activeFilters.condition);
-    if (activeFilters.priceMin > 0)     params.set('price_min',  activeFilters.priceMin);
-    if (activeFilters.priceMax < Infinity) params.set('price_max', activeFilters.priceMax);
+    if (activeFilters.condition)           params.set('condition',  activeFilters.condition);
+    if (activeFilters.priceMin > 0)        params.set('price_min',  activeFilters.priceMin);
+    if (activeFilters.priceMax < Infinity) params.set('price_max',  activeFilters.priceMax);
   }
   const q = document.getElementById('searchInput').value.trim();
   if (q) params.set('search', q);
   return params;
 }
-
-// ── Hamburger ─────────────────────────────────────────────────
-document.getElementById('hamburgerBtn').addEventListener('click', () => {
-  document.getElementById('mobileMenu').classList.toggle('open');
-});
 
 // ── Filter sheet ──────────────────────────────────────────────
 document.getElementById('filterBtn').addEventListener('click', openFilterSheet);
@@ -150,7 +142,6 @@ document.getElementById('filterApplyBtn').addEventListener('click', () => {
   const priceMax     = parseFloat(document.getElementById('filterPriceMax').value) || Infinity;
   document.getElementById('filterPriceHint').textContent = 'Enter a min or max to filter by price.';
   document.getElementById('filterPriceHint').classList.remove('error');
-
   activeFilters.category = document.getElementById('filterCategory').value;
   activeFilters.city     = document.getElementById('filterCity').value.trim().toLowerCase();
   activeFilters.priceMin = priceMin;
@@ -254,7 +245,7 @@ function attachSentinel() {
 
 // ── Render products ───────────────────────────────────────────
 function renderProducts() {
-  const grid = document.getElementById('productGrid');
+  const grid    = document.getElementById('productGrid');
   const countEl = document.getElementById('productsCount');
   if (filteredProducts.length === 0) {
     countEl.textContent = '';
@@ -320,7 +311,7 @@ function updateFilterBadge() {
 }
 
 function renderActiveFilterChips() {
-  const el = document.getElementById('activeFilters');
+  const el    = document.getElementById('activeFilters');
   const chips = [];
   if (activeFilters.category)  chips.push({ label: activeFilters.category, key: 'category' });
   if (activeFilters.city)      chips.push({ label: `📍 ${activeFilters.city}`, key: 'city' });
@@ -346,7 +337,7 @@ function removeFilter(key) {
 async function toggleWish(btn, productId) {
   const isWished = wishedIds.has(productId);
   if (isWished) { wishedIds.delete(productId); toastSuccess('Removed from wishlist'); }
-  else { wishedIds.add(productId); toastSuccess('Added to wishlist'); }
+  else          { wishedIds.add(productId);    toastSuccess('Added to wishlist'); }
   document.querySelectorAll('.product-wish-btn').forEach(b => {
     const match = b.getAttribute('onclick')?.match(/toggleWish\(this,(\d+)\)/);
     if (match && parseInt(match[1]) === productId) { b.classList.toggle('active', !isWished); b.textContent = isWished ? '♡' : '♥'; }
@@ -354,7 +345,7 @@ async function toggleWish(btn, productId) {
   updateWishlistBadge();
   try {
     if (isWished) await apiRequest(`/auth/user/wishlist/${productId}`, 'DELETE');
-    else await apiRequest('/auth/user/wishlist', 'POST', { product_id: productId });
+    else          await apiRequest('/auth/user/wishlist', 'POST', { product_id: productId });
   } catch {
     if (isWished) wishedIds.add(productId); else wishedIds.delete(productId);
     document.querySelectorAll('.product-wish-btn').forEach(b => {
@@ -366,7 +357,7 @@ async function toggleWish(btn, productId) {
 }
 
 function updateWishlistBadge() {
-  ['wishlistCount','wishlistCountMobile'].forEach(id => {
+  ['wishlistCount', 'wishlistCountMobile'].forEach(id => {
     const badge = document.getElementById(id);
     if (!badge) return;
     badge.style.display = wishedIds.size > 0 ? 'inline' : 'none';
@@ -452,33 +443,6 @@ function enterBrowseCategory(cat) {
   renderActiveFilterChips(); updateFilterBadge(); loadBrowseProducts(true);
 }
 
-// ── Logout ────────────────────────────────────────────────────
-['logoutBtn','logoutBtnMobile'].forEach(id => {
-  const btn = document.getElementById(id);
-  if (!btn) return;
-  btn.addEventListener('click', async () => {
-    const confirmed = await showConfirm({ title:'Log out?', text:"You'll need to sign in again.", confirmLabel:'Log out', cancelLabel:'Stay logged in' });
-    if (!confirmed) return;
-    await apiRequest('/auth/user/logout', 'POST');
-    clearSessionAccount('user');
-    window.location.href = '/user/login';
-  });
-});
-
-// ── Nav avatar ────────────────────────────────────────────────
-async function loadNavUser() {
-  const res = await apiRequest('/auth/user/profile', 'GET');
-  if (!res.success) return;
-  const u = res.user;
-  const html = u.profile_photo
-    ? `<img class="avatar-img-sm" src="${u.profile_photo}" alt="${u.name || ''}">`
-    : `<span>${getInitials(u.name)}</span>`;
-  document.getElementById('navUserAvatar').innerHTML = html;
-  document.getElementById('navUserAvatarMobile').innerHTML = html;
-  document.getElementById('navUserName').textContent = u.name || '';
-  document.getElementById('navUserNameMobile').textContent = u.name || '';
-}
-
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   loadNavUser();
@@ -488,19 +452,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
   const catParam  = urlParams.get('category');
   if (catParam) enterBrowseCategory(catParam);
-
-  document.addEventListener('visibilitychange', async () => {
-    if (document.visibilityState === 'visible') {
-      const res = await apiRequest('/auth/user/profile', 'GET');
-      if (!res.success && res.httpStatus === 401) { clearSessionAccount('user'); window.location.href = '/user/login'; }
-    }
-  });
 });
 
 window.addEventListener('pageshow', (event) => {
   if (event.persisted) { loadBrowseHomepage(); loadWishlist().catch(() => {}); }
-});
-
-window.addEventListener('resize', () => {
-  if (window.innerWidth > 860) document.getElementById('mobileMenu').classList.remove('open');
 });

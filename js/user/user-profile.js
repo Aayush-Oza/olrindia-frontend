@@ -1,13 +1,9 @@
 /* ============================================================
    OLR INDIA - PROFILE PAGE JS
+   Requires: user-nav.js (loaded before this)
    ============================================================ */
 
-// ── Hamburger ─────────────────────────────────────────────────
-document.getElementById('hamburgerBtn').addEventListener('click', () => {
-  document.getElementById('mobileMenu').classList.toggle('open');
-});
-
-// ── Nav avatar + name ─────────────────────────────────────────
+// ── Avatar helper ─────────────────────────────────────────────
 function renderAvatarHTML(name, photoUrl, size) {
   const cls = size === 'big' ? 'avatar-img-big' : 'avatar-img-sm';
   return photoUrl
@@ -37,10 +33,12 @@ async function loadUserProfile() {
     removeBtn.style.display = 'none';
   }
 
+  // Update nav avatar via shared helper
   document.getElementById('navUserAvatar').innerHTML = renderAvatarHTML(u.name, u.profile_photo, 'sm');
   document.getElementById('navUserAvatarMobile').innerHTML = renderAvatarHTML(u.name, u.profile_photo, 'sm');
   document.getElementById('navUserName').textContent = u.name || '';
   document.getElementById('navUserNameMobile').textContent = u.name || '';
+
   document.getElementById('profileName').textContent = u.name || '';
   document.getElementById('profileEmail').textContent = u.email || '';
   document.getElementById('infoEmail').textContent = u.email || '';
@@ -87,12 +85,12 @@ document.getElementById('profileForm').addEventListener('submit', async (e) => {
   const btn = e.target.querySelector('button[type="submit"]');
   btn.classList.add('loading');
   const payload = {
-    name: document.getElementById('editName').value.trim(),
-    mobile: document.getElementById('editMobile').value.trim(),
+    name:    document.getElementById('editName').value.trim(),
+    mobile:  document.getElementById('editMobile').value.trim(),
     pincode: document.getElementById('editPincode').value.trim(),
-    area: document.getElementById('editArea').value.trim(),
-    city: document.getElementById('editCity').value.trim(),
-    state: document.getElementById('editState').value.trim(),
+    area:    document.getElementById('editArea').value.trim(),
+    city:    document.getElementById('editCity').value.trim(),
+    state:   document.getElementById('editState').value.trim(),
   };
   const res = await apiRequest('/auth/user/profile', 'PUT', payload);
   btn.classList.remove('loading');
@@ -105,45 +103,14 @@ const profileFormEl = document.getElementById('profileForm');
 if (profileFormEl) {
   wirePincodeAutofill({
     pincodeInput: profileFormEl.pincode,
-    stateInput: profileFormEl.state,
-    cityInput: profileFormEl.city,
-    areaInput: profileFormEl.area,
-    statusEl: profileFormEl.querySelector('.pincode-status'),
+    stateInput:   profileFormEl.state,
+    cityInput:    profileFormEl.city,
+    areaInput:    profileFormEl.area,
+    statusEl:     profileFormEl.querySelector('.pincode-status'),
   });
 }
-
-// ── Logout ────────────────────────────────────────────────────
-['logoutBtn', 'logoutBtnMobile'].forEach(id => {
-  const btn = document.getElementById(id);
-  if (!btn) return;
-  btn.addEventListener('click', async () => {
-    const confirmed = await showConfirm({
-      title: 'Log out?',
-      text: "You'll need to sign in again to access your account.",
-      confirmLabel: 'Log out', cancelLabel: 'Stay logged in',
-    });
-    if (!confirmed) return;
-    await apiRequest('/auth/user/logout', 'POST');
-    clearSessionAccount('user');
-    window.location.href = '/user/login';
-  });
-});
 
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   loadUserProfile();
-
-  document.addEventListener('visibilitychange', async () => {
-    if (document.visibilityState === 'visible') {
-      const res = await apiRequest('/auth/user/profile', 'GET');
-      if (!res.success && res.httpStatus === 401) {
-        clearSessionAccount('user');
-        window.location.href = '/user/login';
-      }
-    }
-  });
-});
-
-window.addEventListener('resize', () => {
-  if (window.innerWidth > 860) document.getElementById('mobileMenu').classList.remove('open');
 });
