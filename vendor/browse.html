@@ -85,57 +85,57 @@
   <div class="dash-page">
     <div class="dash-panel active" id="panel-viewsite">
 
-      <div class="vendor-filter-row">
-        <div class="vendor-filter-row-inner">
-          <div class="vendor-nav-search">
-            <svg class="vendor-nav-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m16.5 16.5 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <div class="filter-row">
+        <div class="filter-row-inner">
+          <div class="nav-search">
+            <svg class="nav-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m16.5 16.5 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
             <input type="text" id="vsSearchInput" placeholder="Search products…" autocomplete="off">
           </div>
-          <button class="vendor-filter-main-btn" id="vsFilterBtn">
+          <button class="filter-main-btn" id="vsFilterBtn">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
             Filters
-            <span class="vendor-filter-count-badge" id="vsFilterCountBadge" style="display:none;">0</span>
+            <span class="filter-count-badge" id="vsFilterCountBadge" style="display:none;">0</span>
           </button>
         </div>
-        <div class="vendor-active-filters" id="vsActiveFilters"></div>
+        <div class="active-filters" id="vsActiveFilters"></div>
       </div>
 
-      <div class="vendor-filter-overlay" id="vsFilterOverlay"></div>
-      <div class="vendor-filter-sheet" id="vsFilterSheet">
-        <div class="vendor-filter-sheet-head">
+      <div class="filter-overlay" id="vsFilterOverlay"></div>
+      <div class="filter-sheet" id="vsFilterSheet">
+        <div class="filter-sheet-head">
           <span>Filters</span>
-          <button class="vendor-filter-sheet-close" onclick="bsCloseFilterSheet()">✕</button>
+          <button class="filter-sheet-close" onclick="bsCloseFilterSheet()">✕</button>
         </div>
-        <div class="vendor-filter-sheet-body">
-          <div class="vendor-filter-group">
-            <div class="vendor-filter-group-label">Category</div>
-            <select class="vendor-filter-select" id="vsFilterCategory">
+        <div class="filter-sheet-body">
+          <div class="filter-group">
+            <div class="filter-group-label">Category</div>
+            <select class="filter-select" id="vsFilterCategory">
               <option value="">All categories</option>
             </select>
           </div>
-          <div class="vendor-filter-group">
-            <div class="vendor-filter-group-label">City / Location</div>
-            <div class="vendor-filter-location-row">
-              <input class="vendor-filter-input" type="text" id="vsFilterCity" placeholder="e.g. Mumbai, Delhi…">
-              <button class="vendor-filter-locate-btn" id="vsFilterLocateBtn" title="Use my location">
+          <div class="filter-group">
+            <div class="filter-group-label">City / Location</div>
+            <div class="filter-location-row">
+              <input class="filter-input" type="text" id="vsFilterCity" placeholder="e.g. Mumbai, Delhi…">
+              <button class="filter-locate-btn" id="vsFilterLocateBtn" title="Use my location">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9" r="2.5" stroke="currentColor" stroke-width="1.8"/></svg>
               </button>
             </div>
           </div>
           <!-- RENT-ONLY -->
-          <div class="vendor-filter-group" id="vsFilterGroupPriceType">
-            <div class="vendor-filter-group-label">Price per</div>
-            <div class="vendor-price-type-toggle">
-              <button class="vendor-price-type-btn" data-type="hour">Hour</button>
-              <button class="vendor-price-type-btn" data-type="km">Km</button>
-              <button class="vendor-price-type-btn" data-type="day">Day</button>
-              <button class="vendor-price-type-btn" data-type="month">Month</button>
+          <div class="filter-group" id="vsFilterGroupPriceType">
+            <div class="filter-group-label">Price per</div>
+            <div class="price-type-toggle">
+              <button class="price-type-btn" data-type="hour">Hour</button>
+              <button class="price-type-btn" data-type="km">Km</button>
+              <button class="price-type-btn" data-type="day">Day</button>
+              <button class="price-type-btn" data-type="month">Month</button>
             </div>
           </div>
           <!-- BUY-ONLY -->
-          <div class="vendor-filter-group" id="vsFilterGroupCondition" style="display:none;">
-            <div class="vendor-filter-group-label">Condition</div>
-            <select class="vendor-filter-select" id="vsFilterCondition">
+          <div class="filter-group" id="vsFilterGroupCondition" style="display:none;">
+            <div class="filter-group-label">Condition</div>
+            <select class="filter-select" id="vsFilterCondition">
               <option value="">Any condition</option>
               <option value="new">New</option>
               <option value="like_new">Like New</option>
@@ -143,30 +143,30 @@
               <option value="fair">Fair</option>
             </select>
           </div>
-          <div class="vendor-filter-group">
-            <div class="vendor-filter-group-label">Price range (₹)</div>
-            <div class="vendor-filter-price-row">
-              <input class="vendor-filter-input" type="number" id="vsFilterPriceMin" placeholder="Min" min="0">
-              <span class="vendor-filter-price-sep">–</span>
-              <input class="vendor-filter-input" type="number" id="vsFilterPriceMax" placeholder="Max" min="0">
+          <div class="filter-group">
+            <div class="filter-group-label">Price range (₹)</div>
+            <div class="filter-price-row">
+              <input class="filter-input" type="number" id="vsFilterPriceMin" placeholder="Min" min="0">
+              <span class="filter-price-sep">–</span>
+              <input class="filter-input" type="number" id="vsFilterPriceMax" placeholder="Max" min="0">
             </div>
-            <div class="vendor-filter-price-hint" id="vsFilterPriceHint">Enter a min or max to filter by price.</div>
+            <div class="filter-price-hint" id="vsFilterPriceHint">Enter a min or max to filter by price.</div>
           </div>
         </div>
-        <div class="vendor-filter-sheet-foot">
-          <button class="vendor-filter-clear-btn" id="vsFilterClearBtn">Clear all</button>
+        <div class="filter-sheet-foot">
+          <button class="filter-clear-btn" id="vsFilterClearBtn">Clear all</button>
           <button class="btn btn-primary" id="vsFilterApplyBtn" style="flex:1;padding:12px;">Apply</button>
         </div>
       </div>
 
-      <div class="vendor-page-body">
-        <div class="vendor-section-head">
+      <div class="page-body">
+        <div class="section-head">
           <h2 id="vsProductsTitle">All products</h2>
-          <span class="vendor-products-count" id="vsProductsCount"></span>
+          <span class="products-count" id="vsProductsCount"></span>
         </div>
-        <div class="vendor-product-grid" id="vsProductGrid">
-          <div class="vendor-grid-loading">
-            <div class="vendor-grid-spinner"></div>
+        <div class="product-grid" id="vsProductGrid">
+          <div class="grid-loading">
+            <div class="grid-spinner"></div>
             <span>Loading products…</span>
           </div>
         </div>
