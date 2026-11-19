@@ -516,7 +516,8 @@
   }
 
   #panel-chats .chat-overlay.chat-embedded .chat-list-view {
-    width: 360px;
+    width: 25%;
+    min-width: 220px;
     flex-shrink: 0;
     border-right: 1px solid var(--c-border-soft);
     display: flex;
