@@ -1491,8 +1491,8 @@
 }
 
 .nav-list-btn:hover {
-  filter: brightness(1.07);
   transform: translateY(-1px);
+  text-decoration: none;
 }
 
 @media (min-width: 769px) {
