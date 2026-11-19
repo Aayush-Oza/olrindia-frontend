@@ -6,24 +6,24 @@
 // ── Vendor product card ───────────────────────────────────────
 function vsProductCardHTML(p) {
   const img = p.images && p.images[0]
-    ? `<img class="vendor-product-img" src="${p.images[0]}" alt="${p.name}" loading="lazy">`
-    : `<div class="vendor-product-img-placeholder">📦</div>`;
+    ? `<img class="product-img" src="${p.images[0]}" alt="${p.name}" loading="lazy">`
+    : `<div class="product-img-placeholder">📦</div>`;
 
   const badge = p.vendor_badge === 'featured'
-    ? `<span class="vendor-browse-badge vendor-browse-badge-premium">★ Top Vendor</span>`
+    ? `<span class="vendor-badge badge-premium">★ Top Vendor</span>`
     : p.vendor_badge === 'verified'
-      ? `<span class="vendor-browse-badge vendor-browse-badge-growth">✓ Verified</span>`
+      ? `<span class="vendor-badge badge-growth">✓ Verified</span>`
       : '';
 
   return `
-    <div class="vendor-product-card" onclick="bsOpenProduct('${p.share_slug}', '${p.category}', '${p.city || ''}')">
+    <div class="product-card" onclick="bsOpenProduct('${p.share_slug}', '${p.category}', '${p.city || ''}')">
       ${img}${badge}
-      <div class="vendor-product-body">
-        <div class="vendor-product-cat">${p.category || ''}</div>
-        <div class="vendor-product-title">${p.name}</div>
-        <div class="vendor-product-bottom">
-          <div class="vendor-product-price">${bsBuildPriceLabel(p)}</div>
-          <div class="vendor-product-loc">
+      <div class="product-body">
+        <div class="product-cat">${p.category || ''}</div>
+        <div class="product-title">${p.name}</div>
+        <div class="product-bottom">
+          <div class="product-price">${bsBuildPriceLabel(p)}</div>
+          <div class="product-loc">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" stroke="currentColor" stroke-width="2"/></svg>
             ${p.city || ''}
           </div>
@@ -43,7 +43,7 @@ async function vsLoadProducts(reset = true) {
     const res = await apiRequest(`/products/public?${bsBuildParams(bsCurrentPage, 20)}`, 'GET');
     if (!res.success) {
       document.getElementById('vsProductGrid').innerHTML =
-        `<div class="vendor-grid-empty"><div style="font-size:40px">😕</div><p>Failed to load products.</p></div>`;
+        `<div class="grid-empty"><div style="font-size:40px">😕</div><p>Failed to load products.</p></div>`;
       return;
     }
     bsTotalProducts = res.total;
@@ -53,7 +53,7 @@ async function vsLoadProducts(reset = true) {
     bsUpdateFilterBadge();
   } catch {
     document.getElementById('vsProductGrid').innerHTML =
-      `<div class="vendor-grid-empty"><div style="font-size:40px">😕</div><p>Failed to load products.</p></div>`;
+      `<div class="grid-empty"><div style="font-size:40px">😕</div><p>Failed to load products.</p></div>`;
   }
 }
 
@@ -101,10 +101,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       filterPriceMaxId:        'vsFilterPriceMax',
       filterPriceHintId:       'vsFilterPriceHint',
       filterLocateBtnId:       'vsFilterLocateBtn',
-      priceTypeBtnSelector:    '.vendor-price-type-btn',
+      priceTypeBtnSelector:    '.price-type-btn',
       // active chips
       activeFiltersId:         'vsActiveFilters',
-      activeChipClass:         'vendor-active-chip',
+      activeChipClass:         'active-chip',
       // product grid
       productGridId:           'vsProductGrid',
       productsCountId:         'vsProductsCount',
