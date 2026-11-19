@@ -457,7 +457,6 @@
 }
 
 .chat-overlay.chat-embedded .chat-list-view {
-  flex: 1;
   overflow-y: auto;
 }
 
