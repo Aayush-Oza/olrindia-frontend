@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
   browseSharedInit({
     tabAllId: 'tabAll',
     tabRentId: 'tabRent',
-    tabBuyId: 'tabBuy',
+    tabBuyId: 'tabSell',
     filterGroupPriceTypeId: 'filterGroupPriceType',
     filterGroupConditionId: 'filterGroupCondition',
     filterCategoryId: 'filterCategory',
