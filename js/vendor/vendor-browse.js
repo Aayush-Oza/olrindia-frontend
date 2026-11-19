@@ -80,6 +80,9 @@ async function vsLoadHomepage() {
   if (bsHasMore) bsAttachSentinel();
 }
 
+// ── Tab switching (HTML onclick wrapper) ──────────────────────
+function switchTab(tab) { bsSwitchTab(tab); }
+
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
   await loadVendorProfile();
