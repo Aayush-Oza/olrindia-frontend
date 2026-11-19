@@ -1492,6 +1492,7 @@
 
 .nav-list-btn:hover {
   transform: translateY(-1px);
+  color: #fff;
   text-decoration: none;
 }
 
