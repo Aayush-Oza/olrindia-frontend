@@ -141,10 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadProducts:    loadProducts,
     productCardHTML: productCardHTML,
   });
-
-  loadHomepage();
-});
-// ── List Item Button visibility ───────────────────────────────
+  // ── List Item Button visibility ───────────────────────────────
 (function initListBtn() {
   const hasSess = sessionStorage.getItem('olr_user') || sessionStorage.getItem('olr_vendor');
   if (hasSess) return; // session exists → show nothing
@@ -153,3 +150,5 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('fabListBtn')?.classList.add('visible');
   document.getElementById('navListBtn')?.classList.add('visible');
 })();
+  loadHomepage();
+});
