@@ -178,7 +178,7 @@
     !function (f, b, e, v, n, t, s) {
       if (f.fbq) return; n = f.fbq = function () {
         n.callMethod ?
-        n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+          n.callMethod.apply(n, arguments) : n.queue.push(arguments)
       }; if (!f._fbq) f._fbq = n;
       n.push = n; n.loaded = !0; n.version = '2.0'; n.queue = []; t = b.createElement(e); t.async = !0;
       t.src = v; s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s)
@@ -223,7 +223,7 @@
     }
 
     .hero-inner p {
-      font-size: clamp(0.95rem, 2vw, 1.1rem) !important;
+      font-size: clamp(0.85rem, 1.5vw, 0.8rem) !important;
       color: rgba(255, 255, 255, 0.85) !important;
       margin: 0 !important;
     }
@@ -359,7 +359,8 @@
 
   <!-- ── RENT / SELL TABS ── -->
   <div class="listing-tabs" id="listingTabs">
-    <button class="listing-tab active" id="tabRent" onclick="switchTab('rent')">Rent</button>
+    <button class="listing-tab active" id="tabAll" onclick="switchTab('all')">All</button>
+    <button class="listing-tab" id="tabRent" onclick="switchTab('rent')">Rent</button>
     <button class="listing-tab" id="tabSell" onclick="switchTab('sell')">Buy</button>
   </div>
 
@@ -606,12 +607,12 @@
   </footer>
 
   <script src="js/footer.js?v=10"></script>
-<button class="fab-list-btn" id="fabListBtn" onclick="window.location.href='/vendor/login'">
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-    <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-  </svg>
-  List Item
-</button>
+  <button class="fab-list-btn" id="fabListBtn" onclick="window.location.href='/vendor/login'">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+    </svg>
+    List Item
+  </button>
 </body>
 
 </html>

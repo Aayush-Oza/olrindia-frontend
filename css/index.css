@@ -254,7 +254,7 @@
 }
 
 .listing-tab {
-  padding: 13px 44px;
+  padding: 13px 32px;
   font-family: var(--font-display);
   font-size: 15px;
   font-weight: 600;
@@ -1196,7 +1196,10 @@
   .nav-action span {
     font-size: 7px;
   }
-
+  .listing-tabs {
+    padding: 12px 20px;
+    font-size: 13px;
+  }
   .filter-row {
     top: 62px;
   }
@@ -1307,4 +1310,28 @@
   .nav-list-btn.visible {
     display: inline-flex;
   }
+}
+/* ── Listing type chip (shown in All tab) ───────────────────── */
+.listing-type-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-top: 8px;
+  width: fit-content;
+}
+
+.chip-rent {
+  background: #EAF3FF;
+  color: #1565C0;
+  border: 1px solid #C5DCFF;
+}
+
+.chip-sell {
+  background: #E8F5E9;
+  color: #2E7D32;
+  border: 1px solid #C8E6C9;
 }

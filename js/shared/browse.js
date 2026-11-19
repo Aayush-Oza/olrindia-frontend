@@ -3,7 +3,7 @@
 ============================================================ */
 
 // ── Shared state ───────────────────────────────────────────────
-let bsActiveTab = 'rent';
+let bsActiveTab = 'all';
 
 let bsActiveFilters = {
   category:  '',
@@ -46,10 +46,11 @@ function browseSharedInit(pageCfg, callbacks) {
 function bsSwitchTab(tab) {
   if (tab === bsActiveTab) return;
   bsActiveTab = tab;
+  document.getElementById(cfg.tabAllId).classList.toggle('active', tab === 'all');
   document.getElementById(cfg.tabRentId).classList.toggle('active', tab === 'rent');
   document.getElementById(cfg.tabBuyId).classList.toggle('active', tab === 'sell');
   document.getElementById(cfg.filterGroupPriceTypeId).style.display = tab === 'rent' ? '' : 'none';
-  document.getElementById(cfg.filterGroupConditionId).style.display = tab === 'sell' ? '' : 'none';
+  document.getElementById(cfg.filterGroupConditionId).style.display  = tab === 'sell' ? '' : 'none';
   bsResetFilters(false);
   bsRenderActiveFilterChips();
   bsUpdateFilterBadge();
@@ -94,15 +95,20 @@ function bsSkeletonCardHTML() {
 // ── Build API params ──────────────────────────────────────────
 function bsBuildParams(page, perPage) {
   const q = document.getElementById(cfg.searchId).value.trim();
-  const params = new URLSearchParams({ page, per_page: perPage, listing_type: bsActiveTab });
+  const params = new URLSearchParams({ page, per_page: perPage });
+  if (bsActiveTab !== 'all') params.set('listing_type', bsActiveTab);
   if (bsActiveFilters.category) params.set('category', bsActiveFilters.category);
   if (bsActiveFilters.city)     params.set('city',     bsActiveFilters.city);
   if (bsActiveTab === 'rent') {
     if (bsActiveFilters.priceType)           params.set('price_type', bsActiveFilters.priceType);
     if (bsActiveFilters.priceMin > 0)        params.set('price_min',  bsActiveFilters.priceMin);
     if (bsActiveFilters.priceMax < Infinity) params.set('price_max',  bsActiveFilters.priceMax);
-  } else {
+  } else if (bsActiveTab === 'sell') {
     if (bsActiveFilters.condition)           params.set('condition',  bsActiveFilters.condition);
+    if (bsActiveFilters.priceMin > 0)        params.set('price_min',  bsActiveFilters.priceMin);
+    if (bsActiveFilters.priceMax < Infinity) params.set('price_max',  bsActiveFilters.priceMax);
+  } else {
+    // 'all' tab — only price range applies, no type/condition filter
     if (bsActiveFilters.priceMin > 0)        params.set('price_min',  bsActiveFilters.priceMin);
     if (bsActiveFilters.priceMax < Infinity) params.set('price_max',  bsActiveFilters.priceMax);
   }
@@ -306,7 +312,8 @@ function bsRenderHomepageShell(skeletonCount = 8) {
   const countEl = document.getElementById(cfg.productsCountId);
   countEl.textContent = '';
   document.getElementById(cfg.productsTitleId).textContent =
-    bsActiveTab === 'rent' ? 'Browse & Rent' : 'Browse & Buy';
+  bsActiveTab === 'rent' ? 'Browse & Rent' :
+  bsActiveTab === 'sell' ? 'Browse & Buy'  : 'All Products';
   grid.style.display = 'none';
 
   let homeSection = document.getElementById('bsHomeSection');
