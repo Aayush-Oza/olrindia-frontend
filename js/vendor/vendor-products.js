@@ -559,16 +559,10 @@ async function openEditModal(productId) {
   const form = document.getElementById('productForm');
   form.reset();
 
-  // listing_type is locked on edit — show locked pill, hide toggle
-  const lt = p.listing_type || 'rent';
-  currentListingType = lt;
-  document.getElementById('listingTypeToggle').style.display = 'none';
-  document.getElementById('listingTypeLocked').style.display = '';
-  const pill = document.getElementById('listingTypeLockedPill');
-  if (pill) {
-    pill.textContent = lt === 'sell' ? '🏷️ For Sale' : '🔑 For Rent';
-    pill.className = 'lt-pill' + (lt === 'sell' ? ' sell' : '');
-  }
+    const lt = p.listing_type || 'rent';
+  document.getElementById('listingTypeToggle').style.display = '';
+  document.getElementById('listingTypeLocked').style.display = 'none';
+  setListingType(lt);
 
   // Show/hide correct sections
   document.getElementById('rentFieldsSection').style.display = lt === 'rent' ? '' : 'none';
@@ -699,6 +693,7 @@ document.getElementById('productForm')?.addEventListener('submit', async e => {
     const state = form.querySelector('[name="state"]').value.trim();
 
     const data = {
+      listing_type: currentListingType,
       name: name || undefined,
       category: cat || undefined,
       description: desc === '' ? null : desc,
