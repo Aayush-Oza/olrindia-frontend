@@ -226,176 +226,6 @@
   max-width: 1180px;
   margin: 0 auto;
   padding: 36px 20px 42px;
-  display: flex;
-  align-items: center;
-  gap: 40px;
-}
-
-/* ── Animation side ── */
-.hero-animation {
-  flex: 0 0 55%;
-  aspect-ratio: 16/9;
-  background: #000;
-  border-radius: 14px;
-  overflow: hidden;
-  position: relative;
-}
-
-.hanim-slide {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  opacity: 0;
-  transition: opacity 0.6s ease;
-}
-
-.hanim-slide.active {
-  opacity: 1;
-}
-
-.hanim-icon {
-  font-size: 48px;
-  margin-bottom: 10px;
-}
-
-.hanim-title {
-  font-size: 17px;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 6px;
-  line-height: 1.3;
-  font-family: var(--font-display);
-}
-
-.hanim-title-big {
-  font-size: 22px;
-  line-height: 1.2;
-}
-
-.hanim-sub {
-  font-size: 12.5px;
-  color: rgba(255, 255, 255, 0.82);
-  line-height: 1.5;
-}
-
-.hanim-tags {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-.hanim-tags span {
-  background: rgba(255, 255, 255, 0.18);
-  color: #fff;
-  font-size: 11px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-weight: 600;
-}
-
-.hanim-money {
-  background: #22c55e;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 700;
-  padding: 7px 18px;
-  border-radius: 999px;
-  margin-top: 10px;
-}
-
-.hanim-bar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  height: 3px;
-  background: rgba(255, 255, 255, 0.9);
-  width: 0%;
-}
-
-.hanim-dots {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 6px;
-}
-
-.hanim-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.35);
-  transition: background 0.3s;
-}
-
-.hanim-dot.active {
-  background: #fff;
-}
-
-/* ── Text side (desktop only) ── */
-.hero-text-side {
-  flex: 1;
-  text-align: left;
-}
-
-.hero-text-side h1 {
-  color: #fff;
-  font-size: 26px;
-  margin-bottom: 10px;
-}
-
-.hero-text-side p {
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 15px;
-  margin-bottom: 20px;
-}
-
-.hero-install-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  background: #fff;
-  color: var(--c-blue);
-  font-size: 13px;
-  font-weight: 700;
-  padding: 10px 20px;
-  border-radius: 999px;
-  text-decoration: none;
-  margin-top: 12px;
-  font-family: var(--font-display);
-  transition: all 0.2s;
-}
-
-.hero-install-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-}
-
-.hero-about-btn {
-  display: inline-block;
-  margin-top: 0;
-  padding: 9px 24px;
-  border-radius: var(--r-pill);
-  background: rgba(255, 255, 255, 0.18);
-  border: 1.5px solid rgba(255, 255, 255, 0.5);
-  color: #fff;
-  font-size: 13.5px;
-  font-weight: 600;
-  font-family: var(--font-display);
-  text-decoration: none;
-  transition: all 0.2s var(--ease);
-  margin-right: 10px;
-}
-
-.hero-about-btn:hover {
-  background: rgba(255, 255, 255, 0.30);
-  border-color: rgba(255, 255, 255, 0.8);
-  transform: translateY(-1px);
 }
 
 .hero-location {
@@ -409,30 +239,6 @@
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: var(--r-pill);
   padding: 4px 12px;
-}
-
-/* ── Mobile: stack vertically ── */
-@media (max-width: 768px) {
-  .hero-inner {
-    flex-direction: column;
-    gap: 0;
-    padding: 0;
-  }
-
-  .hero-animation {
-    flex: none;
-    width: 100%;
-    aspect-ratio: 16/9;
-    border-radius: 0;
-  }
-
-  .hero-text-side {
-    display: none;
-  }
-
-  .hanim-scene.active.hs5-mobile::after {
-    content: '';
-  }
 }
 
 /* ── Rent / Buy tabs ─────────────────────────────────────────── */
@@ -1262,7 +1068,7 @@
   color: var(--c-ink-faint);
 }
 
-/* ── Category card grid (homepage) ──────────────────────────── */
+/* ── Category card grid ──────────────────────────────────────── */
 .cat-card-grid {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
@@ -1340,7 +1146,6 @@
 
 /* ── Responsive ──────────────────────────────────────────────── */
 @media (max-width: 860px) {
-  /* Filter sheet → bottom sheet on mobile */
   .filter-sheet {
     top: auto;
     left: 0;
@@ -1401,7 +1206,7 @@
     gap: 12px;
   }
 
-    .cat-card-grid {
+  .cat-card-grid {
     grid-template-columns: repeat(4, 1fr);
     gap: 8px;
     overflow: visible;
@@ -1433,6 +1238,7 @@
     font-size: 13px;
   }
 }
+
 /* ── Floating List Item Button (Mobile) ── */
 .fab-list-btn {
   position: fixed;
@@ -1470,6 +1276,7 @@
     display: none !important;
   }
 }
+
 /* ── Navbar List Item Button (Desktop) ── */
 .nav-list-btn {
   display: none;

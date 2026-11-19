@@ -683,7 +683,7 @@ document.getElementById('productForm')?.addEventListener('submit', async e => {
   } else {
     // ── EDIT ──
     const snap = originalProductSnapshot;
-    const lt = snap.listing_type;  // locked — use from snapshot
+    const lt = snap.listing_type;  // locked - use from snapshot
     const desc = form.querySelector('[name="description"]').value.trim();
     const cat = category;
     const sub = document.getElementById('modalSubcategory').value;

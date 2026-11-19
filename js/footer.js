@@ -47,7 +47,7 @@
   function autoApplyLang() {
     const lang = getLang();
     if (!lang || lang === 'en') return;
-    // Set cookie — Google Translate reads it automatically on page load
+    // Set cookie - Google Translate reads it automatically on page load
     setGoogCookie(lang);
     // Also try combo in case GT is already loaded
     let attempts = 0;
