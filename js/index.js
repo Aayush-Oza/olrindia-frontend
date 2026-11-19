@@ -23,7 +23,6 @@ function productCardHTML(p) {
   return `
   <div class="product-card" onclick="bsOpenProduct('${p.share_slug}','${p.category || ''}','${p.city || ''}')">
     ${img}${badge}
-    <button class="product-wish-btn" onclick="event.stopPropagation();handleWish(this,${p.id})" title="Save to wishlist">♡</button>
     <div class="product-body">
       <div class="product-cat">${p.category || ''}</div>
       <div class="product-title">${p.name}</div>
