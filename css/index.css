@@ -1435,12 +1435,14 @@
 }
 /* ── Floating List Item Button (Mobile) ── */
 .fab-list-btn {
-  display: none; /* hidden by default, JS shows it */
   position: fixed;
   bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: fit-content;
   z-index: 500;
+  display: none;
   align-items: center;
   gap: 8px;
   padding: 13px 28px;
@@ -1457,51 +1459,14 @@
   transition: all 0.2s ease;
 }
 
-.fab-list-btn:hover {
-  filter: brightness(1.08);
-  box-shadow: 0 6px 24px rgba(8,115,231,0.4);
-}
-
-/* ── Navbar List Item Button (Desktop) ── */
-.nav-list-btn {
-  display: none; /* hidden by default, JS shows it */
-  align-items: center;
-  gap: 7px;
-  padding: 9px 18px;
-  background: var(--grad-brand);
-  color: #fff;
-  font-family: var(--font-display);
-  font-size: 13.5px;
-  font-weight: 700;
-  border: none;
-  border-radius: 999px;
-  cursor: pointer;
-  box-shadow: 0 2px 10px rgba(8,115,231,0.25);
-  white-space: nowrap;
-  transition: all 0.2s ease;
-  text-decoration: none;
-}
-
-.nav-list-btn:hover {
-  filter: brightness(1.07);
-  transform: translateY(-1px);
-}
-
-/* ── Show correct button per screen size ── */
 @media (max-width: 768px) {
   .fab-list-btn.visible {
-    display: inline-flex;
-  }
-  .nav-list-btn {
-    display: none !important;
+    display: inline-flex !important;
   }
 }
 
 @media (min-width: 769px) {
   .fab-list-btn {
     display: none !important;
-  }
-  .nav-list-btn.visible {
-    display: inline-flex;
   }
 }
