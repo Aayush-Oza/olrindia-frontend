@@ -164,7 +164,9 @@
   <link rel="icon" href="assets/favicon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="css/variables.css?v=10">
   <link rel="stylesheet" href="css/base.css?v=10">
   <link rel="stylesheet" href="css/components.css?v=10">
@@ -173,15 +175,19 @@
 
   <!-- Meta Pixel Code -->
   <script>
-    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
-    document,'script','https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init','1083939711042882');fbq('track','PageView');
+    !function (f, b, e, v, n, t, s) {
+      if (f.fbq) return; n = f.fbq = function () {
+        n.callMethod ?
+        n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+      }; if (!f._fbq) f._fbq = n;
+      n.push = n; n.loaded = !0; n.version = '2.0'; n.queue = []; t = b.createElement(e); t.async = !0;
+      t.src = v; s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s)
+    }(window,
+      document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1083939711042882'); fbq('track', 'PageView');
   </script>
   <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=1083939711042882&ev=PageView&noscript=1"/></noscript>
+      src="https://www.facebook.com/tr?id=1083939711042882&ev=PageView&noscript=1" /></noscript>
   <!-- End Meta Pixel Code -->
 
   <style>
@@ -190,16 +196,21 @@
       background: var(--grad-brand) !important;
       padding: 60px 24px 52px !important;
     }
+
     .hero-inner {
-      display: block !important;        /* kill flex */
+      display: block !important;
+      /* kill flex */
       text-align: center !important;
       max-width: 640px !important;
       margin: 0 auto !important;
       padding: 0 !important;
     }
+
     /* hide the old two-column children if they ever render */
     .hero-animation,
-    .hero-text-side { display: none !important; }
+    .hero-text-side {
+      display: none !important;
+    }
 
     /* the actual h1 and p are direct children of .hero-inner in our new markup */
     .hero-inner h1 {
@@ -210,20 +221,22 @@
       margin: 0 0 14px !important;
       line-height: 1.18 !important;
     }
+
     .hero-inner p {
       font-size: clamp(0.95rem, 2vw, 1.1rem) !important;
-      color: rgba(255,255,255,0.85) !important;
+      color: rgba(255, 255, 255, 0.85) !important;
       margin: 0 !important;
     }
+
     .hero-inner .hero-location {
       display: inline-flex;
       align-items: center;
       gap: 5px;
       font-size: 13px;
-      color: rgba(255,255,255,0.75);
+      color: rgba(255, 255, 255, 0.75);
       margin-top: 12px;
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
       border-radius: 999px;
       padding: 4px 12px;
     }
@@ -236,9 +249,11 @@
       border-bottom: 2px solid var(--c-border-soft, #eee) !important;
       padding: 0 !important;
       position: sticky !important;
-      top: 68px !important;   /* navbar is 68px per index.css */
+      top: 68px !important;
+      /* navbar is 68px per index.css */
       z-index: 150 !important;
     }
+
     .listing-tab {
       padding: 14px 44px !important;
       font-family: var(--font-display, 'Poppins', sans-serif) !important;
@@ -252,10 +267,12 @@
       transition: color 0.2s, border-color 0.2s !important;
       margin-bottom: -2px !important;
     }
+
     .listing-tab.active {
       color: #f7931e !important;
       border-bottom-color: #f7931e !important;
     }
+
     .listing-tab:hover:not(.active) {
       color: var(--c-ink, #222) !important;
     }
@@ -265,7 +282,8 @@
       .filter-sheet {
         left: auto !important;
         right: 20px !important;
-        top: 180px !important;   /* below navbar + tabs + filter row */
+        top: 180px !important;
+        /* below navbar + tabs + filter row */
         border-radius: var(--r-lg, 14px) !important;
       }
     }
@@ -284,8 +302,9 @@
         <div class="nav-action nav-lang-wrap" id="navLangWrap">
           <button class="nav-wish-btn" id="navLangBtn" title="Language">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
-              <path d="M3 12h18M12 3c2.4 2.6 3.8 5.9 3.8 9s-1.4 6.4-3.8 9c-2.4-2.6-3.8-5.9-3.8-9S9.6 5.6 12 3Z" stroke="currentColor" stroke-width="1.8"/>
+              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" />
+              <path d="M3 12h18M12 3c2.4 2.6 3.8 5.9 3.8 9s-1.4 6.4-3.8 9c-2.4-2.6-3.8-5.9-3.8-9S9.6 5.6 12 3Z"
+                stroke="currentColor" stroke-width="1.8" />
             </svg>
           </button>
           <span>Language</span>
@@ -295,7 +314,9 @@
         <div class="nav-action">
           <button class="nav-wish-btn" id="navWishBtn" title="Wishlist">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"
+                stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
             </svg>
           </button>
           <span>Wishlist</span>
@@ -304,12 +325,18 @@
         <div class="nav-action">
           <button class="nav-wish-btn" id="navProfileBtn" title="Login" onclick="openAuthModal('login')">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M4 21v-1a7 7 0 0 1 14 0v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M4 21v-1a7 7 0 0 1 14 0v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+              <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8" />
             </svg>
           </button>
           <span>Login</span>
         </div>
+        <a class="nav-list-btn" id="navListBtn" href="/vendor/login">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+          </svg>
+          List Item
+        </a>
       </div>
     </div>
   </nav>
@@ -321,7 +348,8 @@
       <p>Thousands of local vendors — furniture, tools, vehicles, fashion &amp; more.</p>
       <div class="hero-location" id="heroLocation" style="display:none;">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" stroke="currentColor"
+            stroke-width="1.8" />
         </svg>
         <span id="heroLocationText"></span>
       </div>
@@ -339,14 +367,14 @@
     <div class="filter-row-inner">
       <div class="nav-search">
         <svg class="nav-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
-          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/>
-          <path d="m16.5 16.5 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8" />
+          <path d="m16.5 16.5 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
         </svg>
         <input type="text" id="searchInput" placeholder="Search products…" autocomplete="off">
       </div>
       <button class="filter-main-btn" id="filterBtn">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-          <path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
         </svg>
         Filters
         <span class="filter-count-badge" id="filterCountBadge" style="display:none;">0</span>
@@ -380,8 +408,9 @@
           <input class="filter-input" type="text" id="filterCity" placeholder="e.g. Mumbai, Delhi…">
           <button class="filter-locate-btn" id="filterLocateBtn" title="Use my location">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" stroke="currentColor" stroke-width="1.8"/>
-              <circle cx="12" cy="9" r="2.5" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" stroke="currentColor"
+                stroke-width="1.8" />
+              <circle cx="12" cy="9" r="2.5" stroke="currentColor" stroke-width="1.8" />
             </svg>
           </button>
         </div>
@@ -456,8 +485,8 @@
         <a id="authUser" href="/user/login" class="auth-choice auth-choice-user">
           <div class="auth-choice-icon">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M4 21v-1a7 7 0 0 1 14 0v1" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-              <circle cx="11" cy="7" r="4" stroke="white" stroke-width="1.8"/>
+              <path d="M4 21v-1a7 7 0 0 1 14 0v1" stroke="white" stroke-width="1.8" stroke-linecap="round" />
+              <circle cx="11" cy="7" r="4" stroke="white" stroke-width="1.8" />
             </svg>
           </div>
           <div>
@@ -468,7 +497,8 @@
         <a id="authVendor" href="/vendor/login" class="auth-choice auth-choice-vendor">
           <div class="auth-choice-icon">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M3 9.5 12 3l9 6.5M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M3 9.5 12 3l9 6.5M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5" stroke="white" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </div>
           <div>
@@ -514,15 +544,16 @@
         <div class="footer-col-title">Follow Us</div>
         <a href="https://www.instagram.com/olr_india" target="_blank" rel="noopener" class="footer-social-item">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-            <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.8"/>
-            <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/>
-            <circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
+            <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.8" />
+            <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8" />
+            <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
           </svg>
           Instagram
         </a>
         <a href="https://facebook.com/olrindia" target="_blank" rel="noopener" class="footer-social-item">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" stroke="currentColor"
+              stroke-width="1.8" stroke-linejoin="round" />
           </svg>
           Facebook
         </a>
@@ -531,8 +562,9 @@
         <div class="footer-col-title">Contact</div>
         <a href="mailto:support@olrindia.com" class="footer-contact-item">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.8"/>
-            <path d="m22 6-10 7L2 6" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor"
+              stroke-width="1.8" />
+            <path d="m22 6-10 7L2 6" stroke="currentColor" stroke-width="1.8" />
           </svg>
           support@olrindia.com
         </a>
@@ -573,5 +605,12 @@
   </footer>
 
   <script src="js/footer.js?v=10"></script>
+<button class="fab-list-btn" id="fabListBtn" onclick="window.location.href='/vendor/login'">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+  </svg>
+  List Item
+</button>
 </body>
+
 </html>

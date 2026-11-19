@@ -144,3 +144,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   loadHomepage();
 });
+// ── List Item Button visibility ───────────────────────────────
+(function initListBtn() {
+  const hasSess = sessionStorage.getItem('olr_user') || sessionStorage.getItem('olr_vendor');
+  if (hasSess) return; // session exists → show nothing
+
+  // show both, CSS handles which one is visible per screen
+  document.getElementById('fabListBtn')?.classList.add('visible');
+  document.getElementById('navListBtn')?.classList.add('visible');
+})();
