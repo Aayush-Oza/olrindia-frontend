@@ -383,23 +383,40 @@ function bsRenderCatGrid(catGrid, categories, onCatClick) {
     const showMoreBtn = document.createElement('div');
     showMoreBtn.style.cssText = 'grid-column:1/-1;display:flex;justify-content:center;margin-top:12px;';
     showMoreBtn.innerHTML = `
-      <button id="bsCatShowMore" style="
-        padding:10px 32px;
-        border:1.5px solid var(--brand, #f97316);
-        border-radius:var(--r-md, 8px);
-        background:#fff;
-        color:var(--brand, #f97316);
-        font-weight:600;
-        font-size:14px;
-        cursor:pointer;
-        font-family:var(--font-display);
-        transition:background 0.15s,color 0.15s;
-      ">Show more categories ▾</button>`;
+  <button id="bsCatShowMore" style="
+    padding:7px 20px;
+    border:1.5px solid var(--c-ink-faint, #ccc);
+    border-radius:20px;
+    background:transparent;
+    color:var(--c-ink-muted, #888);
+    font-weight:500;
+    font-size:13px;
+    cursor:pointer;
+    font-family:var(--font-display);
+    transition:background 0.15s,color 0.15s;
+  ">Show more ▾</button>`;
     catGrid.appendChild(showMoreBtn);
 
+    let expanded = false;
+    const hiddenHTML = hidden.map(catCardHTML).join('');
+    let hiddenNodes = [];
+
     document.getElementById('bsCatShowMore').addEventListener('click', function() {
-      this.closest('div').remove();
-      catGrid.insertAdjacentHTML('beforeend', hidden.map(catCardHTML).join(''));
+      if (!expanded) {
+        // Insert hidden cats before the button wrapper
+        const tempDiv = document.createElement('div');
+        tempDiv.style.cssText = 'display:contents';
+        tempDiv.innerHTML = hiddenHTML;
+        hiddenNodes = [...tempDiv.children];
+        hiddenNodes.forEach(n => catGrid.insertBefore(n, showMoreBtn));
+        this.textContent = 'Show less ▴';
+        expanded = true;
+      } else {
+        hiddenNodes.forEach(n => n.remove());
+        hiddenNodes = [];
+        this.textContent = 'Show more categories ▾';
+        expanded = false;
+      }
     });
   }
 }
