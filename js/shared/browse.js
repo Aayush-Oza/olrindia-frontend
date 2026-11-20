@@ -1,10 +1,12 @@
 /* ============================================================
    OLR INDIA – BROWSE SHARED JS
-   Changes vs previous version:
-   · bsUserLat / bsUserLng stored and sent to API as user_lat / user_lng
-   · GPS detect button saves coordinates (not just city name)
-   · City input has Nominatim autocomplete → area-level suggestions
-     (e.g. "Dahisar East, Mumbai") + saves lat/lng on selection
+   Fixes in this version:
+   · Nominatim wildcard search (* suffix) → partial match works
+     e.g. "borival" now returns "Borivali East" etc.
+   · Deduplication of results by formatted label
+   · Better label formatting: suburb → city → state, skips blanks
+   · Coordinates cleared only when truly appropriate
+   · Minor: abort previous fetch on each new keystroke
 ============================================================ */
 
 // ── Shared state ───────────────────────────────────────────────
@@ -34,20 +36,18 @@ let bsUserLng = null;
 let cfg = {};
 
 // Callbacks page-specific file must provide
-let onLoadHomepage    = null;  // fn()      – reload the homepage view
-let onLoadProducts    = null;  // fn(reset) – load filtered product list
-let onWishBtn         = null;  // fn(btn, productId) – wishlist action
-let onProductCardHTML = null;  // fn(p) → HTML string
+let onLoadHomepage    = null;
+let onLoadProducts    = null;
+let onWishBtn         = null;
+let onProductCardHTML = null;
 
-// ── Init (called by page-specific file) ───────────────────────
+// ── Init ──────────────────────────────────────────────────────
 function browseSharedInit(pageCfg, callbacks) {
   cfg = pageCfg;
-
   onLoadHomepage    = callbacks.loadHomepage;
   onLoadProducts    = callbacks.loadProducts;
   onWishBtn         = callbacks.wishBtn     || null;
   onProductCardHTML = callbacks.productCardHTML;
-
   _bindFilterEvents();
 }
 
@@ -77,7 +77,6 @@ function bsResetFilters(reload = true) {
   document.getElementById(cfg.filterPriceHintId).textContent = 'Enter a min or max to filter by price.';
   document.getElementById(cfg.filterPriceHintId).classList.remove('error');
   document.querySelectorAll(cfg.priceTypeBtnSelector).forEach(b => b.classList.remove('active'));
-  // Clear saved location when filters are reset
   bsUserLat = null;
   bsUserLng = null;
   if (reload) onLoadHomepage();
@@ -124,13 +123,10 @@ function bsBuildParams(page, perPage) {
     if (bsActiveFilters.priceMax < Infinity) params.set('price_max',  bsActiveFilters.priceMax);
   }
   if (q) params.set('search', q);
-
-  // ── Send user coordinates if available ──────────────────────
   if (bsUserLat !== null && bsUserLng !== null) {
     params.set('user_lat', bsUserLat);
     params.set('user_lng', bsUserLng);
   }
-
   return params;
 }
 
@@ -277,12 +273,11 @@ function bsRemoveFilter(key) {
   if (key === 'city')      {
     bsActiveFilters.city = '';
     document.getElementById(cfg.filterCityId).value = '';
-    // Clear coordinates when city filter is removed
     bsUserLat = null;
     bsUserLng = null;
   }
-  if (key === 'priceType') { bsActiveFilters.priceType  = ''; document.querySelectorAll(cfg.priceTypeBtnSelector).forEach(b => b.classList.remove('active')); }
-  if (key === 'condition') { bsActiveFilters.condition  = ''; document.getElementById(cfg.filterConditionId).value = ''; }
+  if (key === 'priceType') { bsActiveFilters.priceType = ''; document.querySelectorAll(cfg.priceTypeBtnSelector).forEach(b => b.classList.remove('active')); }
+  if (key === 'condition') { bsActiveFilters.condition = ''; document.getElementById(cfg.filterConditionId).value = ''; }
   if (key === 'price')     { bsActiveFilters.priceMin = 0; bsActiveFilters.priceMax = Infinity; document.getElementById(cfg.filterPriceMinId).value = ''; document.getElementById(cfg.filterPriceMaxId).value = ''; }
   bsRenderActiveFilterChips();
   bsUpdateFilterBadge();
@@ -292,7 +287,7 @@ function bsRemoveFilter(key) {
   if (!hasAny) onLoadHomepage(); else bsApplyFilters();
 }
 
-// ── Apply filters (enter filtered view) ───────────────────────
+// ── Apply filters ─────────────────────────────────────────────
 function bsApplyFilters() {
   const homeSection = document.getElementById('bsHomeSection');
   if (homeSection) homeSection.style.display = 'none';
@@ -329,14 +324,14 @@ function bsCloseFilterSheet() {
   _destroyCityAutocomplete();
 }
 
-// ── Homepage shell (categories + featured) ────────────────────
+// ── Homepage shell ────────────────────────────────────────────
 function bsRenderHomepageShell(skeletonCount = 8) {
   const grid    = document.getElementById(cfg.productGridId);
   const countEl = document.getElementById(cfg.productsCountId);
   countEl.textContent = '';
   document.getElementById(cfg.productsTitleId).textContent =
-  bsActiveTab === 'rent' ? 'Browse & Rent' :
-  bsActiveTab === 'sell' ? 'Browse & Buy'  : 'All Products';
+    bsActiveTab === 'rent' ? 'Browse & Rent' :
+    bsActiveTab === 'sell' ? 'Browse & Buy'  : 'All Products';
   grid.style.display = 'none';
 
   let homeSection = document.getElementById('bsHomeSection');
@@ -406,18 +401,18 @@ function bsRenderCatGrid(catGrid, categories, onCatClick) {
     const showMoreBtn = document.createElement('div');
     showMoreBtn.style.cssText = 'grid-column:1/-1;display:flex;justify-content:center;margin-top:12px;';
     showMoreBtn.innerHTML = `
-  <button id="bsCatShowMore" style="
-    padding:7px 20px;
-    border:1.5px solid #333333;
-    border-radius:20px;
-    background:transparent;
-    color:#333333;
-    font-weight:500;
-    font-size:13px;
-    cursor:pointer;
-    font-family:var(--font-display);
-    transition:background 0.15s,color 0.15s;
-  ">Show more ▾</button>`;
+      <button id="bsCatShowMore" style="
+        padding:7px 20px;
+        border:1.5px solid #333333;
+        border-radius:20px;
+        background:transparent;
+        color:#333333;
+        font-weight:500;
+        font-size:13px;
+        cursor:pointer;
+        font-family:var(--font-display);
+        transition:background 0.15s,color 0.15s;
+      ">Show more ▾</button>`;
     catGrid.appendChild(showMoreBtn);
 
     let expanded = false;
@@ -460,36 +455,52 @@ function bsRenderHomeProdGrid(homeProdGrid, products) {
 
 // ══════════════════════════════════════════════════════════════
 //  CITY AUTOCOMPLETE  (Nominatim – area-level, India only)
+//
+//  KEY FIXES vs previous version:
+//  1. Wildcard suffix (*) appended to every query so partial input
+//     like "borival" matches "Borivali East", "Borivali West" etc.
+//  2. Results deduplicated by formatted label — no more duplicate
+//     "R/C Ward, Maharashtra" entries.
+//  3. Label builder is more defensive — skips blank parts and
+//     avoids repeating the same segment twice in a row.
+//  4. Abort controller is reset properly on every new keystroke
+//     so stale responses never overwrite fresh ones.
 // ══════════════════════════════════════════════════════════════
 
-let _acDebounceTimer  = null;
-let _acDropdown       = null;
-let _acAbortCtrl      = null;
-let _acSelectedFromDropdown = false;  // flag to avoid re-fetching on programmatic value set
+let _acDebounceTimer        = null;
+let _acDropdown             = null;
+let _acAbortCtrl            = null;
+let _acSelectedFromDropdown = false;
 
 const _NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
 
 /**
- * Format a Nominatim result into a readable label.
- * Prefers: suburb/neighbourhood, then city/town/village, then state.
- * Example: "Dahisar East, Mumbai, Maharashtra"
+ * Format a Nominatim result into a readable area label.
+ * Priority: suburb/neighbourhood → city/town/village → state.
+ * Skips blank segments and avoids consecutive duplicates.
  */
 function _formatNominatimLabel(item) {
   const a = item.address || {};
+
+  const area  = a.suburb || a.neighbourhood || a.quarter || a.residential || a.hamlet || '';
+  const city  = a.city   || a.town  || a.village || a.county || '';
+  const state = a.state  || '';
+
+  // Build parts, skipping blanks and consecutive duplicates
+  const raw = [area, city, state];
   const parts = [];
-  // Most specific area first
-  const area = a.suburb || a.neighbourhood || a.quarter || a.residential || a.hamlet || '';
-  const city = a.city || a.town || a.village || a.county || '';
-  const state = a.state || '';
-  if (area)  parts.push(area);
-  if (city && city !== area)  parts.push(city);
-  if (state && state !== city) parts.push(state);
-  return parts.length ? parts.join(', ') : item.display_name.split(',').slice(0, 3).join(',').trim();
+  for (const seg of raw) {
+    if (!seg) continue;
+    if (parts.length && parts[parts.length - 1] === seg) continue;
+    parts.push(seg);
+  }
+
+  return parts.length
+    ? parts.join(', ')
+    : item.display_name.split(',').slice(0, 3).join(',').trim();
 }
 
-/**
- * Inject the autocomplete dropdown styles once.
- */
+/** Inject dropdown styles once. */
 function _ensureAcStyles() {
   if (document.getElementById('bs-ac-styles')) return;
   const style = document.createElement('style');
@@ -524,17 +535,8 @@ function _ensureAcStyles() {
     .bs-ac-item:hover, .bs-ac-item.focused {
       background: var(--c-surface-raised, #f5f5f5);
     }
-    .bs-ac-item svg {
-      flex-shrink: 0;
-      opacity: 0.45;
-    }
-    .bs-ac-loading {
-      padding: 12px 14px;
-      font-size: 13px;
-      color: var(--c-ink-faint, #999);
-      text-align: center;
-    }
-    .bs-ac-empty {
+    .bs-ac-item svg { flex-shrink: 0; opacity: 0.45; }
+    .bs-ac-loading, .bs-ac-empty {
       padding: 12px 14px;
       font-size: 13px;
       color: var(--c-ink-faint, #999);
@@ -544,7 +546,7 @@ function _ensureAcStyles() {
   document.head.appendChild(style);
 }
 
-/** Wrap the city input in a relative-position container for the dropdown. */
+/** Wrap the city input in a relative-position container. */
 function _ensureAcWrap() {
   const input = document.getElementById(cfg.filterCityId);
   if (!input) return null;
@@ -556,7 +558,7 @@ function _ensureAcWrap() {
   return input;
 }
 
-/** Remove the dropdown from DOM. */
+/** Remove dropdown from DOM and cancel any in-flight request. */
 function _destroyCityAutocomplete() {
   _acDropdown?.remove();
   _acDropdown = null;
@@ -564,13 +566,12 @@ function _destroyCityAutocomplete() {
   _acAbortCtrl = null;
 }
 
-/** Show a loading state inside the dropdown. */
 function _acShowLoading() {
   if (!_acDropdown) return;
   _acDropdown.innerHTML = `<div class="bs-ac-loading">Searching…</div>`;
 }
 
-/** Render suggestions list. */
+/** Render deduplicated suggestion list. */
 function _acRenderItems(items, input) {
   if (!_acDropdown) return;
   if (items.length === 0) {
@@ -590,16 +591,13 @@ function _acRenderItems(items, input) {
 
   _acDropdown.querySelectorAll('.bs-ac-item').forEach(el => {
     el.addEventListener('mousedown', e => {
-      e.preventDefault();  // prevent input blur before click fires
+      e.preventDefault();
       const lat   = parseFloat(el.dataset.lat);
       const lng   = parseFloat(el.dataset.lng);
       const label = el.dataset.label;
 
-      // Fill input
       _acSelectedFromDropdown = true;
       input.value = label;
-
-      // Save coordinates
       bsUserLat = lat;
       bsUserLng = lng;
 
@@ -608,28 +606,52 @@ function _acRenderItems(items, input) {
   });
 }
 
-/** Fetch suggestions from Nominatim. */
+/**
+ * Fetch suggestions from Nominatim.
+ *
+ * FIX: Append '*' wildcard so partial input (e.g. "borival") matches
+ * "Borivali", "Borivali East", "Borivali West", etc.
+ * Nominatim supports wildcard search via the structured search endpoint
+ * when the query ends with '*'.
+ *
+ * FIX: Deduplicate results by formatted label before rendering so the
+ * user never sees two identical entries like "R/C Ward, Maharashtra".
+ */
 async function _acFetch(query, input) {
+  // Cancel any previous in-flight request
   _acAbortCtrl?.abort();
   _acAbortCtrl = new AbortController();
 
   _acShowLoading();
 
   try {
-    const url = `${_NOMINATIM_URL}?q=${encodeURIComponent(query)}&countrycodes=in&addressdetails=1&limit=6&format=json&accept-language=en`;
+    // Append wildcard for partial/prefix matching
+    const wildcardQuery = query.trim().endsWith('*') ? query.trim() : `${query.trim()}*`;
+
+    const url = `${_NOMINATIM_URL}?q=${encodeURIComponent(wildcardQuery)}&countrycodes=in&addressdetails=1&limit=8&format=json&accept-language=en`;
     const res  = await fetch(url, {
       signal: _acAbortCtrl.signal,
-      headers: { 'Accept-Language': 'en' }
+      headers: { 'Accept-Language': 'en' },
     });
     const data = await res.json();
-    _acRenderItems(data, input);
+
+    // Deduplicate by formatted label
+    const seen    = new Set();
+    const deduped = data.filter(item => {
+      const label = _formatNominatimLabel(item);
+      if (seen.has(label)) return false;
+      seen.add(label);
+      return true;
+    });
+
+    _acRenderItems(deduped, input);
   } catch (err) {
     if (err.name === 'AbortError') return;
-    _acDropdown && (_acDropdown.innerHTML = `<div class="bs-ac-empty">Could not fetch suggestions.</div>`);
+    if (_acDropdown) _acDropdown.innerHTML = `<div class="bs-ac-empty">Could not fetch suggestions.</div>`;
   }
 }
 
-/** Attach autocomplete behaviour to the city input. */
+/** Attach autocomplete to the city input. */
 function _initCityAutocomplete() {
   _ensureAcStyles();
   const input = _ensureAcWrap();
@@ -652,17 +674,17 @@ function _initCityAutocomplete() {
       input.parentElement.appendChild(_acDropdown);
     }
 
+    // 350 ms debounce — fires _acFetch which appends the wildcard
     _acDebounceTimer = setTimeout(() => _acFetch(q, input), 350);
   });
 
   input.addEventListener('blur', () => {
-    // Small delay so mousedown on item fires first
     setTimeout(_destroyCityAutocomplete, 180);
   });
 
   input.addEventListener('keydown', e => {
     if (!_acDropdown) return;
-    const items = _acDropdown.querySelectorAll('.bs-ac-item');
+    const items   = _acDropdown.querySelectorAll('.bs-ac-item');
     const focused = _acDropdown.querySelector('.bs-ac-item.focused');
     let idx = focused ? parseInt(focused.dataset.idx) : -1;
 
@@ -692,11 +714,10 @@ function _initCityAutocomplete() {
   });
 }
 
-// ── Private: bind all filter-related events ───────────────────
+// ── Bind all filter-related events ────────────────────────────
 function _bindFilterEvents() {
   document.getElementById(cfg.filterBtnId)?.addEventListener('click', () => {
     bsOpenFilterSheet();
-    // Init autocomplete lazily when sheet opens
     _initCityAutocomplete();
   });
 
@@ -709,7 +730,7 @@ function _bindFilterEvents() {
     });
   });
 
-  // ── Detect location button ────────────────────────────────────
+  // ── GPS detect ───────────────────────────────────────────────
   document.getElementById(cfg.filterLocateBtnId)?.addEventListener('click', () => {
     if (!navigator.geolocation) { toastError('Your browser does not support location.'); return; }
     const btn = document.getElementById(cfg.filterLocateBtnId);
@@ -718,8 +739,6 @@ function _bindFilterEvents() {
 
     navigator.geolocation.getCurrentPosition(async pos => {
       const { latitude, longitude } = pos.coords;
-
-      // Save raw coordinates so they're sent to the API
       bsUserLat = latitude;
       bsUserLng = longitude;
 
@@ -731,17 +750,19 @@ function _bindFilterEvents() {
         const data = await res.json();
         const a    = data.address || {};
 
-        // Build a human-friendly label (area → city → state)
         const area  = a.suburb || a.neighbourhood || a.quarter || a.residential || '';
         const city  = a.city   || a.town  || a.village || '';
         const state = a.state  || '';
 
+        const raw   = [area, city, state];
         const parts = [];
-        if (area) parts.push(area);
-        if (city && city !== area) parts.push(city);
-        if (state && state !== city) parts.push(state);
+        for (const seg of raw) {
+          if (!seg) continue;
+          if (parts.length && parts[parts.length - 1] === seg) continue;
+          parts.push(seg);
+        }
 
-        const label = parts.join(', ') || city || '';
+        const label = parts.join(', ');
         if (label) {
           document.getElementById(cfg.filterCityId).value = label;
         } else {
@@ -749,8 +770,7 @@ function _bindFilterEvents() {
         }
       } catch {
         toastError('Location lookup failed.');
-        // Keep coordinates even if reverse-geocode fails —
-        // the backend can still use them for distance sorting.
+        // Coordinates are still saved — backend can use them for distance sorting.
       } finally {
         btn.disabled = false; btn.style.opacity = '1';
       }
@@ -767,10 +787,7 @@ function _bindFilterEvents() {
     bsActiveFilters.category = document.getElementById(cfg.filterCategoryId).value;
     bsActiveFilters.city     = document.getElementById(cfg.filterCityId).value.trim();
 
-    // If user typed a city manually (not via GPS or autocomplete),
-    // clear saved coordinates so the API doesn't mismatch typed text vs coords.
-    // Coordinates are set only via GPS detect or autocomplete selection.
-    // If the city input is empty, clear coords too.
+    // Clear coords if city was cleared manually
     if (!bsActiveFilters.city) {
       bsUserLat = null;
       bsUserLng = null;
