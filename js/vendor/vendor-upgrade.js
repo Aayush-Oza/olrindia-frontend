@@ -141,7 +141,6 @@ function renderPlanCards() {
       </div>`;
   }
 
-  // Monthly: first 3 in a row, Premium full width below
   const monthlyRow1 = monthlyPlans.slice(0, 3);
   const monthlyRow2 = monthlyPlans.slice(3);
 
@@ -149,17 +148,14 @@ function renderPlanCards() {
   if (!container) return;
 
   container.innerHTML = `
-    <!-- MONTHLY -->
     <div id="planListMonthly">
       <div class="plans-grid-3">
         ${monthlyRow1.map(p => planCardHtml(p, false)).join('')}
       </div>
-      <div style="padding-top:14px;">
+      <div class="plans-grid-3" style="margin-top:14px;">
         ${monthlyRow2.map(p => planCardHtml(p, false)).join('')}
       </div>
     </div>
-
-    <!-- YEARLY -->
     <div id="planListYearly" style="display:none;">
       <div class="plans-grid-3">
         ${yearlyPlans.map(p => planCardHtml(p, true)).join('')}
@@ -169,10 +165,8 @@ function renderPlanCards() {
 
 function switchPlanTab(tab) {
   const isMonthly = tab === 'monthly';
-
   document.getElementById('planListMonthly').style.display = isMonthly ? 'block' : 'none';
   document.getElementById('planListYearly').style.display  = isMonthly ? 'none'  : 'block';
-
   const monthlyBtn = document.getElementById('planTabMonthly');
   const yearlyBtn  = document.getElementById('planTabYearly');
   monthlyBtn.style.background  = isMonthly ? '#2563eb' : '#fff';

@@ -24,32 +24,71 @@
       max-width: 860px;
       width: 95vw;
       max-height: 90vh;
-      overflow-y: auto;
-    }
-
-    .plans-section-heading {
       display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 15px;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .plans-modal-head {
+      flex-shrink: 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .plans-modal-title {
+      font-size: 18px;
       font-weight: 700;
+      color: var(--c-ink);
+      margin: 0 0 4px;
+      font-family: var(--font-display);
+    }
+
+    .plans-modal-sub {
+      font-size: 13px;
+      color: var(--c-ink-faint);
+      margin: 0;
+    }
+
+    .plans-current-bar {
+      flex-shrink: 0;
+      font-size: 13px;
       color: var(--c-ink-soft);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid #f3f4f6;
     }
 
-    .plans-yearly-tag {
-      background: #dcfce7;
-      color: #15803d;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 3px 10px;
-      border-radius: 20px;
-      text-transform: none;
-      letter-spacing: 0;
+    .plans-modal-tabs {
+      flex-shrink: 0;
+      padding: 12px 0;
+      border-bottom: 1px solid #f3f4f6;
     }
 
+    .plans-modal-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding-top: 16px;
+      padding-bottom: 16px;
+    }
+
+    /* ── Plans grid ── */
+    .plans-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      padding-top: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .plans-grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ── Plan card ── */
     .plan-card {
       border: 1.5px solid var(--c-border-soft);
       border-radius: var(--r-lg);
@@ -167,39 +206,6 @@
       padding: 10px;
       font-size: 13px;
       margin-top: auto;
-    }
-
-    /* ── Plans grid ── */
-    .plans-grid-3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      padding-top: 14px;
-    }
-
-    .plans-grid-center {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      margin-top: 14px;
-      padding-top: 14px;
-    }
-
-    .plans-grid-center .plan-card {
-      grid-column: 2 / 3;
-    }
-
-    @media (max-width: 600px) {
-
-      .plans-grid-3,
-      .plans-grid-center {
-        grid-template-columns: 1fr;
-        padding-top: 14px;
-      }
-
-      .plans-grid-center .plan-card {
-        grid-column: 1;
-      }
     }
 
     /* ── Listing type toggle ── */
@@ -718,8 +724,7 @@
   <!-- UPGRADE / PLANS MODAL -->
   <div class="product-modal-overlay" id="upgradeModalOverlay">
     <div class="plans-modal">
-      <div class="plans-modal-head"
-        style="position:sticky;top:0;background:#fff;z-index:10;border-bottom:1px solid #f3f4f6;padding-bottom:12px;margin-bottom:0;">
+      <div class="plans-modal-head">
         <div>
           <h3 class="plans-modal-title">Choose a plan</h3>
           <p class="plans-modal-sub" id="upgradeModalText">Upgrade to list more products and get more visibility.</p>
@@ -727,10 +732,10 @@
         <button class="modal-close" id="upgradeModalCancel">✕</button>
       </div>
       <div class="plans-current-bar" id="plansCurrentBar"></div>
-      <div id="planTabsContainer"
-        style="position:sticky;top:72px;background:#fff;z-index:9;padding:12px 0;border-bottom:1px solid #f3f4f6;margin-bottom:16px;">
+      <div class="plans-modal-tabs" id="planTabsContainer"></div>
+      <div class="plans-modal-scroll">
+        <div id="plansContainer"></div>
       </div>
-      <div id="plansContainer"></div>
     </div>
   </div>
 
