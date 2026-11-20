@@ -144,12 +144,12 @@ function renderPlanCards() {
       </button>
     </div>
 
-    <!-- MONTHLY -->
+        <!-- MONTHLY -->
     <div id="planListMonthly">
       <div class="plans-grid-3" style="padding-top:14px;">
         ${monthlyRow1.map(p => planCardHtml(p, false)).join('')}
       </div>
-      <div class="plans-grid-center" style="padding-top:14px;">
+      <div style="padding-top:14px;">
         ${monthlyRow2.map(p => planCardHtml(p, false)).join('')}
       </div>
     </div>
