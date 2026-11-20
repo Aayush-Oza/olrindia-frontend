@@ -246,35 +246,44 @@
   display: flex;
   justify-content: center;
   background: #fff;
-  border-bottom: 2px solid var(--c-border-soft);
-  padding: 0;
+  border-bottom: 1px solid var(--c-border-soft);
+  padding: 12px 0;
   position: sticky;
   top: 68px;
   z-index: 150;
 }
 
+.listing-tabs-inner {
+  display: inline-flex;
+  background: #f1f3f5;
+  border-radius: 999px;
+  padding: 4px;
+  gap: 2px;
+}
+
 .listing-tab {
-  padding: 13px 32px;
+  padding: 8px 32px;
+  border-radius: 999px;
   font-family: var(--font-display);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
-  color: var(--c-ink-faint);
-  background: none;
   border: none;
-  border-bottom: 3px solid transparent;
-  margin-bottom: -2px;
+  background: none;
   cursor: pointer;
-  transition: color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+  color: #888;
+  transition: all 0.18s ease;
 }
 
 .listing-tab.active {
-  color: #f7931e;
-  border-bottom-color: #f7931e;
+  background: #fff;
+  color: #111;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12);
 }
 
 .listing-tab:hover:not(.active) {
-  color: var(--c-ink);
+  color: #444;
 }
+
 
 /* ── Filter row ──────────────────────────────────────────────── */
 .filter-row {
@@ -1199,8 +1208,9 @@
   .nav-action span {
     font-size: 7px;
   }
+
   .listing-tabs {
-    padding: 12px 20px;
+    padding: 8px 20px;
     font-size: 13px;
   }
   .filter-row {
