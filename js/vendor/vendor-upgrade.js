@@ -60,11 +60,11 @@ function renderPlanCards() {
   const monthlyPlans = [
     { key:'free',    label:'Free',    price:'₹0',   sub:'Forever free', badge:'',
       features:[{text:'5 active listings',yes:true},{text:'Basic visibility',yes:true},{text:'No badge',yes:false},{text:'No priority listing',yes:false}] },
-    { key:'starter', label:'Starter', price:'₹249', sub:'per month',    badge:'',
+    { key:'starter', label:'Starter', price:'₹249', sub:'per month', badge:'',
       features:[{text:'10 active listings',yes:true},{text:'Priority over free vendors',yes:true},{text:'No badge',yes:false},{text:'Email support',yes:true}] },
-    { key:'growth',  label:'Growth',  price:'₹449', sub:'per month',    badge:'✓ Verified',
+    { key:'growth',  label:'Growth',  price:'₹449', sub:'per month', badge:'✓ Verified',
       features:[{text:'20 active listings',yes:true},{text:'Higher priority ranking',yes:true},{text:'Verified badge ✓',yes:true},{text:'Priority support',yes:true}] },
-    { key:'premium', label:'Premium', price:'₹999', sub:'per month',    badge:'★ Featured',
+    { key:'premium', label:'Premium', price:'₹999', sub:'per month', badge:'★ Featured',
       features:[{text:'Unlimited listings',yes:true},{text:'Highest priority ranking',yes:true},{text:'Featured badge ★',yes:true},{text:'Dedicated support',yes:true}] },
   ];
 
@@ -77,7 +77,7 @@ function renderPlanCards() {
       features:[{text:'Unlimited listings',yes:true},{text:'Highest priority ranking',yes:true},{text:'Featured badge ★',yes:true},{text:'Dedicated support',yes:true}] },
   ];
 
-  function planCardHtml(plan, isYearly) {
+  function planCardHtml(plan, isYearly, extraStyle = '') {
     const isCurrent = plan.key === current;
     const rank = rankMap[plan.key] ?? 0;
     const isLower = rank < currentRank;
@@ -95,7 +95,7 @@ function renderPlanCards() {
       <div class="plan-saving-amount">You save ₹${discount.saving.toLocaleString('en-IN')}</div>` : '';
 
     return `
-      <div class="plan-card ${isCurrent ? 'plan-card-current' : ''} ${isPopular ? 'plan-card-popular' : ''}">
+      <div class="plan-card ${isCurrent ? 'plan-card-current' : ''} ${isPopular ? 'plan-card-popular' : ''}" style="${extraStyle}">
         ${isPopular ? '<div class="plan-popular-tag">Most Popular</div>' : ''}
         ${isCurrent ? '<div class="plan-current-tag">Current</div>' : ''}
         <div class="plan-card-top">
@@ -109,14 +109,14 @@ function renderPlanCards() {
           </div>
           ${discountHtml}
         </div>
-        <ul class="plan-features" style="margin:8px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;">
+        <ul class="plan-features" style="margin:8px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;flex:1;">
           ${plan.features.map(f => `
             <li style="font-size:12px;color:${f.yes ? 'var(--c-ink-soft)' : 'var(--c-ink-faint)'};">
               ${f.yes ? '✓' : '✗'} ${f.text}
             </li>`).join('')}
         </ul>
         <button class="btn btn-primary plan-select-btn"
-          style="width:100%;margin-top:auto;padding:11px 10px;font-size:13px;"
+          style="width:100%;margin-top:12px;padding:11px 10px;font-size:13px;"
           ${btnDisabled} ${btnOpacity}
           onclick="handlePlanSelect('${plan.key}')" id="planBtn-${plan.key}">
           <span class="btn-label">${btnLabel}</span><span class="spinner"></span>
@@ -127,40 +127,53 @@ function renderPlanCards() {
   const container = document.getElementById('plansContainer');
   if (!container) return;
 
+  // Monthly: first 3 in a row, Premium centered below
+  const monthlyRow1 = monthlyPlans.slice(0, 3);
+  const monthlyRow2 = monthlyPlans.slice(3);
+
   container.innerHTML = `
-    <div style="display:flex;gap:8px;margin-bottom:20px;">
+    <div style="display:flex;gap:8px;margin-bottom:24px;">
       <button id="planTabMonthly" onclick="switchPlanTab('monthly')"
-        style="flex:1;padding:10px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:2px solid #2563eb;background:#2563eb;color:#fff;transition:all 0.15s;">
+        style="flex:1;padding:11px 10px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:2px solid #2563eb;background:#2563eb;color:#fff;transition:all 0.15s;">
         Monthly
       </button>
       <button id="planTabYearly" onclick="switchPlanTab('yearly')"
-        style="flex:1;padding:10px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:2px solid #e5e7eb;background:#fff;color:#6b7280;transition:all 0.15s;position:relative;">
+        style="flex:1;padding:11px 10px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:2px solid #e5e7eb;background:#fff;color:#6b7280;transition:all 0.15s;position:relative;">
         Yearly
-        <span style="position:absolute;top:-10px;right:8px;background:#16a34a;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;white-space:nowrap;">Save 17%</span>
+        <span style="position:absolute;top:-11px;right:10px;background:#16a34a;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;">Save 17%</span>
       </button>
     </div>
-    <div id="planListMonthly" class="plans-list">
-      ${monthlyPlans.map(p => planCardHtml(p, false)).join('')}
+
+    <!-- MONTHLY -->
+    <div id="planListMonthly">
+      <div class="plans-grid-3" style="padding-top:14px;">
+        ${monthlyRow1.map(p => planCardHtml(p, false)).join('')}
+      </div>
+      <div class="plans-grid-center" style="padding-top:14px;">
+        ${monthlyRow2.map(p => planCardHtml(p, false)).join('')}
+      </div>
     </div>
-    <div id="planListYearly" class="plans-list" style="display:none;">
-      ${yearlyPlans.map(p => planCardHtml(p, true)).join('')}
+
+    <!-- YEARLY -->
+    <div id="planListYearly" style="display:none;">
+      <div class="plans-grid-3" style="padding-top:14px;">
+        ${yearlyPlans.map(p => planCardHtml(p, true)).join('')}
+      </div>
     </div>`;
 }
 
 function switchPlanTab(tab) {
   const isMonthly = tab === 'monthly';
 
-  const monthlyList = document.getElementById('planListMonthly');
-  const yearlyList  = document.getElementById('planListYearly');
-  monthlyList.style.display = isMonthly ? 'grid' : 'none';
-  yearlyList.style.display  = isMonthly ? 'none' : 'grid';
+  document.getElementById('planListMonthly').style.display = isMonthly ? 'block' : 'none';
+  document.getElementById('planListYearly').style.display  = isMonthly ? 'none'  : 'block';
 
   const monthlyBtn = document.getElementById('planTabMonthly');
   const yearlyBtn  = document.getElementById('planTabYearly');
   monthlyBtn.style.background  = isMonthly ? '#2563eb' : '#fff';
-  monthlyBtn.style.color       = isMonthly ? '#fff' : '#6b7280';
+  monthlyBtn.style.color       = isMonthly ? '#fff'    : '#6b7280';
   monthlyBtn.style.borderColor = isMonthly ? '#2563eb' : '#e5e7eb';
-  yearlyBtn.style.background   = isMonthly ? '#fff' : '#2563eb';
+  yearlyBtn.style.background   = isMonthly ? '#fff'    : '#2563eb';
   yearlyBtn.style.color        = isMonthly ? '#6b7280' : '#fff';
   yearlyBtn.style.borderColor  = isMonthly ? '#e5e7eb' : '#2563eb';
 }
