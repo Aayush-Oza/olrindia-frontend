@@ -843,7 +843,7 @@ select.input {
 
 .nav-btn-ghost {
   background: transparent;
-  border: 1.5px solid #333333;
+  border: 1.5px solid #333333 !important;
   color: #333333;
 }
 
