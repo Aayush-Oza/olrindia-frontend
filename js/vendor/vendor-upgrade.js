@@ -86,6 +86,7 @@ function renderPlanCards() {
     let btnLabel = `Get ${plan.label}`, btnDisabled = '', btnOpacity = '';
     if (isCurrent) { btnLabel = 'Current Plan'; btnDisabled = 'disabled'; }
     else if (isLower) { btnLabel = 'Downgrade'; btnDisabled = 'disabled'; btnOpacity = 'style="opacity:0.35;"'; }
+
     const discountHtml = discount ? `
       <div class="plan-yearly-discount">
         <span class="plan-original-price">₹${discount.original.toLocaleString('en-IN')}/yr</span>
@@ -94,14 +95,11 @@ function renderPlanCards() {
       <div class="plan-saving-amount">You save ₹${discount.saving.toLocaleString('en-IN')}</div>` : '';
 
     return `
-      <div class="plan-card ${isCurrent ? 'plan-card-current' : ''} ${isPopular ? 'plan-card-popular' : ''}"
-        style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:12px;padding:16px;flex-wrap:wrap;">
-        ${isPopular ? '<div class="plan-popular-tag" style="top:-10px;">Most Popular</div>' : ''}
-        ${isCurrent ? '<div class="plan-current-tag" style="position:absolute;top:6px;right:12px;">Current</div>' : ''}
-
-        <!-- Left: name + price + features -->
-        <div style="flex:1;min-width:0;">
-          <div class="plan-label" style="margin-bottom:2px;">
+      <div class="plan-card ${isCurrent ? 'plan-card-current' : ''} ${isPopular ? 'plan-card-popular' : ''}">
+        ${isPopular ? '<div class="plan-popular-tag">Most Popular</div>' : ''}
+        ${isCurrent ? '<div class="plan-current-tag">Current</div>' : ''}
+        <div class="plan-card-top">
+          <div class="plan-label">
             ${plan.label}
             ${plan.badge ? `<span class="plan-badge">${plan.badge}</span>` : ''}
           </div>
@@ -110,30 +108,25 @@ function renderPlanCards() {
             <div class="plan-sub">${plan.sub}</div>
           </div>
           ${discountHtml}
-          <ul class="plan-features" style="margin:8px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:3px;">
-            ${plan.features.map(f => `
-              <li style="font-size:12px;color:${f.yes ? 'var(--c-ink-soft)' : 'var(--c-ink-faint)'};">
-                ${f.yes ? '✓' : '✗'} ${f.text}
-              </li>`).join('')}
-          </ul>
         </div>
-
-        <!-- Right: CTA button -->
-        <div style="flex-shrink:0;">
-          <button class="btn btn-primary plan-select-btn"
-            style="width:120px;padding:11px 10px;font-size:13px;white-space:nowrap;"
-            ${btnDisabled} ${btnOpacity}
-            onclick="handlePlanSelect('${plan.key}')" id="planBtn-${plan.key}">
-            <span class="btn-label">${btnLabel}</span><span class="spinner"></span>
-          </button>
-        </div>
+        <ul class="plan-features" style="margin:8px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;">
+          ${plan.features.map(f => `
+            <li style="font-size:12px;color:${f.yes ? 'var(--c-ink-soft)' : 'var(--c-ink-faint)'};">
+              ${f.yes ? '✓' : '✗'} ${f.text}
+            </li>`).join('')}
+        </ul>
+        <button class="btn btn-primary plan-select-btn"
+          style="width:100%;margin-top:auto;padding:11px 10px;font-size:13px;"
+          ${btnDisabled} ${btnOpacity}
+          onclick="handlePlanSelect('${plan.key}')" id="planBtn-${plan.key}">
+          <span class="btn-label">${btnLabel}</span><span class="spinner"></span>
+        </button>
       </div>`;
   }
 
   const container = document.getElementById('plansContainer');
   if (!container) return;
 
-  // Inject tab UI
   container.innerHTML = `
     <div style="display:flex;gap:8px;margin-bottom:20px;">
       <button id="planTabMonthly" onclick="switchPlanTab('monthly')"
@@ -146,29 +139,30 @@ function renderPlanCards() {
         <span style="position:absolute;top:-10px;right:8px;background:#16a34a;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;white-space:nowrap;">Save 17%</span>
       </button>
     </div>
-    <div id="planListMonthly" style="display:flex;flex-direction:column;gap:12px;">
+    <div id="planListMonthly" class="plans-list">
       ${monthlyPlans.map(p => planCardHtml(p, false)).join('')}
     </div>
-    <div id="planListYearly" style="display:none;flex-direction:column;gap:12px;">
+    <div id="planListYearly" class="plans-list" style="display:none;">
       ${yearlyPlans.map(p => planCardHtml(p, true)).join('')}
     </div>`;
 }
 
 function switchPlanTab(tab) {
   const isMonthly = tab === 'monthly';
-  document.getElementById('planListMonthly').style.display = isMonthly ? 'flex' : 'none';
-  document.getElementById('planListYearly').style.display  = isMonthly ? 'none' : 'flex';
+
+  const monthlyList = document.getElementById('planListMonthly');
+  const yearlyList  = document.getElementById('planListYearly');
+  monthlyList.style.display = isMonthly ? 'grid' : 'none';
+  yearlyList.style.display  = isMonthly ? 'none' : 'grid';
 
   const monthlyBtn = document.getElementById('planTabMonthly');
   const yearlyBtn  = document.getElementById('planTabYearly');
-
-  monthlyBtn.style.background   = isMonthly ? '#2563eb' : '#fff';
-  monthlyBtn.style.color        = isMonthly ? '#fff' : '#6b7280';
-  monthlyBtn.style.borderColor  = isMonthly ? '#2563eb' : '#e5e7eb';
-
-  yearlyBtn.style.background    = isMonthly ? '#fff' : '#2563eb';
-  yearlyBtn.style.color         = isMonthly ? '#6b7280' : '#fff';
-  yearlyBtn.style.borderColor   = isMonthly ? '#e5e7eb' : '#2563eb';
+  monthlyBtn.style.background  = isMonthly ? '#2563eb' : '#fff';
+  monthlyBtn.style.color       = isMonthly ? '#fff' : '#6b7280';
+  monthlyBtn.style.borderColor = isMonthly ? '#2563eb' : '#e5e7eb';
+  yearlyBtn.style.background   = isMonthly ? '#fff' : '#2563eb';
+  yearlyBtn.style.color        = isMonthly ? '#6b7280' : '#fff';
+  yearlyBtn.style.borderColor  = isMonthly ? '#e5e7eb' : '#2563eb';
 }
 
 async function handlePlanSelect(planKey) {

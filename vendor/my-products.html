@@ -245,6 +245,14 @@
     }
     .product-type-badge.rent { background: #eff6ff; color: #1d4ed8; }
     .product-type-badge.sell { background: #f0fdf4; color: #15803d; }
+.plans-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+@media (max-width: 600px) {
+  .plans-list { grid-template-columns: 1fr; }
+}
   </style>
 </head>
 <body>
@@ -526,7 +534,7 @@
 <!-- UPGRADE / PLANS MODAL -->
 <div class="product-modal-overlay" id="upgradeModalOverlay">
   <div class="plans-modal">
-    <div class="plans-modal-head">
+    <div class="plans-modal-head" style="position:sticky;top:0;background:#fff;z-index:10;padding-bottom:12px;">
       <div>
         <h3 class="plans-modal-title">Choose a plan</h3>
         <p class="plans-modal-sub" id="upgradeModalText">Upgrade to list more products and get more visibility.</p>
