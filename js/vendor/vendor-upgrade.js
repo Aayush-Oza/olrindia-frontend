@@ -77,7 +77,7 @@ function renderPlanCards() {
       features:[{text:'Unlimited listings',yes:true},{text:'Highest priority ranking',yes:true},{text:'Featured badge ★',yes:true},{text:'Dedicated support',yes:true}] },
   ];
 
-  function planCardHtml(plan, isYearly, extraStyle = '') {
+  function planCardHtml(plan, isYearly) {
     const isCurrent = plan.key === current;
     const rank = rankMap[plan.key] ?? 0;
     const isLower = rank < currentRank;
@@ -95,7 +95,7 @@ function renderPlanCards() {
       <div class="plan-saving-amount">You save ₹${discount.saving.toLocaleString('en-IN')}</div>` : '';
 
     return `
-      <div class="plan-card ${isCurrent ? 'plan-card-current' : ''} ${isPopular ? 'plan-card-popular' : ''}" style="${extraStyle}">
+      <div class="plan-card ${isCurrent ? 'plan-card-current' : ''} ${isPopular ? 'plan-card-popular' : ''}">
         ${isPopular ? '<div class="plan-popular-tag">Most Popular</div>' : ''}
         ${isCurrent ? '<div class="plan-current-tag">Current</div>' : ''}
         <div class="plan-card-top">
@@ -124,29 +124,34 @@ function renderPlanCards() {
       </div>`;
   }
 
-  const container = document.getElementById('plansContainer');
-  if (!container) return;
+  // Render tabs into sticky container
+  const tabsContainer = document.getElementById('planTabsContainer');
+  if (tabsContainer) {
+    tabsContainer.innerHTML = `
+      <div style="display:flex;gap:8px;">
+        <button id="planTabMonthly" onclick="switchPlanTab('monthly')"
+          style="flex:1;padding:11px 10px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:2px solid #2563eb;background:#2563eb;color:#fff;transition:all 0.15s;">
+          Monthly
+        </button>
+        <button id="planTabYearly" onclick="switchPlanTab('yearly')"
+          style="flex:1;padding:11px 10px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:2px solid #e5e7eb;background:#fff;color:#6b7280;transition:all 0.15s;position:relative;">
+          Yearly
+          <span style="position:absolute;top:-11px;right:10px;background:#16a34a;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;">Save 17%</span>
+        </button>
+      </div>`;
+  }
 
-  // Monthly: first 3 in a row, Premium centered below
+  // Monthly: first 3 in a row, Premium full width below
   const monthlyRow1 = monthlyPlans.slice(0, 3);
   const monthlyRow2 = monthlyPlans.slice(3);
 
-  container.innerHTML = `
-    <div style="display:flex;gap:8px;margin-bottom:24px;">
-      <button id="planTabMonthly" onclick="switchPlanTab('monthly')"
-        style="flex:1;padding:11px 10px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:2px solid #2563eb;background:#2563eb;color:#fff;transition:all 0.15s;">
-        Monthly
-      </button>
-      <button id="planTabYearly" onclick="switchPlanTab('yearly')"
-        style="flex:1;padding:11px 10px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:2px solid #e5e7eb;background:#fff;color:#6b7280;transition:all 0.15s;position:relative;">
-        Yearly
-        <span style="position:absolute;top:-11px;right:10px;background:#16a34a;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;">Save 17%</span>
-      </button>
-    </div>
+  const container = document.getElementById('plansContainer');
+  if (!container) return;
 
-        <!-- MONTHLY -->
+  container.innerHTML = `
+    <!-- MONTHLY -->
     <div id="planListMonthly">
-      <div class="plans-grid-3" style="padding-top:14px;">
+      <div class="plans-grid-3">
         ${monthlyRow1.map(p => planCardHtml(p, false)).join('')}
       </div>
       <div style="padding-top:14px;">
@@ -156,7 +161,7 @@ function renderPlanCards() {
 
     <!-- YEARLY -->
     <div id="planListYearly" style="display:none;">
-      <div class="plans-grid-3" style="padding-top:14px;">
+      <div class="plans-grid-3">
         ${yearlyPlans.map(p => planCardHtml(p, true)).join('')}
       </div>
     </div>`;
