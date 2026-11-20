@@ -385,10 +385,10 @@ function bsRenderCatGrid(catGrid, categories, onCatClick) {
     showMoreBtn.innerHTML = `
   <button id="bsCatShowMore" style="
     padding:7px 20px;
-    border:1.5px solid var(--c-ink-faint, #ccc);
+    border:1.5px solid #333333;
     border-radius:20px;
     background:transparent;
-    color:var(--c-ink-muted, #888);
+    color:#333333;
     font-weight:500;
     font-size:13px;
     cursor:pointer;
