@@ -1,5 +1,10 @@
 /* ============================================================
    OLR INDIA – BROWSE SHARED JS
+   Changes vs previous version:
+   · bsUserLat / bsUserLng stored and sent to API as user_lat / user_lng
+   · GPS detect button saves coordinates (not just city name)
+   · City input has Nominatim autocomplete → area-level suggestions
+     (e.g. "Dahisar East, Mumbai") + saves lat/lng on selection
 ============================================================ */
 
 // ── Shared state ───────────────────────────────────────────────
@@ -14,12 +19,16 @@ let bsActiveFilters = {
   priceMax:  Infinity,
 };
 
-let bsCurrentPage   = 1;
-let bsTotalProducts = 0;
-let bsHasMore       = false;
-let bsIsLoadingMore = false;
-let bsSentinel      = null;
+let bsCurrentPage    = 1;
+let bsTotalProducts  = 0;
+let bsHasMore        = false;
+let bsIsLoadingMore  = false;
+let bsSentinel       = null;
 let bsScrollObserver = null;
+
+// ── User location (GPS or picked from autocomplete) ────────────
+let bsUserLat = null;
+let bsUserLng = null;
 
 // Set by page-specific file
 let cfg = {};
@@ -68,6 +77,9 @@ function bsResetFilters(reload = true) {
   document.getElementById(cfg.filterPriceHintId).textContent = 'Enter a min or max to filter by price.';
   document.getElementById(cfg.filterPriceHintId).classList.remove('error');
   document.querySelectorAll(cfg.priceTypeBtnSelector).forEach(b => b.classList.remove('active'));
+  // Clear saved location when filters are reset
+  bsUserLat = null;
+  bsUserLng = null;
   if (reload) onLoadHomepage();
 }
 
@@ -108,11 +120,17 @@ function bsBuildParams(page, perPage) {
     if (bsActiveFilters.priceMin > 0)        params.set('price_min',  bsActiveFilters.priceMin);
     if (bsActiveFilters.priceMax < Infinity) params.set('price_max',  bsActiveFilters.priceMax);
   } else {
-    // 'all' tab — only price range applies, no type/condition filter
     if (bsActiveFilters.priceMin > 0)        params.set('price_min',  bsActiveFilters.priceMin);
     if (bsActiveFilters.priceMax < Infinity) params.set('price_max',  bsActiveFilters.priceMax);
   }
   if (q) params.set('search', q);
+
+  // ── Send user coordinates if available ──────────────────────
+  if (bsUserLat !== null && bsUserLng !== null) {
+    params.set('user_lat', bsUserLat);
+    params.set('user_lng', bsUserLng);
+  }
+
   return params;
 }
 
@@ -256,7 +274,13 @@ function bsRenderActiveFilterChips() {
 
 function bsRemoveFilter(key) {
   if (key === 'category')  { bsActiveFilters.category  = ''; document.getElementById(cfg.filterCategoryId).value  = ''; }
-  if (key === 'city')      { bsActiveFilters.city       = ''; document.getElementById(cfg.filterCityId).value      = ''; }
+  if (key === 'city')      {
+    bsActiveFilters.city = '';
+    document.getElementById(cfg.filterCityId).value = '';
+    // Clear coordinates when city filter is removed
+    bsUserLat = null;
+    bsUserLng = null;
+  }
   if (key === 'priceType') { bsActiveFilters.priceType  = ''; document.querySelectorAll(cfg.priceTypeBtnSelector).forEach(b => b.classList.remove('active')); }
   if (key === 'condition') { bsActiveFilters.condition  = ''; document.getElementById(cfg.filterConditionId).value = ''; }
   if (key === 'price')     { bsActiveFilters.priceMin = 0; bsActiveFilters.priceMax = Infinity; document.getElementById(cfg.filterPriceMinId).value = ''; document.getElementById(cfg.filterPriceMaxId).value = ''; }
@@ -302,11 +326,10 @@ function bsOpenFilterSheet() {
 function bsCloseFilterSheet() {
   document.getElementById(cfg.filterSheetId).classList.remove('open');
   document.getElementById(cfg.filterOverlayId).classList.remove('open');
+  _destroyCityAutocomplete();
 }
 
 // ── Homepage shell (categories + featured) ────────────────────
-//    Returns { homeSection, catGrid, homeProdGrid } after inserting HTML.
-//    Page-specific file calls this, populates the grids, then calls bsAttachSentinel().
 function bsRenderHomepageShell(skeletonCount = 8) {
   const grid    = document.getElementById(cfg.productGridId);
   const countEl = document.getElementById(cfg.productsCountId);
@@ -339,7 +362,7 @@ function bsRenderHomepageShell(skeletonCount = 8) {
 
   return {
     homeSection,
-    catGrid:     document.getElementById('bsCatCardGrid'),
+    catGrid:      document.getElementById('bsCatCardGrid'),
     homeProdGrid: document.getElementById('bsHomeProdGrid'),
   };
 }
@@ -358,8 +381,8 @@ function bsRenderCatGrid(catGrid, categories, onCatClick) {
 
   bsPopulateCategoryDropdown(categories);
 
-  const DESKTOP_VISIBLE = 16; // 2 rows x 8
-  const MOBILE_VISIBLE  = 8;  // 2 rows x 4
+  const DESKTOP_VISIBLE = 16;
+  const MOBILE_VISIBLE  = 8;
   const isMobile = window.innerWidth < 768;
   const visibleCount = isMobile ? MOBILE_VISIBLE : DESKTOP_VISIBLE;
 
@@ -403,7 +426,6 @@ function bsRenderCatGrid(catGrid, categories, onCatClick) {
 
     document.getElementById('bsCatShowMore').addEventListener('click', function() {
       if (!expanded) {
-        // Insert hidden cats before the button wrapper
         const tempDiv = document.createElement('div');
         tempDiv.style.cssText = 'display:contents';
         tempDiv.innerHTML = hiddenHTML;
@@ -436,9 +458,248 @@ function bsRenderHomeProdGrid(homeProdGrid, products) {
   }
 }
 
+// ══════════════════════════════════════════════════════════════
+//  CITY AUTOCOMPLETE  (Nominatim – area-level, India only)
+// ══════════════════════════════════════════════════════════════
+
+let _acDebounceTimer  = null;
+let _acDropdown       = null;
+let _acAbortCtrl      = null;
+let _acSelectedFromDropdown = false;  // flag to avoid re-fetching on programmatic value set
+
+const _NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
+
+/**
+ * Format a Nominatim result into a readable label.
+ * Prefers: suburb/neighbourhood, then city/town/village, then state.
+ * Example: "Dahisar East, Mumbai, Maharashtra"
+ */
+function _formatNominatimLabel(item) {
+  const a = item.address || {};
+  const parts = [];
+  // Most specific area first
+  const area = a.suburb || a.neighbourhood || a.quarter || a.residential || a.hamlet || '';
+  const city = a.city || a.town || a.village || a.county || '';
+  const state = a.state || '';
+  if (area)  parts.push(area);
+  if (city && city !== area)  parts.push(city);
+  if (state && state !== city) parts.push(state);
+  return parts.length ? parts.join(', ') : item.display_name.split(',').slice(0, 3).join(',').trim();
+}
+
+/**
+ * Inject the autocomplete dropdown styles once.
+ */
+function _ensureAcStyles() {
+  if (document.getElementById('bs-ac-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'bs-ac-styles';
+  style.textContent = `
+    .bs-ac-wrap { position: relative; }
+    .bs-ac-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0; right: 0;
+      background: var(--c-surface, #fff);
+      border: 1.5px solid var(--c-border, #e0e0e0);
+      border-radius: var(--r-md, 10px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      z-index: 9999;
+      overflow: hidden;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+    .bs-ac-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      cursor: pointer;
+      font-size: 13.5px;
+      color: var(--c-ink, #222);
+      border-bottom: 1px solid var(--c-border-faint, #f0f0f0);
+      transition: background 0.1s;
+    }
+    .bs-ac-item:last-child { border-bottom: none; }
+    .bs-ac-item:hover, .bs-ac-item.focused {
+      background: var(--c-surface-raised, #f5f5f5);
+    }
+    .bs-ac-item svg {
+      flex-shrink: 0;
+      opacity: 0.45;
+    }
+    .bs-ac-loading {
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--c-ink-faint, #999);
+      text-align: center;
+    }
+    .bs-ac-empty {
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--c-ink-faint, #999);
+      text-align: center;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+/** Wrap the city input in a relative-position container for the dropdown. */
+function _ensureAcWrap() {
+  const input = document.getElementById(cfg.filterCityId);
+  if (!input) return null;
+  if (input.parentElement.classList.contains('bs-ac-wrap')) return input;
+  const wrap = document.createElement('div');
+  wrap.className = 'bs-ac-wrap';
+  input.parentNode.insertBefore(wrap, input);
+  wrap.appendChild(input);
+  return input;
+}
+
+/** Remove the dropdown from DOM. */
+function _destroyCityAutocomplete() {
+  _acDropdown?.remove();
+  _acDropdown = null;
+  _acAbortCtrl?.abort();
+  _acAbortCtrl = null;
+}
+
+/** Show a loading state inside the dropdown. */
+function _acShowLoading() {
+  if (!_acDropdown) return;
+  _acDropdown.innerHTML = `<div class="bs-ac-loading">Searching…</div>`;
+}
+
+/** Render suggestions list. */
+function _acRenderItems(items, input) {
+  if (!_acDropdown) return;
+  if (items.length === 0) {
+    _acDropdown.innerHTML = `<div class="bs-ac-empty">No areas found. Try a different name.</div>`;
+    return;
+  }
+
+  const pinIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+
+  _acDropdown.innerHTML = items.map((item, i) => {
+    const label = _formatNominatimLabel(item);
+    return `<div class="bs-ac-item" data-idx="${i}" data-lat="${item.lat}" data-lng="${item.lon}" data-label="${label.replace(/"/g, '&quot;')}">
+      ${pinIcon}
+      <span>${label}</span>
+    </div>`;
+  }).join('');
+
+  _acDropdown.querySelectorAll('.bs-ac-item').forEach(el => {
+    el.addEventListener('mousedown', e => {
+      e.preventDefault();  // prevent input blur before click fires
+      const lat   = parseFloat(el.dataset.lat);
+      const lng   = parseFloat(el.dataset.lng);
+      const label = el.dataset.label;
+
+      // Fill input
+      _acSelectedFromDropdown = true;
+      input.value = label;
+
+      // Save coordinates
+      bsUserLat = lat;
+      bsUserLng = lng;
+
+      _destroyCityAutocomplete();
+    });
+  });
+}
+
+/** Fetch suggestions from Nominatim. */
+async function _acFetch(query, input) {
+  _acAbortCtrl?.abort();
+  _acAbortCtrl = new AbortController();
+
+  _acShowLoading();
+
+  try {
+    const url = `${_NOMINATIM_URL}?q=${encodeURIComponent(query)}&countrycodes=in&addressdetails=1&limit=6&format=json&accept-language=en`;
+    const res  = await fetch(url, {
+      signal: _acAbortCtrl.signal,
+      headers: { 'Accept-Language': 'en' }
+    });
+    const data = await res.json();
+    _acRenderItems(data, input);
+  } catch (err) {
+    if (err.name === 'AbortError') return;
+    _acDropdown && (_acDropdown.innerHTML = `<div class="bs-ac-empty">Could not fetch suggestions.</div>`);
+  }
+}
+
+/** Attach autocomplete behaviour to the city input. */
+function _initCityAutocomplete() {
+  _ensureAcStyles();
+  const input = _ensureAcWrap();
+  if (!input) return;
+
+  input.setAttribute('autocomplete', 'off');
+
+  input.addEventListener('input', () => {
+    if (_acSelectedFromDropdown) {
+      _acSelectedFromDropdown = false;
+      return;
+    }
+    clearTimeout(_acDebounceTimer);
+    const q = input.value.trim();
+    if (q.length < 2) { _destroyCityAutocomplete(); return; }
+
+    if (!_acDropdown) {
+      _acDropdown = document.createElement('div');
+      _acDropdown.className = 'bs-ac-dropdown';
+      input.parentElement.appendChild(_acDropdown);
+    }
+
+    _acDebounceTimer = setTimeout(() => _acFetch(q, input), 350);
+  });
+
+  input.addEventListener('blur', () => {
+    // Small delay so mousedown on item fires first
+    setTimeout(_destroyCityAutocomplete, 180);
+  });
+
+  input.addEventListener('keydown', e => {
+    if (!_acDropdown) return;
+    const items = _acDropdown.querySelectorAll('.bs-ac-item');
+    const focused = _acDropdown.querySelector('.bs-ac-item.focused');
+    let idx = focused ? parseInt(focused.dataset.idx) : -1;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      focused?.classList.remove('focused');
+      idx = Math.min(idx + 1, items.length - 1);
+      items[idx]?.classList.add('focused');
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      focused?.classList.remove('focused');
+      idx = Math.max(idx - 1, 0);
+      items[idx]?.classList.add('focused');
+    } else if (e.key === 'Enter' && focused) {
+      e.preventDefault();
+      const lat   = parseFloat(focused.dataset.lat);
+      const lng   = parseFloat(focused.dataset.lng);
+      const label = focused.dataset.label;
+      _acSelectedFromDropdown = true;
+      input.value = label;
+      bsUserLat = lat;
+      bsUserLng = lng;
+      _destroyCityAutocomplete();
+    } else if (e.key === 'Escape') {
+      _destroyCityAutocomplete();
+    }
+  });
+}
+
 // ── Private: bind all filter-related events ───────────────────
 function _bindFilterEvents() {
-  document.getElementById(cfg.filterBtnId)?.addEventListener('click', bsOpenFilterSheet);
+  document.getElementById(cfg.filterBtnId)?.addEventListener('click', () => {
+    bsOpenFilterSheet();
+    // Init autocomplete lazily when sheet opens
+    _initCityAutocomplete();
+  });
+
   document.getElementById(cfg.filterOverlayId)?.addEventListener('click', bsCloseFilterSheet);
 
   document.querySelectorAll(cfg.priceTypeBtnSelector).forEach(btn => {
@@ -448,24 +709,51 @@ function _bindFilterEvents() {
     });
   });
 
+  // ── Detect location button ────────────────────────────────────
   document.getElementById(cfg.filterLocateBtnId)?.addEventListener('click', () => {
     if (!navigator.geolocation) { toastError('Your browser does not support location.'); return; }
     const btn = document.getElementById(cfg.filterLocateBtnId);
     btn.disabled = true; btn.style.opacity = '0.5';
     toastInfo('Looking for your location…');
+
     navigator.geolocation.getCurrentPosition(async pos => {
+      const { latitude, longitude } = pos.coords;
+
+      // Save raw coordinates so they're sent to the API
+      bsUserLat = latitude;
+      bsUserLng = longitude;
+
       try {
         const res  = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json`,
+          `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1&accept-language=en`,
           { headers: { 'Accept-Language': 'en' } }
         );
         const data = await res.json();
-        let city = data.address?.city || data.address?.town || data.address?.village || '';
-        if (!city) city = (data.address?.city_district || data.address?.state_district || '').split(' ')[0] || '';
-        if (city) document.getElementById(cfg.filterCityId).value = city;
-        else toastError("Couldn't determine your city.");
-      } catch { toastError('Location lookup failed.'); }
-      finally { btn.disabled = false; btn.style.opacity = '1'; }
+        const a    = data.address || {};
+
+        // Build a human-friendly label (area → city → state)
+        const area  = a.suburb || a.neighbourhood || a.quarter || a.residential || '';
+        const city  = a.city   || a.town  || a.village || '';
+        const state = a.state  || '';
+
+        const parts = [];
+        if (area) parts.push(area);
+        if (city && city !== area) parts.push(city);
+        if (state && state !== city) parts.push(state);
+
+        const label = parts.join(', ') || city || '';
+        if (label) {
+          document.getElementById(cfg.filterCityId).value = label;
+        } else {
+          toastError("Couldn't determine your area.");
+        }
+      } catch {
+        toastError('Location lookup failed.');
+        // Keep coordinates even if reverse-geocode fails —
+        // the backend can still use them for distance sorting.
+      } finally {
+        btn.disabled = false; btn.style.opacity = '1';
+      }
     }, err => {
       const msgs = { 1: 'Location permission denied.', 2: 'Location unavailable.', 3: 'Request timed out.' };
       toastError(msgs[err.code] || 'Could not get your location.');
@@ -473,10 +761,21 @@ function _bindFilterEvents() {
     });
   });
 
+  // ── Apply filters ─────────────────────────────────────────────
   document.getElementById(cfg.filterApplyBtnId)?.addEventListener('click', () => {
     const selectedType = document.querySelector(`${cfg.priceTypeBtnSelector}.active`)?.dataset.type || '';
     bsActiveFilters.category = document.getElementById(cfg.filterCategoryId).value;
-    bsActiveFilters.city     = document.getElementById(cfg.filterCityId).value.trim().toLowerCase();
+    bsActiveFilters.city     = document.getElementById(cfg.filterCityId).value.trim();
+
+    // If user typed a city manually (not via GPS or autocomplete),
+    // clear saved coordinates so the API doesn't mismatch typed text vs coords.
+    // Coordinates are set only via GPS detect or autocomplete selection.
+    // If the city input is empty, clear coords too.
+    if (!bsActiveFilters.city) {
+      bsUserLat = null;
+      bsUserLng = null;
+    }
+
     bsActiveFilters.priceMin = parseFloat(document.getElementById(cfg.filterPriceMinId).value) || 0;
     bsActiveFilters.priceMax = parseFloat(document.getElementById(cfg.filterPriceMaxId).value) || Infinity;
     document.getElementById(cfg.filterPriceHintId).textContent = 'Enter a min or max to filter by price.';
@@ -493,6 +792,7 @@ function _bindFilterEvents() {
     bsRenderActiveFilterChips();
   });
 
+  // ── Clear filters ─────────────────────────────────────────────
   document.getElementById(cfg.filterClearBtnId)?.addEventListener('click', () => {
     bsResetFilters(false);
     bsCloseFilterSheet();
@@ -501,6 +801,7 @@ function _bindFilterEvents() {
     onLoadHomepage();
   });
 
+  // ── Search debounce ───────────────────────────────────────────
   let searchDebounceTimer = null;
   document.getElementById(cfg.searchId)?.addEventListener('input', () => {
     clearTimeout(searchDebounceTimer);
