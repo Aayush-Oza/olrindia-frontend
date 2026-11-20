@@ -683,9 +683,19 @@
               style="font-weight:400;text-transform:none;letter-spacing:0;">(auto-filled from your profile - edit if
               different)</span></div>
           <div class="field-row">
-            <div class="field"><label class="label" for="modalPincode">Pincode</label><input class="input" type="text"
-                id="modalPincode" name="pincode" placeholder="6-digit pincode" maxlength="6">
+            <div class="field">
+              <label class="label" for="modalPincode">Pincode</label>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input class="input" type="text" id="modalPincode" name="pincode" placeholder="6-digit pincode"
+                  maxlength="6" style="flex:1;">
+                <button type="button" id="detectLocationBtn"
+                  style="padding:9px 12px;border:1.5px solid var(--c-border);border-radius:var(--r-md);background:#fff;cursor:pointer;font-size:13px;white-space:nowrap;flex-shrink:0;">
+                  📍 Detect
+                </button>
+              </div>
               <div class="field-hint" id="modalPincodeStatus"></div>
+              <input type="hidden" id="modalLat" name="latitude">
+              <input type="hidden" id="modalLng" name="longitude">
             </div>
             <div class="field"><label class="label" for="modalArea">Area</label><input class="input" type="text"
                 id="modalArea" name="area" placeholder="Area / locality"></div>

@@ -1,5 +1,5 @@
 /* ============================================================
-   OLR INDIA – VENDOR PRODUCTS JS  (my-products.html)  v5
+   OLR INDIA – VENDOR PRODUCTS JS  (my-products.html)  v6
    Requires: vendor-nav.js, vendor-upgrade.js
    ============================================================ */
 
@@ -14,7 +14,7 @@ const slotUrls = {};
 let previewProductId = null;
 let originalProductSnapshot = null;
 
-// ── Suspended banner (products-specific selectors) ────────────
+// ── Suspended banner ──────────────────────────────────────────
 function renderSuspendedBanner() {
   if (!vendorProfile) return;
   const banner = document.getElementById('suspendedBanner');
@@ -62,7 +62,6 @@ async function loadVendorProfile() {
   renderPlanUsageStrip();
 }
 
-
 // ── Load categories ───────────────────────────────────────────
 async function loadCategories() {
   const res = await apiRequest('/auth/vendor/categories', 'GET');
@@ -85,7 +84,6 @@ async function loadConditions() {
       CONDITIONS = res.conditions;
     }
   } catch (_) {
-    // fallback: render common conditions statically
     CONDITIONS = ['Brand New', 'Like New', 'Good', 'Fair', 'For Parts'];
   }
   renderConditionChips();
@@ -134,7 +132,6 @@ function setListingType(type) {
   }
   document.getElementById('rentFieldsSection').style.display = type === 'rent' ? '' : 'none';
   document.getElementById('sellFieldsSection').style.display = type === 'sell' ? '' : 'none';
-  // Clear irrelevant fields when switching
   if (type === 'sell') {
     ['rent_per_hour','rent_per_km','rent_per_day','rent_per_month','security_deposit'].forEach(n => {
       const el = document.querySelector(`[name="${n}"]`);
@@ -175,14 +172,69 @@ function updateRentFields() {
   });
 }
 
+// ── Location helpers ──────────────────────────────────────────
+function clearLocationHiddens() {
+  document.getElementById('modalLat').value = '';
+  document.getElementById('modalLng').value = '';
+  const statusEl = document.getElementById('modalPincodeStatus');
+  if (statusEl) statusEl.textContent = '';
+}
+
+function initDetectLocationBtn() {
+  document.getElementById('detectLocationBtn')?.addEventListener('click', async () => {
+    const btn = document.getElementById('detectLocationBtn');
+    if (!navigator.geolocation) { toastError('Geolocation not supported by your browser.'); return; }
+    btn.disabled = true;
+    btn.textContent = '⏳ Detecting...';
+    navigator.geolocation.getCurrentPosition(async pos => {
+      try {
+        const { latitude, longitude } = pos.coords;
+        document.getElementById('modalLat').value = latitude;
+        document.getElementById('modalLng').value = longitude;
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+          { headers: { 'Accept-Language': 'en' } }
+        );
+        const data = await res.json();
+        const addr = data.address || {};
+        const pincode = addr.postcode || '';
+        const area    = addr.suburb || addr.neighbourhood || addr.village || '';
+        const city    = addr.city || addr.town || addr.county || '';
+        const state   = addr.state || '';
+        if (pincode) document.getElementById('modalPincode').value = pincode;
+        if (area)    document.getElementById('modalArea').value    = area;
+        if (city)    document.getElementById('modalCity').value    = city;
+        if (state)   document.getElementById('modalState').value   = state;
+        const statusEl = document.getElementById('modalPincodeStatus');
+        if (statusEl) statusEl.textContent = '✅ Location detected successfully!';
+        toastSuccess('Location detected!');
+      } catch {
+        toastError('Could not detect location. Please enter your pincode manually.');
+      }
+      btn.disabled = false;
+      btn.textContent = '📍 Detect';
+    }, err => {
+      const msgs = { 1: 'Location permission denied.', 2: 'Location unavailable.', 3: 'Request timed out.' };
+      toastError((msgs[err.code] || 'Could not get location.') + ' Please enter pincode manually.');
+      btn.disabled = false;
+      btn.textContent = '📍 Detect';
+    });
+  });
+}
+
 // ── Pincode autofill ──────────────────────────────────────────
 function initModalPincodeAutofill() {
   wirePincodeAutofill({
     pincodeInput: document.getElementById('modalPincode'),
-    areaInput: document.getElementById('modalArea'),
-    cityInput: document.getElementById('modalCity'),
-    stateInput: document.getElementById('modalState'),
-    statusEl: document.getElementById('modalPincodeStatus'),
+    areaInput:    document.getElementById('modalArea'),
+    cityInput:    document.getElementById('modalCity'),
+    stateInput:   document.getElementById('modalState'),
+    statusEl:     document.getElementById('modalPincodeStatus'),
+    onSuccess: (lat, lng) => {
+      // If pincode API returns lat/lng, save them
+      if (lat) document.getElementById('modalLat').value = lat;
+      if (lng) document.getElementById('modalLng').value = lng;
+    }
   });
 }
 
@@ -198,10 +250,10 @@ async function loadProducts() {
 }
 
 function updateStats() {
-  const totalEl = document.getElementById('statTotal');
+  const totalEl  = document.getElementById('statTotal');
   const activeEl = document.getElementById('statActive');
   const clicksEl = document.getElementById('statClicks');
-  if (totalEl) totalEl.textContent = allProducts.length;
+  if (totalEl)  totalEl.textContent  = allProducts.length;
   if (activeEl) activeEl.textContent = allProducts.filter(p => p.is_active).length;
   if (clicksEl) clicksEl.textContent = allProducts.reduce((s, p) => s + (p.click_count || 0), 0);
 }
@@ -254,16 +306,11 @@ function renderProducts() {
       : 'Not viewed yet';
     const isAdminFlagged = p.deactivated_by === 'admin';
     const daysLeft = p.edit_days_remaining ?? 0;
-
-    // listing type badge
     const isSell = p.listing_type === 'sell';
     const typeBadge = `<span class="product-type-badge ${isSell ? 'sell' : 'rent'}">${isSell ? '🏷️ For Sale' : '🔑 For Rent'}</span>`;
-
-    // condition chip (sell only)
     const conditionBadge = isSell && p.condition
       ? `<span style="font-size:11px;background:#f0fdf4;color:#15803d;border-radius:20px;padding:2px 8px;font-weight:600;">${p.condition}</span>`
       : '';
-
     const strikeBanner = isAdminFlagged ? `
       <div style="background:#fff7ed;border:1px solid #f97316;color:#9a3412;padding:10px 12px;border-radius:6px;margin:8px 0;font-size:13px;">
         ⚠️ <strong>Removed by Admin</strong><br>
@@ -361,9 +408,9 @@ function renderPreviewModal(productId) {
     }
   } else {
     const rows = [
-      p.rent_per_hour  ? `₹${p.rent_per_hour} / hour`  : null,
-      p.rent_per_km    ? `₹${p.rent_per_km} / km`      : null,
-      p.rent_per_day   ? `₹${p.rent_per_day} / day`    : null,
+      p.rent_per_hour  ? `₹${p.rent_per_hour} / hour`   : null,
+      p.rent_per_km    ? `₹${p.rent_per_km} / km`       : null,
+      p.rent_per_day   ? `₹${p.rent_per_day} / day`     : null,
       p.rent_per_month ? `₹${p.rent_per_month} / month` : null,
     ].filter(Boolean).join(' &nbsp;•&nbsp; ');
     priceHtml = `<div style="font-size:15px;font-weight:700;color:var(--c-blue-deep);margin-bottom:4px;">${rows || 'Price not set'}</div>`;
@@ -431,7 +478,7 @@ document.getElementById('shareLinkCopyBtn')?.addEventListener('click', async () 
   toastSuccess('Link copied!');
 });
 
-// ── Upgrade modal ─────────────────────────────────────────────
+// ── Image slots ───────────────────────────────────────────────
 function setSlotImage(i, src) {
   const slot = document.getElementById(`slot${i}`);
   if (!slot) return;
@@ -528,22 +575,19 @@ function openAddModal() {
   editingId = null;
   document.getElementById('modalTitle').textContent = 'Add new product';
   document.getElementById('productForm').reset();
-
-  // Show toggle, hide locked
   document.getElementById('listingTypeToggle').style.display = '';
   document.getElementById('listingTypeLocked').style.display = 'none';
-
-  // Default to rent
   setListingType('rent');
   renderConditionChips('');
+  clearLocationHiddens();
 
   const account = getSessionAccount('vendor');
   if (account) {
     const f = document.getElementById('productForm');
     f.querySelector('[name="pincode"]').value = account.pincode || '';
-    f.querySelector('[name="area"]').value = account.area || '';
-    f.querySelector('[name="city"]').value = account.city || '';
-    f.querySelector('[name="state"]').value = account.state || '';
+    f.querySelector('[name="area"]').value    = account.area    || '';
+    f.querySelector('[name="city"]').value    = account.city    || '';
+    f.querySelector('[name="state"]').value   = account.state   || '';
   }
   for (let i = 1; i <= 5; i++) clearSlotImage(i);
   document.getElementById('modalSubcategory').innerHTML = '<option value="">Select subcategory (optional)</option>';
@@ -558,29 +602,31 @@ async function openEditModal(productId) {
   document.getElementById('modalTitle').textContent = 'Edit product';
   const form = document.getElementById('productForm');
   form.reset();
+  clearLocationHiddens();
 
-    const lt = p.listing_type || 'rent';
+  const lt = p.listing_type || 'rent';
   document.getElementById('listingTypeToggle').style.display = '';
   document.getElementById('listingTypeLocked').style.display = 'none';
   setListingType(lt);
-
-  // Show/hide correct sections
   document.getElementById('rentFieldsSection').style.display = lt === 'rent' ? '' : 'none';
   document.getElementById('sellFieldsSection').style.display = lt === 'sell' ? '' : 'none';
 
-  // Fill common fields
-  form.querySelector('[name="name"]').value = p.name || '';
+  form.querySelector('[name="name"]').value        = p.name        || '';
   form.querySelector('[name="description"]').value = p.description || '';
-  form.querySelector('[name="pincode"]').value = p.pincode || '';
-  form.querySelector('[name="area"]').value = p.area || '';
-  form.querySelector('[name="city"]').value = p.city || '';
-  form.querySelector('[name="state"]').value = p.state || '';
+  form.querySelector('[name="pincode"]').value     = p.pincode     || '';
+  form.querySelector('[name="area"]').value        = p.area        || '';
+  form.querySelector('[name="city"]').value        = p.city        || '';
+  form.querySelector('[name="state"]').value       = p.state       || '';
+
+  // Pre-fill lat/lng if product already has them
+  document.getElementById('modalLat').value = p.latitude  || '';
+  document.getElementById('modalLng').value = p.longitude || '';
 
   if (lt === 'rent') {
-    form.querySelector('[name="rent_per_hour"]').value = p.rent_per_hour || '';
-    form.querySelector('[name="rent_per_km"]').value = p.rent_per_km || '';
-    form.querySelector('[name="rent_per_day"]').value = p.rent_per_day || '';
-    form.querySelector('[name="rent_per_month"]').value = p.rent_per_month || '';
+    form.querySelector('[name="rent_per_hour"]').value    = p.rent_per_hour    || '';
+    form.querySelector('[name="rent_per_km"]').value      = p.rent_per_km      || '';
+    form.querySelector('[name="rent_per_day"]').value     = p.rent_per_day     || '';
+    form.querySelector('[name="rent_per_month"]').value   = p.rent_per_month   || '';
     form.querySelector('[name="security_deposit"]').value = p.security_deposit || '';
   } else {
     document.getElementById('modalSellingPrice').value = p.selling_price || '';
@@ -596,6 +642,7 @@ async function openEditModal(productId) {
     selling_price: String(p.selling_price || ''), condition: p.condition || '',
     category: p.category || '', subcategory: p.subcategory || '',
     pincode: p.pincode || '', area: p.area || '', city: p.city || '', state: p.state || '',
+    latitude: String(p.latitude || ''), longitude: String(p.longitude || ''),
   };
 
   const catSel = document.getElementById('modalCategory');
@@ -620,17 +667,26 @@ function closeProductModal() {
 // ── Save product ──────────────────────────────────────────────
 document.getElementById('productForm')?.addEventListener('submit', async e => {
   e.preventDefault();
-  const form = e.target;
+  const form    = e.target;
   const saveBtn = document.getElementById('modalSaveBtn');
-  const name = form.querySelector('[name="name"]').value.trim();
+  const name    = form.querySelector('[name="name"]').value.trim();
   const category = document.getElementById('modalCategory').value;
-  const lt = currentListingType;
+  const lt       = currentListingType;
+  const pincode  = form.querySelector('[name="pincode"]').value.trim();
+  const lat      = document.getElementById('modalLat').value;
+  const lng      = document.getElementById('modalLng').value;
 
   if (editingId === null) {
     // ── ADD ──
-    if (!name) { toastError('Please enter a product name.'); return; }
-    if (!category) { toastError('Please select a category.'); return; }
+    if (!name)     { toastError('Please enter a product name.'); return; }
+    if (!category) { toastError('Please select a category.');    return; }
     if (Object.keys(slotFiles).length === 0) { toastError('Please upload at least one photo.'); return; }
+
+    // Location validation — must have pincode OR detected lat/lng
+    if (!pincode && !lat) {
+      toastError('Please enter your pincode or use the 📍 Detect button to set your location.');
+      return;
+    }
 
     if (lt === 'rent') {
       const rh = form.querySelector('[name="rent_per_hour"]').value.trim();
@@ -639,32 +695,34 @@ document.getElementById('productForm')?.addEventListener('submit', async e => {
       const rm = form.querySelector('[name="rent_per_month"]').value.trim();
       if (!(rh || rk || rd || rm)) { toastError('Please enter at least one rent price.'); return; }
     } else {
-      const sp = document.getElementById('modalSellingPrice').value.trim();
-      if (!sp) { toastError('Please enter a selling price.'); return; }
+      const sp   = document.getElementById('modalSellingPrice').value.trim();
       const cond = document.getElementById('modalCondition').value;
-      if (!cond) { toastError('Please select the item condition.'); return; }
+      if (!sp)   { toastError('Please enter a selling price.');      return; }
+      if (!cond) { toastError('Please select the item condition.');  return; }
     }
 
     const fd = new FormData();
-    fd.append('name', name);
+    fd.append('name',        name);
     fd.append('description', form.querySelector('[name="description"]').value.trim());
-    fd.append('category', category);
+    fd.append('category',    category);
     fd.append('subcategory', document.getElementById('modalSubcategory').value);
     fd.append('listing_type', lt);
-    fd.append('pincode', form.querySelector('[name="pincode"]').value.trim());
-    fd.append('area', form.querySelector('[name="area"]').value.trim());
-    fd.append('city', form.querySelector('[name="city"]').value.trim());
-    fd.append('state', form.querySelector('[name="state"]').value.trim());
+    fd.append('pincode',     pincode);
+    fd.append('area',        form.querySelector('[name="area"]').value.trim());
+    fd.append('city',        form.querySelector('[name="city"]').value.trim());
+    fd.append('state',       form.querySelector('[name="state"]').value.trim());
+    fd.append('latitude',    lat  || '');
+    fd.append('longitude',   lng  || '');
 
     if (lt === 'rent') {
-      fd.append('rent_per_hour', form.querySelector('[name="rent_per_hour"]').value.trim());
-      fd.append('rent_per_km', form.querySelector('[name="rent_per_km"]').value.trim());
-      fd.append('rent_per_day', form.querySelector('[name="rent_per_day"]').value.trim());
-      fd.append('rent_per_month', form.querySelector('[name="rent_per_month"]').value.trim());
+      fd.append('rent_per_hour',    form.querySelector('[name="rent_per_hour"]').value.trim());
+      fd.append('rent_per_km',      form.querySelector('[name="rent_per_km"]').value.trim());
+      fd.append('rent_per_day',     form.querySelector('[name="rent_per_day"]').value.trim());
+      fd.append('rent_per_month',   form.querySelector('[name="rent_per_month"]').value.trim());
       fd.append('security_deposit', form.querySelector('[name="security_deposit"]').value.trim());
     } else {
       fd.append('selling_price', document.getElementById('modalSellingPrice').value.trim());
-      fd.append('condition', document.getElementById('modalCondition').value);
+      fd.append('condition',     document.getElementById('modalCondition').value);
     }
 
     for (let i = 1; i <= 5; i++) {
@@ -682,26 +740,33 @@ document.getElementById('productForm')?.addEventListener('submit', async e => {
 
   } else {
     // ── EDIT ──
-    const snap = originalProductSnapshot;
-    const lt = snap.listing_type;  // locked - use from snapshot
-    const desc = form.querySelector('[name="description"]').value.trim();
-    const cat = category;
-    const sub = document.getElementById('modalSubcategory').value;
-    const pincode = form.querySelector('[name="pincode"]').value.trim();
-    const area = form.querySelector('[name="area"]').value.trim();
-    const city = form.querySelector('[name="city"]').value.trim();
-    const state = form.querySelector('[name="state"]').value.trim();
+    const snap    = originalProductSnapshot;
+    const lt      = snap.listing_type;
+    const desc    = form.querySelector('[name="description"]').value.trim();
+    const cat     = category;
+    const sub     = document.getElementById('modalSubcategory').value;
+    const area    = form.querySelector('[name="area"]').value.trim();
+    const city    = form.querySelector('[name="city"]').value.trim();
+    const state   = form.querySelector('[name="state"]').value.trim();
+
+    // Location validation for edit too
+    if (!pincode && !lat) {
+      toastError('Please enter your pincode or use the 📍 Detect button to set your location.');
+      return;
+    }
 
     const data = {
       listing_type: currentListingType,
-      name: name || undefined,
-      category: cat || undefined,
-      description: desc === '' ? null : desc,
-      subcategory: sub === '' ? null : sub,
-      pincode: pincode === '' ? null : pincode,
-      area: area === '' ? null : area,
-      city: city === '' ? null : city,
-      state: state === '' ? null : state,
+      name:         name     || undefined,
+      category:     cat      || undefined,
+      description:  desc     === '' ? null : desc,
+      subcategory:  sub      === '' ? null : sub,
+      pincode:      pincode  === '' ? null : pincode,
+      area:         area     === '' ? null : area,
+      city:         city     === '' ? null : city,
+      state:        state    === '' ? null : state,
+      latitude:     lat      || null,
+      longitude:    lng      || null,
     };
 
     if (lt === 'rent') {
@@ -710,24 +775,27 @@ document.getElementById('productForm')?.addEventListener('submit', async e => {
       const rd = form.querySelector('[name="rent_per_day"]').value.trim();
       const rm = form.querySelector('[name="rent_per_month"]').value.trim();
       const sd = form.querySelector('[name="security_deposit"]').value.trim();
-      data.rent_per_hour = rh === '' ? null : rh;
-      data.rent_per_km   = rk === '' ? null : rk;
-      data.rent_per_day  = rd === '' ? null : rd;
-      data.rent_per_month = rm === '' ? null : rm;
+      data.rent_per_hour    = rh === '' ? null : rh;
+      data.rent_per_km      = rk === '' ? null : rk;
+      data.rent_per_day     = rd === '' ? null : rd;
+      data.rent_per_month   = rm === '' ? null : rm;
       data.security_deposit = sd === '' ? null : sd;
     } else {
-      const sp = document.getElementById('modalSellingPrice').value.trim();
+      const sp   = document.getElementById('modalSellingPrice').value.trim();
       const cond = document.getElementById('modalCondition').value;
-      data.selling_price = sp === '' ? null : sp;
-      data.condition = cond === '' ? null : cond;
+      data.selling_price = sp   === '' ? null : sp;
+      data.condition     = cond === '' ? null : cond;
     }
 
     Object.keys(data).forEach(k => data[k] === undefined && delete data[k]);
 
     const hasImageChange = Object.keys(slotFiles).length > 0;
-    let hasFieldChange = name !== snap.name || desc !== snap.description ||
-      cat !== snap.category || sub !== snap.subcategory ||
-      pincode !== snap.pincode || area !== snap.area || city !== snap.city || state !== snap.state;
+    let hasFieldChange =
+      name    !== snap.name    || desc  !== snap.description ||
+      cat     !== snap.category || sub  !== snap.subcategory ||
+      pincode !== snap.pincode  || area !== snap.area ||
+      city    !== snap.city     || state !== snap.state ||
+      lat     !== snap.latitude || lng  !== snap.longitude;
 
     if (lt === 'rent') {
       const rh = form.querySelector('[name="rent_per_hour"]').value.trim();
@@ -735,10 +803,11 @@ document.getElementById('productForm')?.addEventListener('submit', async e => {
       const rd = form.querySelector('[name="rent_per_day"]').value.trim();
       const rm = form.querySelector('[name="rent_per_month"]').value.trim();
       const sd = form.querySelector('[name="security_deposit"]').value.trim();
-      hasFieldChange = hasFieldChange || rh !== snap.rent_per_hour || rk !== snap.rent_per_km ||
-        rd !== snap.rent_per_day || rm !== snap.rent_per_month || sd !== snap.security_deposit;
+      hasFieldChange = hasFieldChange ||
+        rh !== snap.rent_per_hour || rk !== snap.rent_per_km ||
+        rd !== snap.rent_per_day  || rm !== snap.rent_per_month || sd !== snap.security_deposit;
     } else {
-      const sp = document.getElementById('modalSellingPrice').value.trim();
+      const sp   = document.getElementById('modalSellingPrice').value.trim();
       const cond = document.getElementById('modalCondition').value;
       hasFieldChange = hasFieldChange || sp !== snap.selling_price || cond !== snap.condition;
     }
@@ -784,6 +853,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('addProductBtn')?.addEventListener('click', openAddModal);
   initImageSlots();
   initModalPincodeAutofill();
+  initDetectLocationBtn();
   loadCategories();
   loadConditions();
   loadProducts();
@@ -791,8 +861,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
-  if (document.getElementById('productModalOverlay')?.classList.contains('open')) closeProductModal();
-  if (document.getElementById('previewModalOverlay')?.classList.contains('open')) closePreviewModal();
+  if (document.getElementById('productModalOverlay')?.classList.contains('open'))  closeProductModal();
+  if (document.getElementById('previewModalOverlay')?.classList.contains('open'))  closePreviewModal();
   document.getElementById('shareModalOverlay')?.classList.remove('open');
   document.getElementById('upgradeModalOverlay')?.classList.remove('open');
 });
