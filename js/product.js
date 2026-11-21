@@ -159,7 +159,7 @@ async function startChat() {
   });
 
   if (window.innerWidth >= 768) {
-    window.location.href = `/user/dashboard#chat=${convId}`;
+    window.location.href = `/user/chat?conv=${convId}`;
     return;
   }
   openChatOverlay();

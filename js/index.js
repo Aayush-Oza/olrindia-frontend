@@ -92,7 +92,7 @@ function handleWish(btn, productId) {
 
 document.getElementById('navWishBtn').addEventListener('click', () => {
   if (!sessionStorage.getItem('olr_user')) { window.location.href = '/user/login'; return; }
-  window.location.href = '/user/dashboard';
+  window.location.href = '/user/browse';
 });
 
 // ── Auth modal ────────────────────────────────────────────────
