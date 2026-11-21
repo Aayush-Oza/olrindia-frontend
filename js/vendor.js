@@ -86,54 +86,47 @@ async function fetchListings(reset = false) {
 
 /* ── Build product card ──────────────────────────────────── */
 function buildCard(p) {
-  const imgHtml = (p.images && p.images[0])
+  const img = p.images && p.images[0]
     ? `<img class="product-img" src="${p.images[0]}" alt="${p.name}" loading="lazy">`
-    : `<div class="product-img-placeholder">📦</div>`;
+    : `<div class="product-img-placeholder"></div>`;
 
-  const typeChip = p.listing_type === 'sell'
-    ? `<span style="position:absolute;top:8px;left:8px;background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;font-family:var(--font-display);">For Sale</span>`
-    : `<span style="position:absolute;top:8px;left:8px;background:#EAF3FF;color:#1d4ed8;border:1px solid #bfdbfe;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;font-family:var(--font-display);">For Rent</span>`;
-
-  let priceHtml = '';
-  if (p.listing_type === 'sell') {
-    priceHtml = p.selling_price
-      ? `<div class="product-price">₹${p.selling_price}</div>`
+  const badge = p.vendor_badge === 'featured'
+    ? `<span class="vendor-badge badge-premium">★ Top Vendor</span>`
+    : p.vendor_badge === 'verified'
+      ? `<span class="vendor-badge badge-growth">✓ Verified</span>`
       : '';
-  } else {
-    const rentVal   = p.rent_per_day || p.rent_per_hour || p.rent_per_month || p.rent_per_km;
-    const rentLabel = p.rent_per_day ? '/day'
-      : p.rent_per_hour ? '/hr'
-      : p.rent_per_month ? '/mo'
-      : p.rent_per_km ? '/km' : '';
-    priceHtml = rentVal
-      ? `<div class="product-price">₹${rentVal}<span>${rentLabel}</span></div>`
-      : '';
-  }
 
-  const locHtml = (p.city || p.vendor_city)
-    ? `<div class="product-loc">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
-          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" stroke="currentColor" stroke-width="1.8"/>
-          <circle cx="12" cy="9" r="2.5" stroke="currentColor" stroke-width="1.8"/>
-        </svg>
-        ${p.city || p.vendor_city}
-      </div>`
-    : '';
+  const rentVal   = p.rent_per_day || p.rent_per_hour || p.rent_per_month || p.rent_per_km;
+  const rentLabel = p.rent_per_day ? '/day'
+    : p.rent_per_hour ? '/hr'
+    : p.rent_per_month ? '/mo'
+    : p.rent_per_km ? '/km' : '';
 
-  const url = `/product/${slugify(p.category)}/${slugify(p.city || 'india')}/${p.share_slug}`;
+  const price = p.listing_type === 'sell'
+    ? (p.selling_price ? `₹${p.selling_price}` : `<span style="color:var(--c-ink-faint);font-size:12px;">Price not set</span>`)
+    : (rentVal ? `₹${rentVal} <span>${rentLabel}</span>` : `<span style="color:var(--c-ink-faint);font-size:12px;">Price not available</span>`);
+
+  const url = `/product/${slugify(p.category || '')}/${slugify(p.city || 'india')}/${p.share_slug}`;
 
   return `
     <div class="product-card" onclick="window.location.href='${url}'">
       <div style="position:relative;">
-        ${imgHtml}
-        ${typeChip}
+        ${img}${badge}
       </div>
       <div class="product-body">
         <div class="product-cat">${p.category || ''}</div>
         <div class="product-title">${p.name}</div>
         <div class="product-bottom">
-          ${priceHtml}
-          ${locHtml}
+          <div class="product-price">${price}</div>
+          <div class="product-loc">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            ${p.city || ''}
+          </div>
+        </div>
+        <div class="listing-type-chip ${p.listing_type === 'sell' ? 'chip-sell' : 'chip-rent'}">
+          ${p.listing_type === 'sell' ? 'FOR SALE' : 'FOR RENT'}
         </div>
       </div>
     </div>`;
