@@ -271,4 +271,4 @@ async function loadStore() {
   }
 }
 
-loadStore();
+document.addEventListener('DOMContentLoaded', loadStore);
