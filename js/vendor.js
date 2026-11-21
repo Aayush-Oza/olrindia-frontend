@@ -266,6 +266,7 @@ async function loadStore() {
     document.getElementById('vsContent').style.display  = 'block';
 
   } catch (e) {
+      console.error('VENDOR STORE ERROR:', e); // ← add this
     showError('Failed to load store. Please try again.');
   }
 }
