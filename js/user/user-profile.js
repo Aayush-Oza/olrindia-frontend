@@ -1,5 +1,5 @@
 /* ============================================================
-   OLR INDIA - PROFILE PAGE JS
+   OLR INDIA - USER PROFILE PAGE JS
    Requires: user-nav.js (loaded before this)
    ============================================================ */
 
@@ -17,6 +17,9 @@ async function loadUserProfile() {
   if (!res.success) { toastError(res.message || 'Failed to load profile.'); return; }
   const u = res.user;
 
+  // Store Google flag globally for delete account use
+  window._userIsGoogle = u.is_google_user;
+
   const avatarImg = document.getElementById('profileAvatarImg');
   const avatarBig = document.getElementById('profileAvatar');
   const removeBtn = document.getElementById('profileAvatarRemoveBtn');
@@ -33,7 +36,6 @@ async function loadUserProfile() {
     removeBtn.style.display = 'none';
   }
 
-  // Update nav avatar via shared helper
   document.getElementById('navUserAvatar').innerHTML = renderAvatarHTML(u.name, u.profile_photo, 'sm');
   document.getElementById('navUserAvatarMobile').innerHTML = renderAvatarHTML(u.name, u.profile_photo, 'sm');
   document.getElementById('navUserName').textContent = u.name || '';
@@ -59,7 +61,8 @@ document.getElementById('profileAvatarRemoveBtn')?.addEventListener('click', asy
   const confirmed = await showConfirm({
     title: 'Remove profile photo?',
     text: 'Your profile will show your initials instead.',
-    confirmLabel: 'Remove', cancelLabel: 'Cancel',
+    confirmLabel: 'Remove',
+    cancelLabel: 'Cancel',
   });
   if (!confirmed) return;
   const res = await apiRequest('/auth/user/profile/photo', 'DELETE');
@@ -109,6 +112,64 @@ if (profileFormEl) {
     statusEl:     profileFormEl.querySelector('.pincode-status'),
   });
 }
+
+// ── Delete account ────────────────────────────────────────────
+document.getElementById('deleteAccountBtn')?.addEventListener('click', async () => {
+  const isGoogle = window._userIsGoogle;
+
+  if (isGoogle) {
+    // Google user — just confirm, no password needed
+    const confirmed = await showConfirm({
+      title: 'Delete your account?',
+      text: 'This will permanently delete your account, wishlist, chats and all data. This cannot be undone.',
+      confirmLabel: 'Delete account',
+      cancelLabel: 'Cancel',
+    });
+    if (!confirmed) return;
+
+    const btn = document.getElementById('deleteAccountBtn');
+    setButtonLoading(btn, true);
+    const res = await apiRequest('/auth/user/delete-account', 'POST', {});
+    setButtonLoading(btn, false);
+
+    if (res.success) {
+      toastSuccess('Account deleted successfully.');
+      setTimeout(() => window.location.href = '/', 1500);
+    } else {
+      toastError(res.message || 'Failed to delete account.');
+    }
+
+  } else {
+    // Password user — confirm then ask for password
+    const confirmed = await showConfirm({
+      title: 'Delete your account?',
+      text: 'This will permanently delete your account, wishlist, chats and all data. This cannot be undone.',
+      confirmLabel: 'Continue',
+      cancelLabel: 'Cancel',
+    });
+    if (!confirmed) return;
+
+    const password = await showConfirmWithPassword({
+      title: 'Confirm deletion',
+      text: 'Enter your password to permanently delete your account.',
+      confirmLabel: 'Delete account',
+      cancelLabel: 'Cancel',
+    });
+    if (!password) return;
+
+    const btn = document.getElementById('deleteAccountBtn');
+    setButtonLoading(btn, true);
+    const res = await apiRequest('/auth/user/delete-account', 'POST', { password });
+    setButtonLoading(btn, false);
+
+    if (res.success) {
+      toastSuccess('Account deleted successfully.');
+      setTimeout(() => window.location.href = '/', 1500);
+    } else {
+      toastError(res.message || 'Failed to delete account.');
+    }
+  }
+});
 
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {

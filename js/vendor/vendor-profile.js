@@ -16,24 +16,23 @@ async function loadVendorProfile() {
   await loadBillingHistory();
 }
 
-
 function renderProfileFields() {
   const v = vendorProfile;
-  const nameEl = document.getElementById('profileName');
-  const emailEl = document.getElementById('profileEmail');
+  const nameEl    = document.getElementById('profileName');
+  const emailEl   = document.getElementById('profileEmail');
   const infoEmail = document.getElementById('infoEmail');
-  if (nameEl) nameEl.textContent = v.name || '';
-  if (emailEl) emailEl.textContent = v.email || '';
+  if (nameEl)    nameEl.textContent    = v.name  || '';
+  if (emailEl)   emailEl.textContent   = v.email || '';
   if (infoEmail) infoEmail.textContent = v.email || '';
   const form = document.getElementById('profileForm');
   if (!form) return;
-  form.querySelector('[name="name"]').value = v.name || '';
-  form.querySelector('[name="mobile"]').value = v.mobile || '';
+  form.querySelector('[name="name"]').value       = v.name       || '';
+  form.querySelector('[name="mobile"]').value     = v.mobile     || '';
   form.querySelector('[name="gst_number"]').value = v.gst_number || '';
-  form.querySelector('[name="pincode"]').value = v.pincode || '';
-  form.querySelector('[name="area"]').value = v.area || '';
-  form.querySelector('[name="city"]').value = v.city || '';
-  form.querySelector('[name="state"]').value = v.state || '';
+  form.querySelector('[name="pincode"]').value    = v.pincode    || '';
+  form.querySelector('[name="area"]').value       = v.area       || '';
+  form.querySelector('[name="city"]').value       = v.city       || '';
+  form.querySelector('[name="state"]').value      = v.state      || '';
   const verifiedBadge = document.getElementById('verifiedBadge');
   const featuredBadge = document.getElementById('featuredBadge');
   if (verifiedBadge) verifiedBadge.style.display = v.badge === 'verified' ? '' : 'none';
@@ -62,23 +61,23 @@ function renderProfileAvatar() {
 function renderProfilePlanSection() {
   const el = document.getElementById('profilePlanSection');
   if (!el || !vendorProfile) return;
-  const v = vendorProfile;
-  const plan = v.subscription_plan || 'free';
+  const v     = vendorProfile;
+  const plan  = v.subscription_plan || 'free';
   const label = PLAN_LABELS[plan] || plan;
   const expires = v.subscription_expires_at;
-  const badge = v.badge;
-  const used = v.active_product_count ?? 0;
-  const limit = v.max_active_posts;
+  const badge   = v.badge;
+  const used    = v.active_product_count ?? 0;
+  const limit   = v.max_active_posts;
   let expiryHtml = '';
   if (expires && plan !== 'free') {
-    const formatted = parseExpiryDate(expires).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+    const formatted   = parseExpiryDate(expires).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
     const expiryLabel = v.expiry_label || null;
     const urgentClass = expiryLabel ? 'expiring-soon' : '';
-    const urgentText = expiryLabel ? ` (${expiryLabel})` : '';
+    const urgentText  = expiryLabel ? ` (${expiryLabel})` : '';
     expiryHtml = `<div class="profile-plan-expires ${urgentClass}">Active until ${formatted}${urgentText}</div>`;
   }
   let badgeHtml = '';
-  if (badge === 'verified') badgeHtml = `<span class="profile-plan-badge verified">✓ Verified vendor badge</span>`;
+  if (badge === 'verified')      badgeHtml = `<span class="profile-plan-badge verified">✓ Verified vendor badge</span>`;
   else if (badge === 'featured') badgeHtml = `<span class="profile-plan-badge featured">★ Featured vendor badge</span>`;
   let pendingHtml = '';
   if (v.pending_plan && v.pending_plan !== plan) {
@@ -112,7 +111,7 @@ async function loadBillingHistory() {
   }
   el.innerHTML = billing.map(b => {
     const start = b.period_start ? new Date(b.period_start).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
-    const end = b.period_end ? new Date(b.period_end).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
+    const end   = b.period_end   ? new Date(b.period_end).toLocaleDateString('en-IN',   { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
     const tag = b.is_current
       ? `<span style="background:#dcfce7;color:#15803d;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;">CURRENT</span>`
       : b.is_future
@@ -133,7 +132,12 @@ async function loadBillingHistory() {
 document.getElementById('profileAvatarEditBtn')?.addEventListener('click', () => document.getElementById('profilePhotoInput').click());
 
 document.getElementById('profileAvatarRemoveBtn')?.addEventListener('click', async () => {
-  const confirmed = await showConfirm({ title: 'Remove profile photo?', text: 'Your profile will show your initials instead.', confirmLabel: 'Remove', cancelLabel: 'Cancel' });
+  const confirmed = await showConfirm({
+    title: 'Remove profile photo?',
+    text: 'Your profile will show your initials instead.',
+    confirmLabel: 'Remove',
+    cancelLabel: 'Cancel',
+  });
   if (!confirmed) return;
   const res = await apiRequest('/auth/vendor/profile/photo', 'DELETE');
   if (res.success) { toastSuccess('Profile photo removed.'); await loadVendorProfile(); }
@@ -155,17 +159,17 @@ document.getElementById('profilePhotoInput')?.addEventListener('change', async f
 // ── Profile form submit ───────────────────────────────────────
 document.getElementById('profileForm')?.addEventListener('submit', async e => {
   e.preventDefault();
-  const form = e.target;
+  const form    = e.target;
   const saveBtn = form.querySelector('button[type="submit"]');
   setButtonLoading(saveBtn, true);
   const data = {
-    name: form.querySelector('[name="name"]').value.trim(),
-    mobile: form.querySelector('[name="mobile"]').value.trim(),
+    name:       form.querySelector('[name="name"]').value.trim(),
+    mobile:     form.querySelector('[name="mobile"]').value.trim(),
     gst_number: form.querySelector('[name="gst_number"]').value.trim(),
-    pincode: form.querySelector('[name="pincode"]').value.trim(),
-    area: form.querySelector('[name="area"]').value.trim(),
-    city: form.querySelector('[name="city"]').value.trim(),
-    state: form.querySelector('[name="state"]').value.trim(),
+    pincode:    form.querySelector('[name="pincode"]').value.trim(),
+    area:       form.querySelector('[name="area"]').value.trim(),
+    city:       form.querySelector('[name="city"]').value.trim(),
+    state:      form.querySelector('[name="state"]').value.trim(),
   };
   const res = await apiRequest('/auth/vendor/profile', 'PUT', data);
   setButtonLoading(saveBtn, false);
@@ -173,30 +177,83 @@ document.getElementById('profileForm')?.addEventListener('submit', async e => {
   else toastError(res.message || 'Failed to save profile.');
 });
 
-// ── Upgrade modal ─────────────────────────────────────────────
 // ── Pincode autofill ──────────────────────────────────────────
 function initModalPincodeAutofill() {
   const pincodeInput = document.getElementById('modalPincode');
-
   if (!pincodeInput) return;
-
   wirePincodeAutofill({
     pincodeInput,
-    areaInput: document.getElementById('modalArea'),
-    cityInput: document.getElementById('modalCity'),
+    areaInput:  document.getElementById('modalArea'),
+    cityInput:  document.getElementById('modalCity'),
     stateInput: document.getElementById('modalState'),
-    statusEl: document.getElementById('modalPincodeStatus'),
+    statusEl:   document.getElementById('modalPincodeStatus'),
   });
 }
+
+// ── Delete account ────────────────────────────────────────────
+document.getElementById('deleteAccountBtn')?.addEventListener('click', async () => {
+  const isGoogle = vendorProfile?.is_google_user;
+
+  if (isGoogle) {
+    const confirmed = await showConfirm({
+      title: 'Delete your vendor account?',
+      text: 'This will permanently delete your account, all products, chats, payments and all data. This cannot be undone.',
+      confirmLabel: 'Delete account',
+      cancelLabel: 'Cancel',
+    });
+    if (!confirmed) return;
+
+    const btn = document.getElementById('deleteAccountBtn');
+    setButtonLoading(btn, true);
+    const res = await apiRequest('/auth/vendor/delete-account', 'POST', {});
+    setButtonLoading(btn, false);
+
+    if (res.success) {
+      toastSuccess('Account deleted successfully.');
+      setTimeout(() => window.location.href = '/', 1500);
+    } else {
+      toastError(res.message || 'Failed to delete account.');
+    }
+
+  } else {
+    const confirmed = await showConfirm({
+      title: 'Delete your vendor account?',
+      text: 'This will permanently delete your account, all products, chats, payments and all data. This cannot be undone.',
+      confirmLabel: 'Continue',
+      cancelLabel: 'Cancel',
+    });
+    if (!confirmed) return;
+
+    const password = await showConfirmWithPassword({
+      title: 'Confirm deletion',
+      text: 'Enter your password to permanently delete your vendor account.',
+      confirmLabel: 'Delete account',
+      cancelLabel: 'Cancel',
+    });
+    if (!password) return;
+
+    const btn = document.getElementById('deleteAccountBtn');
+    setButtonLoading(btn, true);
+    const res = await apiRequest('/auth/vendor/delete-account', 'POST', { password });
+    setButtonLoading(btn, false);
+
+    if (res.success) {
+      toastSuccess('Account deleted successfully.');
+      setTimeout(() => window.location.href = '/', 1500);
+    } else {
+      toastError(res.message || 'Failed to delete account.');
+    }
+  }
+});
 
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   wirePincodeAutofill({
     pincodeInput: document.getElementById('pincode'),
-    areaInput: document.getElementById('area'),
-    cityInput: document.getElementById('city'),
-    stateInput: document.getElementById('state'),
-    statusEl: document.getElementById('pincodeStatus'),
+    areaInput:    document.getElementById('area'),
+    cityInput:    document.getElementById('city'),
+    stateInput:   document.getElementById('state'),
+    statusEl:     document.getElementById('pincodeStatus'),
   });
   loadVendorProfile();
 });

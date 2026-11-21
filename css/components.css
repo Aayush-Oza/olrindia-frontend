@@ -919,6 +919,7 @@ select.input {
 .mobile-nav-link:hover {
   background: var(--c-bg);
   color: var(--c-ink);
+  text-decoration: none;
 }
 
 .mobile-nav-link.active {
@@ -1206,4 +1207,12 @@ select.input {
   .dash-nav-logo img {
     height: 46px;
   }
+}
+.btn-danger {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+}
+.btn-danger:hover {
+  background: #dc2626;
 }
