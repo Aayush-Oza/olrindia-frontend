@@ -449,10 +449,6 @@ function renderPreviewModal(productId) {
       <button class="btn btn-secondary" style="width:auto;padding:10px 16px;" onclick="toggleProductStatus(${p.id},${!p.is_active})">
         ${p.is_active ? deactivateLabel : reactivateLabel}
       </button>` : ''}
-    ${p.deactivated_by === 'plan_expired' ? `
-      <button class="btn btn-primary" style="width:auto;padding:10px 16px;" onclick="closePreviewModal();openUpgradeModal('Renew your plan to reactivate this product.')">
-        🔄 Renew to Reactivate
-      </button>` : ''}
     <button class="btn btn-secondary" style="width:auto;padding:10px 16px;" onclick="closePreviewModal();openEditModal(${p.id})">
       ${p.deactivated_by === 'admin' ? '✏️ Edit to go live' : 'Edit'}
     </button>
