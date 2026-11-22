@@ -39,7 +39,7 @@ function renderProducts(products, reset = true) {
     body.innerHTML = `<div class="admin-empty">No products found.</div>`; return;
   }
   const rows = products.map(p => {
-    const url = `/product?slug=${p.slug}&admin=1`;
+    const url = `/product/${slugify(p.category)}/${slugify(p.city || 'india')}/${p.slug}?admin=1`;
     const img = p.image ? `<img src="${p.image}" class="admin-thumb" alt="${p.name}">` : `<div class="admin-thumb"></div>`;
     return `<tr>
       <td><a href="${url}">${img}</a></td>
