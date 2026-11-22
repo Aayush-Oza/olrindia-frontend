@@ -317,10 +317,12 @@ function bsEnterCategory(cat) {
 function bsOpenFilterSheet() {
   document.getElementById(cfg.filterSheetId).classList.add('open');
   document.getElementById(cfg.filterOverlayId).classList.add('open');
+  document.getElementById('fabListBtn').style.display = 'none';
 }
 function bsCloseFilterSheet() {
   document.getElementById(cfg.filterSheetId).classList.remove('open');
   document.getElementById(cfg.filterOverlayId).classList.remove('open');
+  document.getElementById('fabListBtn').style.display = '';
   _destroyCityAutocomplete();
 }
 
