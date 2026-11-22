@@ -250,6 +250,7 @@
   padding: 12px 0;
   position: sticky;
   top: 68px;
+  margin-top: 0;
   z-index: 150;
 }
 
@@ -1210,8 +1211,7 @@
   }
 
   .listing-tabs {
-    padding: 8px 20px;
-    font-size: 13px;
+    top: 58px;
   }
   .filter-row {
     top: 110px;
