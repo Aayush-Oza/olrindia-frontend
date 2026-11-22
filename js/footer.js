@@ -1,6 +1,12 @@
 (function () {
   const STORAGE_KEY = 'olr_language';
 
+  // Store original labels BEFORE Google Translate touches them
+  const LANG_LABELS = {};
+  document.querySelectorAll('.footer-lang-select option').forEach(opt => {
+    LANG_LABELS[opt.value] = opt.textContent;
+  });
+
   function getLang() {
     return localStorage.getItem(STORAGE_KEY) || 'en';
   }
@@ -32,7 +38,6 @@
     location.reload();
   }
 
-  /* ── Re-translate dynamically loaded content ── */
   function retranslateDynamic() {
     const lang = getLang();
     if (!lang || lang === 'en') return;
@@ -40,16 +45,12 @@
     if (combo) combo.dispatchEvent(new Event('change'));
   }
 
-  // Expose globally so index.js can call it after products render
   window.retranslateDynamic = retranslateDynamic;
 
-  /* ── On page load: auto-apply stored language ── */
   function autoApplyLang() {
     const lang = getLang();
     if (!lang || lang === 'en') return;
-    // Set cookie - Google Translate reads it automatically on page load
     setGoogCookie(lang);
-    // Also try combo in case GT is already loaded
     let attempts = 0;
     const interval = setInterval(() => {
       attempts++;
@@ -77,16 +78,14 @@
     });
   }
 
-  /* ── Build menu ONCE, not on every click ── */
   function buildNavMenu(menu, footerSelect) {
     menu.innerHTML = '';
     const stored = getLang();
     Array.from(footerSelect.options).forEach(opt => {
       const item = document.createElement('div');
       item.className = 'nav-lang-item' + (opt.value === stored ? ' active' : '');
-      item.textContent = opt.textContent;
+      item.textContent = LANG_LABELS[opt.value] || opt.textContent;
 
-      // mousedown fires before document click closes menu
       item.addEventListener('mousedown', (e) => {
         e.preventDefault();
         menu.querySelectorAll('.nav-lang-item').forEach(i => i.classList.remove('active'));
@@ -95,7 +94,6 @@
         applyLang(opt.value);
       });
 
-      // touchend for mobile
       item.addEventListener('touchend', (e) => {
         e.preventDefault();
         menu.querySelectorAll('.nav-lang-item').forEach(i => i.classList.remove('active'));
@@ -120,13 +118,11 @@
 
       if (!btn || !menu || !footerSelect) return;
 
-      // Build menu ONCE on init
       buildNavMenu(menu, footerSelect);
 
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
 
-        // Smart positioning - never go off screen
         const rect = btn.getBoundingClientRect();
         const menuWidth = 210;
         const viewportWidth = window.innerWidth;
