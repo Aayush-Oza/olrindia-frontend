@@ -6,10 +6,6 @@ Allow: /terms.html
 Allow: /privacy.html
 Allow: /product.html
 Allow: /vendor.html
-Allow: /vendor/signup.html
-Allow: /vendor/login.html
-Allow: /user/signup.html
-Allow: /user/login.html
 
 Disallow: /user/browse.html
 Disallow: /user/chat.html
@@ -26,5 +22,9 @@ Disallow: /vendor/forgot-password.html
 Disallow: /vendor/reset-password.html
 Disallow: /vendor/verify-email.html
 Disallow: /admin/
+Disallow: /user/login
+Disallow: /user/signup
+Disallow: /vendor/login
+Disallow: /vendor/signup
 
 Sitemap: https://olrindia.com/sitemap.xml
