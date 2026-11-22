@@ -81,6 +81,9 @@
   <link rel="stylesheet" href="css/components.css?v=18">
   <link rel="stylesheet" href="css/index.css?v=18">
   <link rel="stylesheet" href="css/footer.css?v=18">
+  <!-- Admin CSS — only relevant when ?admin=1, harmless otherwise -->
+  <link rel="stylesheet" href="css/admin/admin-dashboard.css?v=18">
+  <link rel="stylesheet" href="css/admin/vendor-detail.css?v=18">
 
   <style>
     /* ── Vendor-specific only - everything else uses index.css ── */
@@ -254,6 +257,23 @@
       font-weight: 500;
     }
 
+    /* Admin sections */
+    .vs-admin-wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 20px 0;
+    }
+
+    .vs-admin-section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--c-ink);
+      font-family: var(--font-display);
+      margin: 28px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--c-border-soft);
+    }
+
     /* Loader */
     #vsLoader {
       display: flex;
@@ -383,8 +403,21 @@
       </div>
     </div>
 
+    <!-- ── ADMIN SECTIONS (hidden by default, shown when ?admin=1) ── -->
+    <div id="adminSections" style="display:none;">
+      <div class="vs-admin-wrap">
+        <div class="vs-admin-section-title">Vendor Details</div>
+        <div id="adminVendorInfoCard" class="admin-vendor-info-card"></div>
+
+        <div class="vs-admin-section-title">Strike History</div>
+        <div id="adminStrikesList" class="admin-strikes-list"></div>
+
+        <div class="vs-admin-section-title">Listings</div>
+      </div>
+    </div>
+
     <!-- Tabs - same as index.css listing-tabs -->
-    <div class="vs-filters">
+    <div class="vs-filters" id="vsFilters">
       <div class="vs-filters-inner">
         <div class="listing-tabs-inner">
           <button class="listing-tab active" data-type="all" onclick="switchTab('all')">All</button>
@@ -406,6 +439,21 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- ── SUSPEND VENDOR MODAL (admin only) ── -->
+  <div class="product-modal-overlay" id="suspendModal">
+    <div class="product-modal-box">
+      <h3 class="product-modal-title">Suspend this vendor?</h3>
+      <p class="product-modal-text">Their account will be locked immediately and all listings hidden. Enter a reason — this will be emailed to them.</p>
+      <textarea class="input" id="suspendReasonInput" rows="4"
+        placeholder="e.g. Multiple complaints received about fraudulent listings."
+        style="margin:12px 0;"></textarea>
+      <div class="product-modal-actions">
+        <button class="btn btn-secondary" id="suspendCancel">Cancel</button>
+        <button class="btn btn-primary" id="suspendConfirm" style="background:var(--c-error);">Suspend &amp; notify vendor</button>
+      </div>
+    </div>
   </div>
 
   <div id="toast-container"></div>
@@ -441,8 +489,8 @@
         <div class="footer-col-title">Contact</div>
         <a href="mailto:support@olrindia.com" class="footer-contact-item">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor"
-              stroke-width="1.8" />
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+              stroke="currentColor" stroke-width="1.8" />
             <path d="m22 6-10 7L2 6" stroke="currentColor" stroke-width="1.8" />
           </svg>
           support@olrindia.com
@@ -455,17 +503,55 @@
         <a class="footer-logo" href="/">
           <img src="assets/logo.png?v=18" alt="OLR India">
         </a>
+        <select class="footer-lang-select notranslate" id="footerLangSelect" style="display:none" translate="no">
+          <option value="en">🌐 English</option>
+          <option value="hi">हिंदी (Hindi)</option>
+          <option value="bn">বাংলা (Bengali)</option>
+          <option value="te">తెలుగు (Telugu)</option>
+          <option value="mr">मराठी (Marathi)</option>
+          <option value="ta">தமிழ் (Tamil)</option>
+          <option value="gu">ગુજરાતી (Gujarati)</option>
+          <option value="kn">ಕನ್ನಡ (Kannada)</option>
+          <option value="ml">മലയാളം (Malayalam)</option>
+          <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+          <option value="or">ଓଡ଼ିଆ (Odia)</option>
+          <option value="as">অসমীয়া (Assamese)</option>
+          <option value="ur">اردو (Urdu)</option>
+          <option value="ne">नेपाली (Nepali)</option>
+          <option value="mai">मैथिली (Maithili)</option>
+          <option value="sa">संस्कृत (Sanskrit)</option>
+          <option value="sd">سنڌي (Sindhi)</option>
+          <option value="sat">ᱥᱟᱱᱛᱟᱲᱤ (Santali)</option>
+          <option value="doi">डोगरी (Dogri)</option>
+          <option value="bho">भोजपुरी (Bhojpuri)</option>
+          <option value="tcy">ತುಳು (Tulu)</option>
+        </select>
       </div>
       <div class="footer-copyright">© 2026 OLR India. All rights reserved.</div>
     </div>
   </footer>
 
   <script src="js/footer.js?v=18"></script>
+
+  <!-- Google Translate -->
+  <div id="google_translate_element" style="display:none;"></div>
+  <script>
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,hi,bn,te,mr,ta,gu,kn,ml,pa,or,as,ur,ne,mai,sa,sd,sat,doi,bho,tcy',
+        autoDisplay: false,
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+      }, 'google_translate_element');
+    }
+  </script>
+  <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+  <script src="js/shared/utils.js?v=18"></script>
   <script type="module" src="js/firebase-config.js?v=18"></script>
   <script src="js/api.js?v=18"></script>
   <script src="js/ui.js?v=18"></script>
   <script src="js/helpers.js?v=18"></script>
-  <script src="js/shared/utils.js?v=18"></script>
   <script src="js/vendor.js?v=18"></script>
 
 </body>

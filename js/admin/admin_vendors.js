@@ -44,13 +44,13 @@ function renderVendors(vendors, reset = true) {
     body.innerHTML = `<div class="admin-empty">No vendors found.</div>`; return;
   }
   const rows = vendors.map(v => `
-    <tr class="admin-row-clickable" data-id="${v.id}">
+    <tr class="admin-row-clickable" data-id="${v.id}" data-store-slug="${v.store_slug}">
       <td><strong>${v.name}</strong></td>
       <td>${v.email}</td>
       <td>${v.mobile}</td>
     </tr>`).join('');
   const cards = vendors.map(v => `
-    <div class="admin-row-card admin-row-clickable" data-id="${v.id}">
+    <div class="admin-row-card admin-row-clickable" data-id="${v.id}" data-store-slug="${v.store_slug}">
       <div class="admin-row-card-top"><div><strong>${v.name}</strong></div></div>
       <div class="admin-row-card-fields">
         <div><label>Email</label><span>${v.email}</span></div>
@@ -71,7 +71,9 @@ function renderVendors(vendors, reset = true) {
   }
 
   body.querySelectorAll('.admin-row-clickable').forEach(el => {
-    el.addEventListener('click', () => { window.location.href = `/admin/vendor-detail?id=${el.dataset.id}`; });
+    el.addEventListener('click', () => {
+      window.location.href = `/vendor/${el.dataset.storeSlug}?admin=1`;
+    });
   });
 }
 

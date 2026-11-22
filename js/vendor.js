@@ -5,13 +5,21 @@ function getStoreSlug() {
   return '';
 }
 
-
 /* ── State ───────────────────────────────────────────────── */
 let currentVendor = null;
 let currentType   = 'all';
 let currentPage   = 1;
 let hasMore       = false;
 let isLoading     = false;
+let isAdminView   = false;
+
+/* ── Admin check (same pattern as product.js) ────────────── */
+async function checkAdminView() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('admin') !== '1') return false;
+  const res = await apiRequest('/auth/admin/profile', 'GET');
+  return !!res.success;
+}
 
 /* ── Tab switching ───────────────────────────────────────── */
 function switchTab(type) {
@@ -106,7 +114,7 @@ function buildCard(p) {
     ? (p.selling_price ? `₹${p.selling_price}` : `<span style="color:var(--c-ink-faint);font-size:12px;">Price not set</span>`)
     : (rentVal ? `₹${rentVal} <span>${rentLabel}</span>` : `<span style="color:var(--c-ink-faint);font-size:12px;">Price not available</span>`);
 
-  const url = `/product/${slugify(p.category || '')}/${slugify(p.city || 'india')}/${p.share_slug}`;
+  const url = `/product/${slugify(p.category || '')}/${slugify(p.city || 'india')}/${p.share_slug}${isAdminView ? '?admin=1' : ''}`;
 
   return `
     <div class="product-card" onclick="window.location.href='${url}'">
@@ -176,6 +184,110 @@ function renderVendorHero(v) {
   `;
 }
 
+/* ── Admin: render vendor info card ──────────────────────── */
+function renderAdminVendorInfo(v) {
+  const verified = v.is_verified
+    ? `<span class="admin-badge admin-badge-live">Verified</span>`
+    : `<span class="admin-badge admin-badge-inactive">Unverified</span>`;
+
+  const status = v.is_active
+    ? `<span class="admin-badge admin-badge-live">Active</span>`
+    : `<span class="admin-badge admin-badge-suspended">Suspended</span>`;
+
+  const strikeBadge = v.strike_count > 0
+    ? `<span class="admin-badge admin-badge-flag">${v.strike_count} Strike${v.strike_count > 1 ? 's' : ''}</span>`
+    : '-';
+
+  const planBadge = v.badge
+    ? `<span class="admin-badge admin-badge-live">${v.badge}</span>`
+    : '-';
+
+  const subActive = v.is_subscription_active
+    ? `<span class="admin-badge admin-badge-live">Paid Active</span>`
+    : v.is_trial_active
+      ? `<span class="admin-badge admin-badge-flag">Trial Active</span>`
+      : `<span class="admin-badge admin-badge-inactive">Expired</span>`;
+
+  document.getElementById('adminVendorInfoCard').innerHTML = `
+    <div class="admin-vendor-fields">
+      <div><label>Email</label><span>${v.email}</span></div>
+      <div><label>Mobile</label><span>${v.mobile}</span></div>
+      <div><label>GST Number</label><span>${v.gst_number || '-'}</span></div>
+      <div><label>Pincode</label><span>${v.pincode || '-'}</span></div>
+      <div><label>City</label><span>${v.city || '-'}</span></div>
+      <div><label>Area</label><span>${v.area || '-'}</span></div>
+      <div><label>State</label><span>${v.state || '-'}</span></div>
+      <div><label>Coordinates</label><span>${v.latitude ?? '-'}, ${v.longitude ?? '-'}</span></div>
+      <div><label>Verified</label><span>${verified}</span></div>
+      <div><label>Status</label><span>${status}</span></div>
+      <div><label>Strikes</label><span>${strikeBadge}</span></div>
+      <div><label>Suspended At</label><span>${v.suspended_at || '-'}</span></div>
+      <div><label>Suspended Reason</label><span>${v.suspended_reason || '-'}</span></div>
+      <div><label>Plan</label><span>${v.subscription_plan ? v.subscription_plan.charAt(0).toUpperCase() + v.subscription_plan.slice(1) : '-'}</span></div>
+      <div><label>Effective Plan</label><span>${v.effective_plan || '-'}</span></div>
+      <div><label>Plan Badge</label><span>${planBadge}</span></div>
+      <div><label>Subscription</label><span>${subActive}</span></div>
+      <div><label>Expires On</label><span>${v.subscription_expires_at || '-'}</span></div>
+      <div><label>Max Active Posts</label><span>${v.max_active_posts === null ? 'Unlimited' : v.max_active_posts}</span></div>
+      <div><label>Active Posts Now</label><span>${v.active_product_count}</span></div>
+      <div><label>Google Linked</label><span>${v.google_linked ? 'Yes' : 'No'}</span></div>
+      <div><label>Facebook Linked</label><span>${v.facebook_linked ? 'Yes' : 'No'}</span></div>
+      <div><label>Joined</label><span>${v.created_at}</span></div>
+      <div><label>Last Updated</label><span>${v.updated_at}</span></div>
+    </div>
+    <div class="admin-vendor-actions" style="margin-top:16px;">
+      ${!v.is_active
+        ? `<button id="unflagVendorBtn" class="admin-action-btn">Unflag &amp; Reactivate</button>`
+        : `<button id="suspendVendorBtn" class="admin-action-btn danger">Suspend Vendor</button>`}
+    </div>
+  `;
+
+  document.getElementById('unflagVendorBtn')?.addEventListener('click', async () => {
+    const slug = getStoreSlug();
+    const res = await apiRequest(`/auth/admin/vendors/${slug}/unflag`, 'POST');
+    if (res.success) { showToast('Vendor unflagged.', 'success'); loadStore(); }
+    else showToast(res.message || 'Failed to unflag vendor.', 'error');
+  });
+
+  document.getElementById('suspendVendorBtn')?.addEventListener('click', () => {
+    document.getElementById('suspendReasonInput').value = '';
+    document.getElementById('suspendModal').classList.add('is-open');
+  });
+}
+
+/* ── Admin: render strikes ───────────────────────────────── */
+function renderAdminStrikes(strikes) {
+  const list = document.getElementById('adminStrikesList');
+  if (!strikes || strikes.length === 0) {
+    list.innerHTML = `<div class="admin-empty">No strikes on record.</div>`;
+    return;
+  }
+  list.innerHTML = strikes.map(s => `
+    <div class="admin-strike-row">
+      <span class="admin-badge admin-badge-flag">Strike ${s.strike_number}</span>
+      <div>
+        <strong>${s.product_name || 'Unknown product'}${s.product_deleted ? ' <span style="color:#9ca3af;font-weight:400;font-size:12px;">(deleted)</span>' : ''}</strong>
+        <p>${s.reason}</p>
+        <small>${s.created_at}</small>
+      </div>
+    </div>`).join('');
+}
+
+/* ── Suspend modal wiring ────────────────────────────────── */
+document.getElementById('suspendCancel')?.addEventListener('click', () => {
+  document.getElementById('suspendModal').classList.remove('is-open');
+});
+
+document.getElementById('suspendConfirm')?.addEventListener('click', async () => {
+  const reason = document.getElementById('suspendReasonInput').value.trim();
+  if (!reason) { showToast('Please enter a reason.', 'error'); return; }
+  document.getElementById('suspendModal').classList.remove('is-open');
+  const slug = getStoreSlug();
+  const res = await apiRequest(`/auth/admin/vendors/${slug}/suspend`, 'POST', { reason });
+  if (res.success) { showToast('Vendor suspended and notified.', 'success'); loadStore(); }
+  else showToast(res.message || 'Failed to suspend.', 'error');
+});
+
 /* ── SEO ─────────────────────────────────────────────────── */
 function updateSEO(v) {
   const storeUrl   = `https://olrindia.com/vendor/${v.store_slug}`;
@@ -227,15 +339,16 @@ function showError(msg) {
     <div style="font-size:40px;margin-bottom:12px;">😕</div>
     <h3 style="color:var(--c-ink);margin-bottom:6px;">Something went wrong</h3>
     <p>${msg}</p>
-    <a href="/" style="margin-top:16px;display:inline-flex;padding:10px 22px;
+    <a href="${isAdminView ? '/admin/vendors' : '/'}" style="margin-top:16px;display:inline-flex;padding:10px 22px;
       background:var(--grad-brand);color:#fff;border-radius:var(--r-md);
       font-weight:600;text-decoration:none;font-family:var(--font-display);">
-      Back to home
+      ${isAdminView ? 'Back to Vendors' : 'Back to home'}
     </a>`;
 }
 
 /* ── Back navigation ─────────────────────────────────────── */
 function goBack() {
+  if (isAdminView) { window.location.href = '/admin/vendors'; return; }
   const cameFromSameSite = document.referrer && document.referrer.startsWith(window.location.origin);
   if (cameFromSameSite && history.length > 1) { history.back(); }
   else { window.location.href = '/'; }
@@ -247,7 +360,12 @@ async function loadStore() {
   if (!slug) { showError('Invalid store link.'); return; }
 
   try {
-    const res = await apiRequest(`/products/vendor/${slug}?page=1&per_page=20`, 'GET');
+    isAdminView = await checkAdminView();
+
+    // Admin hits auth endpoint, public hits public endpoint
+    const res = isAdminView
+      ? await apiRequest(`/auth/admin/vendors/${slug}`, 'GET')
+      : await apiRequest(`/products/vendor/${slug}?page=1&per_page=20`, 'GET');
 
     if (!res.success) { showError(res.message || 'Store not found.'); return; }
 
@@ -255,29 +373,53 @@ async function loadStore() {
     hasMore       = res.has_more;
 
     renderVendorHero(res.vendor);
-    updateSEO(res.vendor);
 
-    const grid = document.getElementById('vsGrid');
-    if (!res.products.length) {
-      grid.innerHTML = `
-        <div class="vs-empty" style="grid-column:1/-1;">
-          <div class="vs-empty-icon">📦</div>
-          <h3>No listings yet</h3>
-          <p>This vendor hasn't added any listings.</p>
-        </div>`;
-      document.getElementById('vsListingsCount').textContent = '';
-    } else {
-      res.products.forEach(p => grid.insertAdjacentHTML('beforeend', buildCard(p)));
-      document.getElementById('vsListingsCount').textContent =
-        `${res.total} ${res.total === 1 ? 'listing' : 'listings'}`;
+    if (!isAdminView) {
+      updateSEO(res.vendor);
     }
 
-    document.getElementById('vsLoadMore').style.display = hasMore ? 'flex' : 'none';
+    // ── Admin mode ────────────────────────────────────────
+    if (isAdminView) {
+      document.getElementById('adminSections').style.display = 'block';
+      document.getElementById('vsFilters').style.display = 'none';
+      renderAdminVendorInfo(res.vendor);
+      renderAdminStrikes(res.strikes || []);
+
+      // Fetch public listings separately for the grid
+      const listRes = await apiRequest(`/products/vendor/${slug}?page=1&per_page=20`, 'GET');
+      if (listRes.success && listRes.products.length) {
+        const grid = document.getElementById('vsGrid');
+        listRes.products.forEach(p => grid.insertAdjacentHTML('beforeend', buildCard(p)));
+        document.getElementById('vsListingsCount').textContent =
+          `${listRes.total} ${listRes.total === 1 ? 'listing' : 'listings'}`;
+        hasMore = listRes.has_more;
+        document.getElementById('vsLoadMore').style.display = hasMore ? 'flex' : 'none';
+      }
+
+    // ── Public mode ───────────────────────────────────────
+    } else {
+      const grid = document.getElementById('vsGrid');
+      if (!res.products.length) {
+        grid.innerHTML = `
+          <div class="vs-empty" style="grid-column:1/-1;">
+            <div class="vs-empty-icon">📦</div>
+            <h3>No listings yet</h3>
+            <p>This vendor hasn't added any listings.</p>
+          </div>`;
+        document.getElementById('vsListingsCount').textContent = '';
+      } else {
+        res.products.forEach(p => grid.insertAdjacentHTML('beforeend', buildCard(p)));
+        document.getElementById('vsListingsCount').textContent =
+          `${res.total} ${res.total === 1 ? 'listing' : 'listings'}`;
+      }
+      document.getElementById('vsLoadMore').style.display = hasMore ? 'flex' : 'none';
+    }
+
     document.getElementById('vsLoader').style.display   = 'none';
     document.getElementById('vsContent').style.display  = 'block';
 
   } catch (e) {
-      console.error('VENDOR STORE ERROR:', e); // ← add this
+    console.error('VENDOR STORE ERROR:', e);
     showError('Failed to load store. Please try again.');
   }
 }
