@@ -243,7 +243,6 @@
 
 /* ── Rent / Buy tabs ─────────────────────────────────────────── */
 .listing-tabs {
-  margin-top: 0;
   display: flex;
   justify-content: center;
   background: #fff;
@@ -291,7 +290,7 @@
   background: #fff;
   border-bottom: 1px solid var(--c-border-soft);
   position: sticky;
-  top: 60px;
+  top: 121px;
   z-index: 100;
 }
 
@@ -1215,7 +1214,7 @@
     font-size: 13px;
   }
   .filter-row {
-    top: 62px;
+    top: 110px;
   }
 
   .product-grid {
