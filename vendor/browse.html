@@ -108,9 +108,9 @@
     <!-- ── RENT / BUY TABS ── -->
     <div class="listing-tabs" id="listingTabs">
       <div class="listing-tabs-inner">
-      <button class="listing-tab active" id="tabAll" onclick="switchTab('all')">All</button>
-      <button class="listing-tab" id="tabRent" onclick="switchTab('rent')">Rent</button>
-      <button class="listing-tab" id="tabSell" onclick="switchTab('sell')">Buy</button>
+        <button class="listing-tab active" id="tabAll" onclick="switchTab('all')">All</button>
+        <button class="listing-tab" id="tabRent" onclick="switchTab('rent')">Rent</button>
+        <button class="listing-tab" id="tabSell" onclick="switchTab('sell')">Buy</button>
       </div>
     </div>
 
@@ -145,9 +145,23 @@
             <button class="filter-sheet-close" onclick="bsCloseFilterSheet()">✕</button>
           </div>
           <div class="filter-sheet-body">
+            <!-- Category -->
             <div class="filter-group">
               <div class="filter-group-label">Category</div>
-              <select class="filter-select" id="vsFilterCategory">
+              <div class="filter-custom-select" id="filterCategoryWrap">
+                <button class="filter-custom-select-btn" id="filterCategoryBtn" type="button">
+                  <span id="filterCategoryLabel">All categories</span>
+                  <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
+                    <path d="M1 1l4 4 4-4" stroke="#888" stroke-width="1.5" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                  </svg>
+                </button>
+                <div class="filter-custom-select-dropdown" id="filterCategoryDropdown">
+                  <!-- options injected by JS -->
+                </div>
+              </div>
+              <!-- keep this hidden for JS compatibility -->
+              <select class="filter-select" id="filterCategory" style="display:none;">
                 <option value="">All categories</option>
               </select>
             </div>
