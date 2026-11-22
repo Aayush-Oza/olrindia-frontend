@@ -556,8 +556,12 @@ function _ensureAcWrap() {
   if (input.parentElement.classList.contains('bs-ac-wrap')) return input;
   const wrap = document.createElement('div');
   wrap.className = 'bs-ac-wrap';
+  wrap.style.cssText = 'position:relative;flex:1;display:flex;align-items:center;';
   input.parentNode.insertBefore(wrap, input);
   wrap.appendChild(input);
+  // Move locate button inside wrap too
+  const locateBtn = document.getElementById(cfg.filterLocateBtnId);
+  if (locateBtn) wrap.appendChild(locateBtn);
   return input;
 }
 
