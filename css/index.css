@@ -512,7 +512,21 @@
 
 .filter-location-row {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  position: relative;
+}
+
+.filter-location-row .filter-input {
+  width: 100%;
+  padding-right: 44px;
+}
+
+.filter-locate-btn {
+  position: absolute;
+  right: 6px;
+  border: none;
+  background: transparent;
+  color: var(--c-blue);
 }
 
 .filter-input {
@@ -535,21 +549,6 @@
 
 .filter-input::placeholder {
   color: var(--c-ink-faint);
-}
-
-.filter-locate-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--r-md);
-  border: 1.5px solid var(--c-border);
-  background: var(--c-bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--c-ink-soft);
-  flex-shrink: 0;
-  transition: all var(--t-fast) var(--ease);
 }
 
 .filter-locate-btn:hover {
@@ -1168,6 +1167,11 @@
     border-radius: 20px 20px 0 0;
     transform: translateY(30px);
     max-height: 85vh;
+  }
+
+  .filter-select,
+  .filter-input {
+    font-size: 16px;
   }
 
   .filter-sheet.open {
