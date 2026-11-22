@@ -478,7 +478,11 @@
     z-index: 1001;
     box-shadow: -8px 0 32px rgba(0, 0, 0, 0.10);
   }
+  .chat-back-btn {
+    display: none;
+  }
 }
+
 /* ══════════════════════════════════════════════════════════════
    EMBEDDED CHAT PANEL
    Full-page chat panel used in both user and vendor dashboards.
