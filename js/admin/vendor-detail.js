@@ -3,7 +3,7 @@ const vendorId = params.get('id');
 
 async function loadVendorDetail() {
   if (!vendorId) {
-    window.location.href = 'dashboard.html#vendors';
+    window.location.href = 'vendors';
     return;
   }
   const res = await apiRequest(`/auth/admin/vendors/${vendorId}`, 'GET');
