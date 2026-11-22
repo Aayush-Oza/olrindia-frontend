@@ -317,13 +317,13 @@ function bsEnterCategory(cat) {
 function bsOpenFilterSheet() {
   document.getElementById(cfg.filterSheetId).classList.add('open');
   document.getElementById(cfg.filterOverlayId).classList.add('open');
-  document.getElementById('fabListBtn').style.display = 'none';
+  document.getElementById('fabListBtn').classList.remove('visible'); // ← fix
 }
+
 function bsCloseFilterSheet() {
   document.getElementById(cfg.filterSheetId).classList.remove('open');
   document.getElementById(cfg.filterOverlayId).classList.remove('open');
-  const fab = document.getElementById('fabListBtn');
-  if (fab.classList.contains('visible')) fab.style.display = 'inline-flex';
+  document.getElementById('fabListBtn').classList.add('visible'); // ← fix
   _destroyCityAutocomplete();
 }
 
