@@ -23,6 +23,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   const convId = hash.startsWith('conv=') ? hash.split('=')[1] : null;
 
   openChatOverlay();
-  if (convId) openThread(convId);
+  if (convId) {
+    const convRef = window.fsDoc(window.db, 'conversations', convId);
+    const snap = await window.fsGetDoc(convRef);
+    if (snap.exists()) {
+      openThread(convId);
+    } else {
+      history.replaceState(null, '', window.location.pathname);
+    }
+  }
   else renderChatList();
 });

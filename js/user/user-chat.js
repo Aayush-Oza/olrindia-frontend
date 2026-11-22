@@ -38,5 +38,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   listenToUnreadBadge();
   renderChatList();
 
-  if (convId) openThread(convId);
+  if (convId) {
+    const convRef = window.fsDoc(window.db, 'conversations', convId);
+    const snap = await window.fsGetDoc(convRef);
+    if (snap.exists()) {
+      openThread(convId);
+    } else {
+      history.replaceState(null, '', window.location.pathname);
+    }
+  }
 });

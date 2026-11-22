@@ -246,7 +246,12 @@ function listenToConversation(convId, onUpdate) {
 
   const convRef = window.fsDoc(window.db, 'conversations', convId);
   chatUnsubConvo = window.fsOnSnapshot(convRef, snap => {
-    if (snap.exists()) onUpdate(snap.data());
+    if (!snap.exists()) {
+      // Conversation was deleted - go back to list
+      backToChatList();
+      return;
+    }
+    onUpdate(snap.data());
   }, error => {
     console.warn('Chat listener error (likely auth transition):', error.message);
   });
