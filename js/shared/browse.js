@@ -84,10 +84,45 @@ function bsResetFilters(reload = true) {
 
 // ── Category dropdown ─────────────────────────────────────────
 function bsPopulateCategoryDropdown(categories) {
+  // keep hidden select in sync for JS compatibility
   const sel = document.getElementById(cfg.filterCategoryId);
-  if (!sel) return;
-  sel.innerHTML = '<option value="">All categories</option>' +
-    categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+  if (sel) {
+    sel.innerHTML = '<option value="">All categories</option>' +
+      categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+  }
+
+  // populate custom dropdown
+  const dropdown = document.getElementById('filterCategoryDropdown');
+  const btn = document.getElementById('filterCategoryBtn');
+  const label = document.getElementById('filterCategoryLabel');
+  if (!dropdown) return;
+
+  dropdown.innerHTML = `<div class="filter-custom-select-option active" data-value="">All categories</div>` +
+    categories.map(c => `<div class="filter-custom-select-option" data-value="${c.name}">${c.name}</div>`).join('');
+
+  // toggle dropdown
+  document.getElementById('filterCategoryBtn').onclick = () => {
+    dropdown.classList.toggle('open');
+  };
+
+  // option click
+  dropdown.querySelectorAll('.filter-custom-select-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      const val = opt.dataset.value;
+      label.textContent = opt.textContent;
+      sel.value = val;
+      dropdown.querySelectorAll('.filter-custom-select-option').forEach(o => o.classList.remove('active'));
+      opt.classList.add('active');
+      dropdown.classList.remove('open');
+    });
+  });
+
+  // close on outside click
+  document.addEventListener('click', e => {
+    if (!document.getElementById('filterCategoryWrap')?.contains(e.target)) {
+      dropdown.classList.remove('open');
+    }
+  });
 }
 
 // ── Skeleton card HTML ────────────────────────────────────────

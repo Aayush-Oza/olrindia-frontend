@@ -523,19 +523,25 @@
 
 .filter-locate-btn {
   position: absolute;
-  right: 6px;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--r-md);
-  border: 1.5px solid var(--c-border);
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 44px;
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  border: none;
+  border-left: 1.5px solid var(--c-border);
   background: var(--c-bg);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: var(--c-ink-soft);
-  flex-shrink: 0;
   transition: all var(--t-fast) var(--ease);
+}
+
+.filter-locate-btn:hover {
+  background: #EAF3FF;
+  color: var(--c-blue);
 }
 
 .filter-input {
@@ -558,11 +564,6 @@
 
 .filter-input::placeholder {
   color: var(--c-ink-faint);
-}
-
-.filter-locate-btn:hover {
-  border-color: var(--c-blue);
-  color: var(--c-blue);
 }
 
 .price-type-toggle {
@@ -1163,6 +1164,75 @@
   color: var(--c-ink);
   font-family: var(--font-display);
   margin-bottom: 16px;
+}
+
+.filter-custom-select {
+  position: relative;
+}
+
+.filter-custom-select-btn {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--r-md);
+  font-size: 13.5px;
+  font-family: var(--font-body);
+  color: var(--c-ink);
+  background: var(--c-bg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  transition: border-color var(--t-fast) var(--ease);
+}
+
+.filter-custom-select-btn:focus {
+  outline: none;
+  border-color: var(--c-blue);
+}
+
+.filter-custom-select-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 999;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.filter-custom-select-dropdown.open {
+  display: block;
+}
+
+.filter-custom-select-option {
+  padding: 10px 12px;
+  font-size: 13.5px;
+  font-family: var(--font-body);
+  color: var(--c-ink);
+  cursor: pointer;
+  border-bottom: 1px solid var(--c-border-soft);
+  transition: background var(--t-fast) var(--ease);
+}
+
+.filter-custom-select-option:last-child {
+  border-bottom: none;
+}
+
+.filter-custom-select-option:hover {
+  background: var(--c-bg);
+}
+
+.filter-custom-select-option.active {
+  color: var(--c-blue);
+  font-weight: 600;
+  background: #EAF3FF;
 }
 
 /* ── Responsive ──────────────────────────────────────────────── */
