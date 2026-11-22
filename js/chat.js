@@ -108,7 +108,6 @@ async function getOrCreateConversation({ userId, vendorId, productId, userName, 
   const snap = await window.fsGetDoc(ref).catch(() => null);
 
   if (snap && snap.exists()) {
-    // Conversation already exists - refresh names/photos + current product context
     const updates = { current_product_id: productId, current_product_name: productName || '' };
     if (chatRole === 'user') {
       updates.user_name = userName || '';
@@ -118,28 +117,11 @@ async function getOrCreateConversation({ userId, vendorId, productId, userName, 
       updates.vendor_photo = vendorPhoto || null;
     }
     await window.fsUpdateDoc(ref, updates);
-    return convId;
   }
 
-  await window.fsSetDoc(ref, {
-    user_id: userId,
-    vendor_id: vendorId,
-    user_uid: `user_${userId}`,
-    vendor_uid: `vendor_${vendorId}`,
-    user_name: userName || '',
-    user_photo: userPhoto || null,
-    vendor_name: vendorName || '',
-    vendor_photo: vendorPhoto || null,
-    current_product_id: productId,
-    current_product_name: productName || '',
-    last_message: '',
-    last_message_at: window.fsServerTimestamp(),
-    last_sender_role: null,
-    unread_count_user: 0,
-    unread_count_vendor: 0,
-    user_typing: false,
-    vendor_typing: false,
-  });
+  // Store meta for later use when first message is sent
+  window._pendingConvMeta = window._pendingConvMeta || {};
+  window._pendingConvMeta[convId] = { userId, vendorId, productId, userName, userPhoto, vendorName, vendorPhoto, productName };
 
   return convId;
 }
@@ -183,9 +165,34 @@ async function sendChatMessage(convId, text) {
   if (!text) return;
 
   const convRef = window.fsDoc(window.db, 'conversations', convId);
-  const convSnap = await window.fsGetDoc(convRef);
-  const convData = convSnap.exists() ? convSnap.data() : {};
+  let convSnap = await window.fsGetDoc(convRef);
 
+  // Create conversation only on first message
+  if (!convSnap.exists()) {
+    const meta = window._pendingConvMeta?.[convId] || {};
+    await window.fsSetDoc(convRef, {
+      user_id: meta.userId,
+      vendor_id: meta.vendorId,
+      user_uid: `user_${meta.userId}`,
+      vendor_uid: `vendor_${meta.vendorId}`,
+      user_name: meta.userName || '',
+      user_photo: meta.userPhoto || null,
+      vendor_name: meta.vendorName || '',
+      vendor_photo: meta.vendorPhoto || null,
+      current_product_id: meta.productId,
+      current_product_name: meta.productName || '',
+      last_message: '',
+      last_message_at: window.fsServerTimestamp(),
+      last_sender_role: null,
+      unread_count_user: 0,
+      unread_count_vendor: 0,
+      user_typing: false,
+      vendor_typing: false,
+    });
+    convSnap = await window.fsGetDoc(convRef);
+  }
+
+  const convData = convSnap.data();
   const messagesRef = window.fsCollection(window.db, 'conversations', convId, 'messages');
   await window.fsAddDoc(messagesRef, {
     sender_role: chatRole,
@@ -200,7 +207,7 @@ async function sendChatMessage(convId, text) {
   const otherUnreadField = chatRole === 'user' ? 'unread_count_vendor' : 'unread_count_user';
   const currentUnread = convData[otherUnreadField] || 0;
 
-    await window.fsUpdateDoc(convRef, {
+  await window.fsUpdateDoc(convRef, {
     last_message: text,
     last_message_at: window.fsServerTimestamp(),
     last_sender_role: chatRole,
@@ -208,15 +215,13 @@ async function sendChatMessage(convId, text) {
     [`${chatRole}_typing`]: false,
   });
 
-  // ── Push notification to recipient ──────────────────────────
   try {
     await apiRequest(`/auth/${chatRole}/chat/notify`, 'POST', {
       conv_id: convId,
-      text: text,
+      text,
       sender_role: chatRole,
     });
   } catch (_) {}
-  // ───────────────────────────────────────────────────────────
 }
 
 // ── Listen to messages in a conversation (real-time) ─────────────
@@ -249,6 +254,10 @@ function listenToConversation(convId, onUpdate) {
 
 // ── Mark messages from the other party as seen ────────────────────
 async function markMessagesSeen(convId, messages) {
+  const convRef = window.fsDoc(window.db, 'conversations', convId);
+  const convSnap = await window.fsGetDoc(convRef);
+  if (!convSnap.exists()) return; // no doc yet, nothing to mark
+  
   const otherRole = chatRole === 'user' ? 'vendor' : 'user';
   const unseen = messages.filter(m => m.sender_role === otherRole && m.status !== 'seen');
   if (!unseen.length) return;
@@ -258,25 +267,25 @@ async function markMessagesSeen(convId, messages) {
     return window.fsUpdateDoc(msgRef, { status: 'seen' });
   }));
 
-  const convRef = window.fsDoc(window.db, 'conversations', convId);
   const myUnreadField = chatRole === 'user' ? 'unread_count_user' : 'unread_count_vendor';
   await window.fsUpdateDoc(convRef, { [myUnreadField]: 0 });
 }
 
 // ── Typing indicator (throttled - write at most once per 3s) ─────
 function notifyTyping(convId) {
-  const now = Date.now();
-  if (now - lastTypingWriteAt > 3000) {
-    lastTypingWriteAt = now;
-    const convRef = window.fsDoc(window.db, 'conversations', convId);
-    window.fsUpdateDoc(convRef, { [`${chatRole}_typing`]: true }).catch(() => { });
-  }
-
-  clearTimeout(typingTimeout);
-  typingTimeout = setTimeout(() => {
-    const convRef = window.fsDoc(window.db, 'conversations', convId);
-    window.fsUpdateDoc(convRef, { [`${chatRole}_typing`]: false }).catch(() => { });
-  }, 3000);
+  const convRef = window.fsDoc(window.db, 'conversations', convId);
+  window.fsGetDoc(convRef).then(snap => {
+    if (!snap.exists()) return; // don't create doc just for typing
+    const now = Date.now();
+    if (now - lastTypingWriteAt > 3000) {
+      lastTypingWriteAt = now;
+      window.fsUpdateDoc(convRef, { [`${chatRole}_typing`]: true }).catch(() => {});
+    }
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+      window.fsUpdateDoc(convRef, { [`${chatRole}_typing`]: false }).catch(() => {});
+    }, 3000);
+  });
 }
 
 // ── Get all conversations for the current user/vendor ─────────────
