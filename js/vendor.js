@@ -364,7 +364,7 @@ async function loadStore() {
 
     // Admin hits auth endpoint, public hits public endpoint
     const res = isAdminView
-      ? await apiRequest(`/auth/admin/vendors/${slug}`, 'GET')
+      ? await await apiRequest(`/auth/admin/vendors/slug/${slug}`, 'GET')
       : await apiRequest(`/products/vendor/${slug}?page=1&per_page=20`, 'GET');
 
     if (!res.success) { showError(res.message || 'Store not found.'); return; }
