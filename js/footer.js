@@ -83,7 +83,8 @@
     const stored = getLang();
     Array.from(footerSelect.options).forEach(opt => {
       const item = document.createElement('div');
-      item.className = 'nav-lang-item' + (opt.value === stored ? ' active' : '');
+      item.className = 'nav-lang-item notranslate' + (opt.value === stored ? ' active' : '');
+      item.setAttribute('translate', 'no');
       item.textContent = LANG_LABELS[opt.value] || opt.textContent;
 
       item.addEventListener('mousedown', (e) => {
