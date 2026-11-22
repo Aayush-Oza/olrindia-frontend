@@ -682,7 +682,7 @@ document.getElementById('productForm')?.addEventListener('submit', async e => {
     if (!category) { toastError('Please select a category.');    return; }
     if (Object.keys(slotFiles).length === 0) { toastError('Please upload at least one photo.'); return; }
 
-    // Location validation — must have pincode OR detected lat/lng
+    // Location validation - must have pincode OR detected lat/lng
     if (!pincode && !lat) {
       toastError('Please enter your pincode or use the 📍 Detect button to set your location.');
       return;

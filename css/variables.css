@@ -2,7 +2,7 @@
    OLR INDIA – DESIGN TOKENS  (brand-harmonized rebuild)
 
    Every neutral, surface, border, and status color is derived
-   from the three brand hues — nothing is generic gray.
+   from the three brand hues - nothing is generic gray.
 
    Brand DNA:
      Orange  #FF8500 → #F54617   (energy, CTA, primary action)
@@ -126,7 +126,7 @@
 
    --c-bg          #FAFAF8 → #FFF8F2
      Old was a vaguely yellowish white with no intent.
-     New is white tinted with ~3% orange warmth — the page
+     New is white tinted with ~3% orange warmth - the page
      now breathes the same energy as the brand.
 
    --c-surface-raised  (new token)
@@ -134,27 +134,27 @@
      they feel lifted from the page without breaking harmony.
 
    --c-surface-muted   (new token)
-     For input backgrounds and subtle fills — warmer than
+     For input backgrounds and subtle fills - warmer than
      white, cooler than raised. Gives inputs a home.
 
    --c-ink         #181A1B → #0F1923
      Old was cold charcoal with no direction.
-     New is a very dark navy-black — same darkness but pulls
+     New is a very dark navy-black - same darkness but pulls
      toward --c-blue-deep so text feels part of the brand.
 
    --c-ink-soft    #555B61 → #4A5568
      Old had a slight blue-gray cast that clashed with orange.
-     New is a balanced blue-tinted mid-tone — works as
+     New is a balanced blue-tinted mid-tone - works as
      secondary text on both warm surfaces and white cards.
 
    --c-ink-faint   #8A9097 → #7E8FA6
      Old was cold and felt like it belonged to a gray SaaS.
-     New is warmer and bluer — sits comfortably on the warm
+     New is warmer and bluer - sits comfortably on the warm
      page bg without looking washed out.
 
    --c-border      #E6E5E1 → #EADDD0
      Old had a dirty warm cast that felt accidental.
-     New is intentionally orange-tinted at ~10% — borders
+     New is intentionally orange-tinted at ~10% - borders
      now look like they belong to the same family as the brand.
 
    --c-border-soft #F0EFEC → #F2EAE0
@@ -164,10 +164,10 @@
      Slightly warmer to harmonize with the page background.
 
    --c-success-bg  #E9F8F0 → #E6F7F2
-     Marginally richer green tint — was slightly too minty.
+     Marginally richer green tint - was slightly too minty.
 
    --shadow-*      rgba(24,26,27,x) → rgba(8,115,231,x)
-     Old shadows used plain dark rgba — looked generic.
+     Old shadows used plain dark rgba - looked generic.
      New shadows tint from --c-blue so elevation feels on-brand.
      Card shadow also has a soft dark base layer for depth.
 

@@ -497,9 +497,9 @@ function bsRenderHomeProdGrid(homeProdGrid, products) {
 //  KEY FIXES vs previous version:
 //  1. Wildcard suffix (*) appended to every query so partial input
 //     like "borival" matches "Borivali East", "Borivali West" etc.
-//  2. Results deduplicated by formatted label — no more duplicate
+//  2. Results deduplicated by formatted label - no more duplicate
 //     "R/C Ward, Maharashtra" entries.
-//  3. Label builder is more defensive — skips blank parts and
+//  3. Label builder is more defensive - skips blank parts and
 //     avoids repeating the same segment twice in a row.
 //  4. Abort controller is reset properly on every new keystroke
 //     so stale responses never overwrite fresh ones.
@@ -713,7 +713,7 @@ function _initCityAutocomplete() {
       input.parentElement.appendChild(_acDropdown);
     }
 
-    // 350 ms debounce — fires _acFetch which appends the wildcard
+    // 350 ms debounce - fires _acFetch which appends the wildcard
     _acDebounceTimer = setTimeout(() => _acFetch(q, input), 350);
   });
 
@@ -809,7 +809,7 @@ function _bindFilterEvents() {
         }
       } catch {
         toastError('Location lookup failed.');
-        // Coordinates are still saved — backend can use them for distance sorting.
+        // Coordinates are still saved - backend can use them for distance sorting.
       } finally {
         btn.disabled = false; btn.style.opacity = '1';
       }

@@ -118,7 +118,7 @@ document.getElementById('deleteAccountBtn')?.addEventListener('click', async () 
   const isGoogle = window._userIsGoogle;
 
   if (isGoogle) {
-    // Google user — just confirm, no password needed
+    // Google user - just confirm, no password needed
     const confirmed = await showConfirm({
       title: 'Delete your account?',
       text: 'This will permanently delete your account, wishlist, chats and all data. This cannot be undone.',
@@ -140,7 +140,7 @@ document.getElementById('deleteAccountBtn')?.addEventListener('click', async () 
     }
 
   } else {
-    // Password user — confirm then ask for password
+    // Password user - confirm then ask for password
     const confirmed = await showConfirm({
       title: 'Delete your account?',
       text: 'This will permanently delete your account, wishlist, chats and all data. This cannot be undone.',
