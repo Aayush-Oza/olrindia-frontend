@@ -82,10 +82,6 @@ body {
 }
 
 @media (max-width: 480px) {
-  .filter-row {
-    top: 58px;
-  }
-
   .filter-row-inner {
     padding: 12px 12px 10px;
   }
