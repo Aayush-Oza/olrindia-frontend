@@ -243,6 +243,7 @@
 
 /* ── Rent / Buy tabs ─────────────────────────────────────────── */
 .listing-tabs {
+  margin-top: 0;
   display: flex;
   justify-content: center;
   background: #fff;
