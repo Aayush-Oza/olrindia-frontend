@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       filterGroupPriceTypeId:  'vsFilterGroupPriceType',
       filterGroupConditionId:  'vsFilterGroupCondition',
       // filter inputs
-      filterCategoryId:        'FilterCategory',
+      filterCategoryId:        'filterCategory',
       filterCityId:            'vsFilterCity',
       filterConditionId:       'vsFilterCondition',
       filterPriceMinId:        'vsFilterPriceMin',
