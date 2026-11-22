@@ -291,7 +291,7 @@
   background: #fff;
   border-bottom: 1px solid var(--c-border-soft);
   position: sticky;
-  top: 121px;
+  top: 131px;
   z-index: 100;
 }
 
@@ -1214,7 +1214,7 @@
     top: 58px;
   }
   .filter-row {
-    top: 110px;
+    top: 121px;
   }
 
   .product-grid {
