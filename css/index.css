@@ -524,9 +524,18 @@
 .filter-locate-btn {
   position: absolute;
   right: 6px;
-  border: none;
-  background: transparent;
-  color: var(--c-blue);
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-md);
+  border: 1.5px solid var(--c-border);
+  background: var(--c-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--c-ink-soft);
+  flex-shrink: 0;
+  transition: all var(--t-fast) var(--ease);
 }
 
 .filter-input {
