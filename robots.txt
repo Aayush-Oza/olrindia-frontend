@@ -1,19 +1,27 @@
 User-agent: *
+
 Allow: /
 Allow: /about.html
 Allow: /terms.html
 Allow: /privacy.html
+Allow: /product.html
+Allow: /vendor.html
 Allow: /vendor/signup.html
 Allow: /vendor/login.html
 Allow: /user/signup.html
 Allow: /user/login.html
-Allow: /p.html
 
-Disallow: /user/dashboard.html
+Disallow: /user/browse.html
+Disallow: /user/chat.html
+Disallow: /user/profile.html
+Disallow: /user/wishlist.html
 Disallow: /user/forgot-password.html
 Disallow: /user/reset-password.html
 Disallow: /user/verify-email.html
 Disallow: /vendor/browse.html
+Disallow: /vendor/chat.html
+Disallow: /vendor/my-products.html
+Disallow: /vendor/profile.html
 Disallow: /vendor/forgot-password.html
 Disallow: /vendor/reset-password.html
 Disallow: /vendor/verify-email.html
