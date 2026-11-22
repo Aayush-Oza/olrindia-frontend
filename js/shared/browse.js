@@ -322,7 +322,8 @@ function bsOpenFilterSheet() {
 function bsCloseFilterSheet() {
   document.getElementById(cfg.filterSheetId).classList.remove('open');
   document.getElementById(cfg.filterOverlayId).classList.remove('open');
-  document.getElementById('fabListBtn').style.display = '';
+  const fab = document.getElementById('fabListBtn');
+  if (fab.classList.contains('visible')) fab.style.display = 'inline-flex';
   _destroyCityAutocomplete();
 }
 
