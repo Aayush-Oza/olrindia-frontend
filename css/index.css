@@ -1195,6 +1195,7 @@
   box-shadow: var(--shadow-lg);
   z-index: 999;
   max-height: 200px;
+  overflow-y: auto hidden;
 }
 
 .filter-custom-select-dropdown.open {
@@ -1223,6 +1224,15 @@
   color: var(--c-blue);
   font-weight: 600;
   background: #EAF3FF;
+}
+
+.bs-ac-wrap {
+  flex: 1;
+  position: relative;
+}
+
+.bs-ac-wrap input {
+  width: 100%;
 }
 
 /* ── Responsive ──────────────────────────────────────────────── */
