@@ -178,27 +178,35 @@ function renderVendorHero(v) {
 
 /* ── SEO ─────────────────────────────────────────────────── */
 function updateSEO(v) {
-  const storeUrl = `https://olrindia.com/vendor/${v.store_slug}`;
-  const title    = `${v.name}'s Store – OLR India`;
-  const desc     = `Browse ${v.total_listings} active listing${v.total_listings !== 1 ? 's' : ''} from ${v.name} on OLR India. Based in ${v.city || 'India'}.`;
-  const img      = v.profile_photo || 'https://olrindia.com/assets/og-banner.jpg';
+  const storeUrl   = `https://olrindia.com/vendor/${v.store_slug}`;
+  const title      = `${v.name}'s Store – OLR India`;
+  const cityText   = v.city || 'India';
+  const total      = v.total_listings || 0;
+  const desc       = `Browse ${total} active listing${total !== 1 ? 's' : ''} from ${v.name} in ${cityText} on OLR India. No middleman. Direct chat.`;
+  const img        = v.profile_photo || 'https://olrindia.com/assets/og-banner.jpg';
+  const keywords   = `${v.name} rentals, rent in ${cityText}, OLR India vendor, ${cityText} rentals`;
 
   document.title = title;
-  document.getElementById('pageTitle').textContent = title;
+  document.getElementById('pageTitle').textContent    = title;
   document.getElementById('metaDesc').setAttribute('content', desc);
+  document.getElementById('metaKeywords').setAttribute('content', keywords);
   document.getElementById('metaCanonical').setAttribute('href', storeUrl);
   document.getElementById('ogTitle').setAttribute('content', title);
   document.getElementById('ogDesc').setAttribute('content', desc);
   document.getElementById('ogImage').setAttribute('content', img);
+  document.getElementById('ogImageAlt').setAttribute('content', `${v.name}'s Store – OLR India`);
   document.getElementById('ogUrl').setAttribute('content', storeUrl);
   document.getElementById('twTitle').setAttribute('content', title);
   document.getElementById('twDesc').setAttribute('content', desc);
   document.getElementById('twImage').setAttribute('content', img);
+  document.getElementById('twImageAlt').setAttribute('content', `${v.name}'s Store – OLR India`);
 
   document.getElementById('vendorSchema').textContent = JSON.stringify({
     "@context": "https://schema.org",
     "@type":    "LocalBusiness",
+    "@id":      storeUrl,
     "name":     v.name,
+    "description": desc,
     "url":      storeUrl,
     "image":    img,
     "address": {
@@ -206,6 +214,9 @@ function updateSEO(v) {
       "addressLocality": v.city  || '',
       "addressRegion":   v.state || '',
       "addressCountry":  "IN"
+    },
+    "memberOf": {
+      "@id": "https://olrindia.com/#organization"
     }
   });
 }

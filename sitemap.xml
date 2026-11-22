@@ -6,4 +6,7 @@
   <sitemap>
     <loc>https://olrindia.com/sitemap-products.xml</loc>
   </sitemap>
+  <sitemap>
+    <loc>https://olrindia.com/sitemap-vendors.xml</loc>
+  </sitemap>
 </sitemapindex>
