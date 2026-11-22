@@ -721,7 +721,7 @@ document.getElementById('adminRemoveConfirm')?.addEventListener('click', async (
         ? 'Product removed. Vendor reached 3 strikes and was auto-suspended.'
         : `Product removed. Vendor now has ${res.strike_count} strike(s).`
     );
-    setTimeout(() => { window.location.href = '/admin/dashboard#products'; }, 1600);
+    setTimeout(() => { window.location.href = '/admin/products'; }, 1600);
   } else {
     toastError(res.message || 'Failed to remove product.');
   }
