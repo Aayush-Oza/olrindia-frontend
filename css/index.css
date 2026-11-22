@@ -1196,6 +1196,11 @@
   z-index: 999;
   max-height: 200px;
   overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.filter-custom-select-dropdown::-webkit-scrollbar {
+  display: none;
 }
 
 .filter-custom-select-dropdown.open {
