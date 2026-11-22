@@ -512,35 +512,26 @@
 
 .filter-location-row {
   display: flex;
-  align-items: center;
-  position: relative;
-}
-
-.filter-location-row .filter-input {
-  width: 100%;
-  padding-right: 44px;
+  gap: 8px;
 }
 
 .filter-locate-btn {
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 44px;
-  border-radius: 0 var(--r-md) var(--r-md) 0;
-  border: none;
-  border-left: 1.5px solid var(--c-border);
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-md);
+  border: 1.5px solid var(--c-border);
   background: var(--c-bg);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: var(--c-ink-soft);
+  flex-shrink: 0;
   transition: all var(--t-fast) var(--ease);
 }
 
 .filter-locate-btn:hover {
-  background: #EAF3FF;
+  border-color: var(--c-blue);
   color: var(--c-blue);
 }
 
@@ -1204,7 +1195,6 @@
   box-shadow: var(--shadow-lg);
   z-index: 999;
   max-height: 200px;
-  overflow-y: auto;
 }
 
 .filter-custom-select-dropdown.open {
