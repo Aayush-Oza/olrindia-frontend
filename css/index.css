@@ -1300,9 +1300,15 @@
 
   .listing-tabs {
     top: 58px;
+    padding: 8px 0;
+
   }
   .filter-row {
     top: 121px;
+  }
+
+  .filter-row-inner {
+    padding: 8px 12px;  
   }
 
   .product-grid {
