@@ -8,7 +8,9 @@
   <link rel="icon" href="../assets/favicon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="../css/variables.css?v=19">
   <link rel="stylesheet" href="../css/base.css?v=19">
   <link rel="stylesheet" href="../css/components.css?v=19">
@@ -25,7 +27,8 @@
     <div id="suspendedBanner"
       style="display:none;background:#fee2e2;border-bottom:2px solid #ef4444;color:#991b1b;padding:14px 24px;font-size:14px;text-align:center;position:relative;z-index:999;">
       <strong>Account Suspended:</strong> Your account has been suspended. You cannot perform any actions.
-      Please contact <a href="mailto:support@olrindia.com" style="color:#991b1b;font-weight:600;">support@olrindia.com</a> to get your account reviewed.
+      Please contact <a href="mailto:support@olrindia.com"
+        style="color:#991b1b;font-weight:600;">support@olrindia.com</a> to get your account reviewed.
     </div>
 
     <!-- NAVBAR -->
@@ -37,40 +40,43 @@
         <div class="dash-nav-links">
           <a class="nav-link active" href="/vendor/my-products">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-              <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
-              <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
-              <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
-              <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+              <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+              <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+              <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+              <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
             </svg>
             My Products
             <span class="nav-badge" id="productCount" style="display:none;"></span>
           </a>
           <a class="nav-link" href="/vendor/chat">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
-                stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path
+                d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
+                stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
             Chat
             <span class="nav-badge" id="chatUnreadCount" style="display:none;"></span>
           </a>
           <a class="nav-link" href="/vendor/profile">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-              <path d="M4 21v-1a7 7 0 0 1 14 0v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-              <circle cx="11" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M4 21v-1a7 7 0 0 1 14 0v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+              <circle cx="11" cy="7" r="4" stroke="currentColor" stroke-width="1.8" />
             </svg>
             Profile
           </a>
           <a class="nav-link" href="/vendor/browse">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-              <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" stroke="currentColor" stroke-width="1.8"/>
-              <path d="M9 21V12h6v9" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" stroke="currentColor"
+                stroke-width="1.8" />
+              <path d="M9 21V12h6v9" stroke="currentColor" stroke-width="1.8" />
             </svg>
             Browse
           </a>
           <button class="nav-lang-select-btn" id="navLangBtn">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
-              <path d="M3 12h18M12 3c2.4 2.6 3.8 5.9 3.8 9s-1.4 6.4-3.8 9c-2.4-2.6-3.8-5.9-3.8-9S9.6 5.6 12 3Z" stroke="currentColor" stroke-width="1.8"/>
+              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" />
+              <path d="M3 12h18M12 3c2.4 2.6 3.8 5.9 3.8 9s-1.4 6.4-3.8 9c-2.4-2.6-3.8-5.9-3.8-9S9.6 5.6 12 3Z"
+                stroke="currentColor" stroke-width="1.8" />
             </svg>
             Language
           </button>
@@ -86,8 +92,9 @@
         <div class="nav-lang-wrap" id="navLangWrapMobile">
           <button class="nav-wish-btn" id="navLangBtnMobile" title="Language">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
-              <path d="M3 12h18M12 3c2.4 2.6 3.8 5.9 3.8 9s-1.4 6.4-3.8 9c-2.4-2.6-3.8-5.9-3.8-9S9.6 5.6 12 3Z" stroke="currentColor" stroke-width="1.8"/>
+              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" />
+              <path d="M3 12h18M12 3c2.4 2.6 3.8 5.9 3.8 9s-1.4 6.4-3.8 9c-2.4-2.6-3.8-5.9-3.8-9S9.6 5.6 12 3Z"
+                stroke="currentColor" stroke-width="1.8" />
             </svg>
           </button>
           <div class="nav-lang-menu" id="navLangMenuMobile"></div>
@@ -103,36 +110,39 @@
         </div>
         <a class="mobile-nav-link active" href="/vendor/my-products">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
-            <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
-            <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
-            <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/>
+            <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+            <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+            <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
+            <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8" />
           </svg>
           My Products
         </a>
         <a class="mobile-nav-link" href="/vendor/chat">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
-              stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path
+              d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
+              stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
           Chat
           <span class="nav-badge" id="chatUnreadCountMobile" style="display:none;"></span>
         </a>
         <a class="mobile-nav-link" href="/vendor/profile">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M4 21v-1a7 7 0 0 1 14 0v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-            <circle cx="11" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M4 21v-1a7 7 0 0 1 14 0v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            <circle cx="11" cy="7" r="4" stroke="currentColor" stroke-width="1.8" />
           </svg>
           Profile
         </a>
         <a class="mobile-nav-link" href="/vendor/browse">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" stroke="currentColor" stroke-width="1.8"/>
-            <path d="M9 21V12h6v9" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" stroke="currentColor"
+              stroke-width="1.8" />
+            <path d="M9 21V12h6v9" stroke="currentColor" stroke-width="1.8" />
           </svg>
           Browse
         </a>
-        <button class="nav-btn nav-btn-ghost" id="logoutBtnMobile" style="width:100%;justify-content:center;margin-top:4px;">Log out</button>
+        <button class="nav-btn nav-btn-ghost" id="logoutBtnMobile"
+          style="width:100%;justify-content:center;margin-top:4px;">Log out</button>
       </div>
     </nav>
 
@@ -143,7 +153,7 @@
           <h2>My Products</h2>
           <button class="btn btn-primary" id="addProductBtn" style="width:auto;padding:9px 20px;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="margin-right:6px;">
-              <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+              <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
             </svg>
             Add product
           </button>
@@ -202,7 +212,7 @@
         </div>
         <button class="modal-close" onclick="closeProductModal()">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
           </svg>
         </button>
       </div>
@@ -217,8 +227,8 @@
               <button type="button" id="toggleRent" class="lt-btn active" onclick="setListingType('rent')">
                 <span class="lt-icon">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="1.8"/>
-                    <path d="M9 22V12h6v10" stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="1.8" />
+                    <path d="M9 22V12h6v10" stroke="currentColor" stroke-width="1.8" />
                   </svg>
                 </span>
                 <span class="lt-text">
@@ -229,8 +239,9 @@
               <button type="button" id="toggleSell" class="lt-btn" onclick="setListingType('sell')">
                 <span class="lt-icon">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" stroke="currentColor" stroke-width="1.8"/>
-                    <circle cx="7" cy="7" r="1.5" fill="currentColor"/>
+                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"
+                      stroke="currentColor" stroke-width="1.8" />
+                    <circle cx="7" cy="7" r="1.5" fill="currentColor" />
                   </svg>
                 </span>
                 <span class="lt-text">
@@ -247,16 +258,18 @@
 
           <!-- Photos -->
           <div class="form-section">
-            <div class="form-section-label">Photos <span class="form-section-label-opt">up to 5 — tap two to swap order</span></div>
+            <div class="form-section-label">Photos <span class="form-section-label-opt">up to 5 — tap two to swap
+                order</span></div>
             <div class="photo-upload-zone" id="photoUploadZone">
               <input type="file" id="bulkImageInput" accept="image/*" multiple style="display:none;">
               <div class="photo-upload-inner" id="photoUploadInner"
                 onclick="document.getElementById('bulkImageInput').click()">
                 <div class="photo-upload-icon">
                   <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                    <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.6"/>
-                    <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" opacity=".5"/>
-                    <path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.6" />
+                    <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" opacity=".5" />
+                    <path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
+                      stroke-linejoin="round" />
                   </svg>
                 </div>
                 <p class="photo-upload-label">Click to upload photos</p>
@@ -271,17 +284,33 @@
           <div class="form-section">
             <div class="field-row">
               <div class="field">
-                <label class="label" for="modalCategory">Category</label>
-                <select class="input" id="modalCategory" name="category">
-                  <option value="">Select category</option>
-                </select>
+                <label class="label">Category</label>
+                <div class="filter-custom-select" id="categoryDropdown">
+                  <button type="button" class="filter-custom-select-btn" id="modalCategoryBtn">
+                    <span id="modalCategoryLabel">Select category</span>
+                    <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
+                      <path d="M1 1l4 4 4-4" stroke="#888" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    </svg>
+                  </button>
+                  <div class="filter-custom-select-dropdown" id="modalCategoryDropdown"></div>
+                </div>
+                <input type="hidden" id="modalCategory" name="category">
                 <div class="field-error" id="err-category">Please select a category.</div>
               </div>
               <div class="field">
-                <label class="label" for="modalSubcategory">Subcategory <span class="opt">optional</span></label>
-                <select class="input" id="modalSubcategory" name="subcategory">
-                  <option value="">Select subcategory</option>
-                </select>
+                <label class="label">Subcategory <span class="opt">optional</span></label>
+                <div class="filter-custom-select" id="subcategoryDropdown">
+                  <button type="button" class="filter-custom-select-btn" id="modalSubcategoryBtn">
+                    <span id="modalSubcategoryLabel">Select subcategory</span>
+                    <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
+                      <path d="M1 1l4 4 4-4" stroke="#888" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    </svg>
+                  </button>
+                  <div class="filter-custom-select-dropdown" id="modalSubcategoryDropdown"></div>
+                </div>
+                <input type="hidden" id="modalSubcategory" name="subcategory">
               </div>
             </div>
           </div>
@@ -290,7 +319,8 @@
           <div class="form-section">
             <div class="field">
               <label class="label" for="modalName">Product name</label>
-              <input class="input" type="text" id="modalName" name="name" placeholder="e.g. Canon EOS 90D DSLR Camera" autocomplete="off">
+              <input class="input" type="text" id="modalName" name="name" placeholder="e.g. Canon EOS 90D DSLR Camera"
+                autocomplete="off">
               <div class="field-error" id="err-name">Please enter a product name.</div>
             </div>
             <div class="field" style="margin-bottom:0;">
@@ -302,11 +332,13 @@
 
           <!-- Rent fields -->
           <div class="form-section" id="rentFieldsSection">
-            <div class="form-section-label">Pricing <span class="form-section-label-opt">set at least one rate</span></div>
+            <div class="form-section-label">Pricing <span class="form-section-label-opt">set at least one rate</span>
+            </div>
             <div class="field-row-3" id="rentPriceGrid">
               <div class="field" id="rentWrap_hour">
                 <label class="label" for="modalRentHour">Per hour (₹)</label>
-                <input class="input" type="number" id="modalRentHour" name="rent_per_hour" placeholder="e.g. 99" min="0">
+                <input class="input" type="number" id="modalRentHour" name="rent_per_hour" placeholder="e.g. 99"
+                  min="0">
               </div>
               <div class="field" id="rentWrap_km">
                 <label class="label" for="modalRentKm">Per km (₹)</label>
@@ -318,13 +350,15 @@
               </div>
               <div class="field" id="rentWrap_month">
                 <label class="label" for="modalRentMonth">Per month (₹)</label>
-                <input class="input" type="number" id="modalRentMonth" name="rent_per_month" placeholder="e.g. 4999" min="0">
+                <input class="input" type="number" id="modalRentMonth" name="rent_per_month" placeholder="e.g. 4999"
+                  min="0">
               </div>
             </div>
             <div class="field-error-block" id="err-rent-price">Please set at least one rent rate.</div>
             <div class="field" style="max-width:200px;margin-bottom:0;">
               <label class="label" for="modalDeposit">Security deposit (₹) <span class="opt">optional</span></label>
-              <input class="input" type="number" id="modalDeposit" name="security_deposit" placeholder="e.g. 2000" min="0">
+              <input class="input" type="number" id="modalDeposit" name="security_deposit" placeholder="e.g. 2000"
+                min="0">
             </div>
           </div>
 
@@ -334,7 +368,8 @@
             <div class="field-row" style="align-items:flex-start;">
               <div class="field">
                 <label class="label" for="modalSellingPrice">Selling price (₹)</label>
-                <input class="input" type="number" id="modalSellingPrice" name="selling_price" placeholder="e.g. 15000" min="0">
+                <input class="input" type="number" id="modalSellingPrice" name="selling_price" placeholder="e.g. 15000"
+                  min="0">
                 <div class="field-error" id="err-sell-price">Please enter a selling price.</div>
               </div>
             </div>
@@ -348,17 +383,20 @@
 
           <!-- Location -->
           <div class="form-section">
-            <div class="form-section-label">Location <span class="form-section-label-opt">auto-filled from profile</span></div>
+            <div class="form-section-label">Location <span class="form-section-label-opt">auto-filled from
+                profile</span></div>
             <div class="field-row">
               <div class="field">
                 <label class="label" for="modalPincode">Pincode</label>
                 <div class="pincode-input-wrap">
-                  <input class="input" type="text" id="modalPincode" name="pincode" placeholder="6-digit pincode" maxlength="6">
+                  <input class="input" type="text" id="modalPincode" name="pincode" placeholder="6-digit pincode"
+                    maxlength="6">
                   <button type="button" id="detectLocationBtn" class="detect-location-btn" title="Detect my location">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                      <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/>
-                      <path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                      <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2 3"/>
+                      <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8" />
+                      <path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" />
+                      <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2 3" />
                     </svg>
                   </button>
                 </div>
@@ -404,7 +442,7 @@
         <h3>Product details</h3>
         <button class="modal-close" onclick="closePreviewModal()">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
           </svg>
         </button>
       </div>
@@ -423,7 +461,7 @@
         </div>
         <button class="modal-close" id="upgradeModalCancel">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
           </svg>
         </button>
       </div>
@@ -442,21 +480,23 @@
       <p class="product-modal-text">Send this link to anyone — they can view your product directly.</p>
       <div class="share-link-row">
         <input class="input" type="text" id="shareLinkInput" readonly>
-        <button class="btn btn-primary" id="shareLinkCopyBtn" style="width:auto;padding:10px 18px;flex-shrink:0;">Copy</button>
+        <button class="btn btn-primary" id="shareLinkCopyBtn"
+          style="width:auto;padding:10px 18px;flex-shrink:0;">Copy</button>
       </div>
       <div class="share-options-row">
         <button class="share-option-btn" id="shareNativeBtn">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="1.8"/>
-            <circle cx="6" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/>
-            <circle cx="18" cy="19" r="3" stroke="currentColor" stroke-width="1.8"/>
-            <path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" stroke="currentColor" stroke-width="1.8"/>
+            <circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="1.8" />
+            <circle cx="6" cy="12" r="3" stroke="currentColor" stroke-width="1.8" />
+            <circle cx="18" cy="19" r="3" stroke="currentColor" stroke-width="1.8" />
+            <path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" stroke="currentColor" stroke-width="1.8" />
           </svg>
           <span>Share via…</span>
         </button>
         <a class="share-option-btn share-option-whatsapp" id="shareWhatsappBtn" target="_blank" rel="noopener">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12.04 2c-5.46 0-9.9 4.44-9.9 9.9 0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.87 9.87 0 0 0 4.79 1.22h.01c5.46 0 9.9-4.44 9.9-9.9s-4.44-9.94-9.91-9.94zm0 18.13a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.21 8.21 0 0 1-1.27-4.37c0-4.54 3.7-8.23 8.24-8.23 2.2 0 4.27.86 5.83 2.42a8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.7 8.22-8.24 8.22zm4.52-6.16c-.25-.12-1.47-.72-1.7-.81-.23-.08-.39-.12-.56.12-.17.25-.64.81-.78.97-.14.17-.29.19-.54.06-.25-.12-1.04-.38-1.99-1.22-.74-.65-1.23-1.46-1.38-1.7-.14-.25-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.15.16-.25.25-.42.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.42-.14-.01-.31-.01-.48-.01-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.43 1.03 2.6.13.17 1.77 2.71 4.3 3.79.6.26 1.07.41 1.43.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.1-.23-.16-.48-.28z"/>
+            <path
+              d="M12.04 2c-5.46 0-9.9 4.44-9.9 9.9 0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.87 9.87 0 0 0 4.79 1.22h.01c5.46 0 9.9-4.44 9.9-9.9s-4.44-9.94-9.91-9.94zm0 18.13a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.21 8.21 0 0 1-1.27-4.37c0-4.54 3.7-8.23 8.24-8.23 2.2 0 4.27.86 5.83 2.42a8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.7 8.22-8.24 8.22zm4.52-6.16c-.25-.12-1.47-.72-1.7-.81-.23-.08-.39-.12-.56.12-.17.25-.64.81-.78.97-.14.17-.29.19-.54.06-.25-.12-1.04-.38-1.99-1.22-.74-.65-1.23-1.46-1.38-1.7-.14-.25-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.15.16-.25.25-.42.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.42-.14-.01-.31-.01-.48-.01-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.43 1.03 2.6.13.17 1.77 2.71 4.3 3.79.6.26 1.07.41 1.43.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.1-.23-.16-.48-.28z" />
           </svg>
           <span>WhatsApp</span>
         </a>
@@ -505,15 +545,16 @@
         <div class="footer-col-title">Follow Us</div>
         <a href="https://www.instagram.com/olr_india" target="_blank" rel="noopener" class="footer-social-item">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-            <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.8"/>
-            <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/>
-            <circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
+            <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.8" />
+            <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8" />
+            <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
           </svg>
           Instagram
         </a>
         <a href="https://facebook.com/olrindia" target="_blank" rel="noopener" class="footer-social-item">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" stroke="currentColor"
+              stroke-width="1.8" stroke-linejoin="round" />
           </svg>
           Facebook
         </a>
@@ -522,8 +563,9 @@
         <div class="footer-col-title">Contact</div>
         <a href="mailto:support@olrindia.com" class="footer-contact-item">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.8"/>
-            <path d="m22 6-10 7L2 6" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor"
+              stroke-width="1.8" />
+            <path d="m22 6-10 7L2 6" stroke="currentColor" stroke-width="1.8" />
           </svg>
           support@olrindia.com
         </a>

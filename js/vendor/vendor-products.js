@@ -1,5 +1,5 @@
 /* ============================================================
-   OLR INDIA – VENDOR PRODUCTS JS  v8
+   OLR INDIA – VENDOR PRODUCTS JS  v9
    Requires: vendor-nav.js, vendor-upgrade.js
    ============================================================ */
 
@@ -13,7 +13,7 @@ let currentListingType = 'rent';
 // Unified photo slots: index 0–4 → slot 1–5
 // Each entry: { file: File|null, preview: string, url: string|null }
 const photoSlots = [null, null, null, null, null];
-let previewProductId       = null;
+let previewProductId        = null;
 let originalProductSnapshot = null;
 
 // ── Suspended banner ──────────────────────────────────────────
@@ -74,15 +74,60 @@ async function loadVendorProfile() {
 async function loadCategories() {
   const res = await apiRequest('/auth/vendor/categories', 'GET');
   if (res.success) CATEGORIES = res.categories;
-  const sel = document.getElementById('modalCategory');
-  if (!sel) return;
-  sel.innerHTML = '<option value="">Select category</option>';
+  initCategoryDropdown();
+}
+
+function initCategoryDropdown() {
+  const dropdown = document.getElementById('modalCategoryDropdown');
+  if (!dropdown) return;
+  dropdown.innerHTML = '';
+  const clearOpt = document.createElement('div');
+  clearOpt.className   = 'filter-custom-select-option';
+  clearOpt.textContent = 'Select category';
+  clearOpt.addEventListener('click', () => setCategoryValue('', 'Select category'));
+  dropdown.appendChild(clearOpt);
   Object.keys(CATEGORIES).forEach(cat => {
-    const o = document.createElement('option');
-    o.value       = cat;
-    o.textContent = cat;
-    sel.appendChild(o);
+    const opt = document.createElement('div');
+    opt.className   = 'filter-custom-select-option';
+    opt.textContent = cat;
+    opt.addEventListener('click', () => setCategoryValue(cat, cat));
+    dropdown.appendChild(opt);
   });
+}
+
+function setCategoryValue(val, label) {
+  document.getElementById('modalCategory').value          = val;
+  document.getElementById('modalCategoryLabel').textContent = label;
+  document.getElementById('modalCategoryDropdown').classList.remove('open');
+  // reset subcategory
+  setSubcategoryValue('', 'Select subcategory');
+  // populate subcategories
+  const subDropdown = document.getElementById('modalSubcategoryDropdown');
+  if (!subDropdown) return;
+  subDropdown.innerHTML = '';
+  const subs = (CATEGORIES[val] || {}).subcategories || [];
+  if (subs.length) {
+    const clearOpt = document.createElement('div');
+    clearOpt.className   = 'filter-custom-select-option';
+    clearOpt.textContent = 'Select subcategory';
+    clearOpt.addEventListener('click', () => setSubcategoryValue('', 'Select subcategory'));
+    subDropdown.appendChild(clearOpt);
+    subs.forEach(s => {
+      const opt = document.createElement('div');
+      opt.className   = 'filter-custom-select-option';
+      opt.textContent = s;
+      opt.addEventListener('click', () => setSubcategoryValue(s, s));
+      subDropdown.appendChild(opt);
+    });
+  }
+  updateRentFields();
+  clearFieldError('modalCategory', 'err-category');
+}
+
+function setSubcategoryValue(val, label) {
+  document.getElementById('modalSubcategory').value             = val;
+  document.getElementById('modalSubcategoryLabel').textContent  = label;
+  document.getElementById('modalSubcategoryDropdown')?.classList.remove('open');
 }
 
 // ── Load conditions ───────────────────────────────────────────
@@ -111,21 +156,8 @@ function selectCondition(val) {
     chip.classList.toggle('selected', chip.textContent === val);
   });
   document.getElementById('modalCondition').value = val;
-  const errEl = document.getElementById('err-condition');
-  if (errEl) errEl.classList.remove('visible');
+  document.getElementById('err-condition')?.classList.remove('visible');
 }
-
-document.getElementById('modalCategory')?.addEventListener('change', function () {
-  const subSel = document.getElementById('modalSubcategory');
-  subSel.innerHTML = '<option value="">Select subcategory</option>';
-  ((CATEGORIES[this.value] || {}).subcategories || []).forEach(s => {
-    const o = document.createElement('option');
-    o.value = s; o.textContent = s;
-    subSel.appendChild(o);
-  });
-  updateRentFields();
-  clearFieldError('modalCategory', 'err-category');
-});
 
 // ── Listing type toggle ───────────────────────────────────────
 function setListingType(type) {
@@ -335,7 +367,6 @@ function renderProducts() {
     const daysLeft       = p.edit_days_remaining ?? 0;
     const isSell         = p.listing_type === 'sell';
 
-    // Plain text badge — no emojis
     const typeBadge = `<span class="product-type-badge ${isSell ? 'sell' : 'rent'}">${isSell ? 'For Sale' : 'For Rent'}</span>`;
 
     const conditionBadge = isSell && p.condition
@@ -429,7 +460,6 @@ function renderPreviewModal(productId) {
   const images = Array.isArray(p.images) ? p.images : [];
   const isSell = p.listing_type === 'sell';
 
-  // Images
   let imagesHtml = '';
   if (images.length) {
     const mainImg = `<img src="${images[0]}" alt="${p.name}"
@@ -447,13 +477,9 @@ function renderPreviewModal(productId) {
     imagesHtml = `<div style="width:100%;height:180px;background:var(--c-bg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:40px;margin:16px 0 12px;border:1px solid var(--c-border-soft);">📦</div>`;
   }
 
-  // Type badge — plain text
-  const typeBadgeHtml = `<span class="product-type-badge ${isSell ? 'sell' : 'rent'}" style="position:static;">${isSell ? 'For Sale' : 'For Rent'}</span>`;
-
-  // Status badge
+  const typeBadgeHtml   = `<span class="product-type-badge ${isSell ? 'sell' : 'rent'}" style="position:static;">${isSell ? 'For Sale' : 'For Rent'}</span>`;
   const statusBadgeHtml = `<span class="product-status-badge ${p.is_active ? '' : 'inactive'}" style="position:static;">${p.is_active ? 'Live' : 'Inactive'}</span>`;
 
-  // Price
   let priceHtml = '';
   if (isSell) {
     priceHtml = p.selling_price
@@ -473,10 +499,8 @@ function renderPreviewModal(productId) {
       priceHtml += `<div style="font-size:13px;color:var(--c-ink-faint);margin-bottom:8px;">Security deposit: ₹${Number(p.security_deposit).toLocaleString('en-IN')}</div>`;
   }
 
-  // Location
   const locationStr = [p.area, p.city, p.state, p.pincode].filter(Boolean).join(', ');
 
-  // Admin flag banner
   const adminBanner = p.deactivated_by === 'admin' ? `
     <div style="background:#fff7ed;border:1px solid #f97316;color:#9a3412;padding:12px 14px;border-radius:6px;margin:14px 0 0;font-size:13px;">
       <strong>Removed by Admin</strong><br>
@@ -539,8 +563,8 @@ document.getElementById('shareLinkCopyBtn')?.addEventListener('click', async () 
 
 // ══════════════════════════════════════════════════════════════
 //  PHOTO UPLOAD – unified zone with thumbnail strip
-//  Touch-friendly reorder: tap a thumb to select, tap another
-//  to swap. Desktop keeps mouse-drag reorder.
+//  Touch reorder: tap one thumb then tap another to swap.
+//  Desktop: mouse drag to reorder.
 // ══════════════════════════════════════════════════════════════
 
 function readFileAsDataUrl(file) {
@@ -573,10 +597,8 @@ function compressImage(file, maxWidthPx = 1920, qualityJpeg = 0.82) {
 function usedSlotCount()  { return photoSlots.filter(s => s !== null).length; }
 function firstEmptySlot() { return photoSlots.indexOf(null); }
 
-// touch-reorder state
 let touchSelectedIdx = null;
-// mouse drag-reorder state
-let dragSrcIdx = null;
+let dragSrcIdx       = null;
 
 function renderPhotoThumbs() {
   const thumbsEl    = document.getElementById('photoThumbs');
@@ -607,7 +629,7 @@ function renderPhotoThumbs() {
     thumb.className   = 'photo-thumb' + (idx === 0 ? ' photo-thumb-main' : '');
     thumb.dataset.idx = idx;
 
-    // ── Desktop drag-to-reorder ──
+    // Desktop drag
     thumb.draggable = true;
     thumb.addEventListener('dragstart', e => {
       dragSrcIdx = idx;
@@ -632,24 +654,18 @@ function renderPhotoThumbs() {
       dragSrcIdx = null;
     });
 
-    // ── Touch tap-to-reorder ──
+    // Touch tap-to-reorder
     thumb.addEventListener('click', e => {
-      // Don't trigger if the delete button was tapped
       if (e.target.closest('.photo-thumb-del')) return;
-
       if (touchSelectedIdx === null) {
-        // Select this thumb
         touchSelectedIdx = idx;
         thumb.classList.add('touch-selected');
       } else if (touchSelectedIdx === idx) {
-        // Deselect
         touchSelectedIdx = null;
         thumb.classList.remove('touch-selected');
       } else {
-        // Swap with previously selected
         swapSlots(touchSelectedIdx, idx);
         touchSelectedIdx = null;
-        // renderPhotoThumbs re-renders so no need to remove class
       }
     });
 
@@ -669,13 +685,10 @@ function renderPhotoThumbs() {
     });
     thumb.appendChild(delBtn);
 
-    // Restore touch-selected highlight if idx matches
     if (touchSelectedIdx === idx) thumb.classList.add('touch-selected');
-
     thumbsEl.appendChild(thumb);
   });
 
-  // Add "+" button if room remains
   if (used < 5) {
     const addBtn     = document.createElement('button');
     addBtn.type      = 'button';
@@ -690,22 +703,21 @@ function renderPhotoThumbs() {
 }
 
 function swapSlots(a, b) {
-  const tmp      = photoSlots[a];
-  photoSlots[a]  = photoSlots[b];
-  photoSlots[b]  = tmp;
-  renderPhotoThumbs(); // no toast — just a reorder
+  const tmp     = photoSlots[a];
+  photoSlots[a] = photoSlots[b];
+  photoSlots[b] = tmp;
+  renderPhotoThumbs();
 }
 
 function removePhotoSlot(idx) {
   const slot = photoSlots[idx];
   if (!slot) return;
-  // If existing server image on edit, queue server deletion (no confirm needed here — user chose ✕)
   if (editingId && slot.url && !slot.file) {
     apiRequest(`/auth/vendor/products/${editingId}/image/${idx + 1}`, 'DELETE').catch(() => {});
   }
   photoSlots[idx] = null;
   compactPhotoSlots();
-  if (touchSelectedIdx !== null) touchSelectedIdx = null; // reset selection on removal
+  touchSelectedIdx = null;
   renderPhotoThumbs();
 }
 
@@ -726,8 +738,8 @@ async function addPhotos(files) {
     const slotIdx = firstEmptySlot();
     if (slotIdx === -1) break;
     try {
-      const preview        = await readFileAsDataUrl(file);
-      photoSlots[slotIdx]  = { file, preview, url: null };
+      const preview       = await readFileAsDataUrl(file);
+      photoSlots[slotIdx] = { file, preview, url: null };
     } catch {
       toastError('Could not read one of the images.');
     }
@@ -860,7 +872,7 @@ function openAddModal() {
   setListingType('rent');
   renderConditionChips('');
   clearLocationHiddens();
-  updateRentFields();
+  setCategoryValue('', 'Select category');
 
   const account = getSessionAccount('vendor');
   if (account) {
@@ -871,7 +883,6 @@ function openAddModal() {
     f.querySelector('[name="state"]').value   = account.state   || '';
   }
 
-  document.getElementById('modalSubcategory').innerHTML = '<option value="">Select subcategory</option>';
   document.getElementById('productModalOverlay').classList.add('open');
 }
 
@@ -890,7 +901,6 @@ async function openEditModal(productId) {
 
   const lt = p.listing_type || 'rent';
 
-  // Lock listing type on edit
   document.getElementById('listingTypeToggle').style.display = 'none';
   document.getElementById('listingTypeLocked').style.display = '';
   const pill = document.getElementById('listingTypeLockedPill');
@@ -932,8 +942,8 @@ async function openEditModal(productId) {
     rent_per_month:   String(p.rent_per_month   || ''),
     security_deposit: String(p.security_deposit || ''),
     selling_price:    String(p.selling_price    || ''),
-    condition:  p.condition   || '',
-    category:   p.category    || '',
+    condition:   p.condition   || '',
+    category:    p.category    || '',
     subcategory: p.subcategory || '',
     pincode: p.pincode || '', area: p.area   || '',
     city:    p.city    || '', state: p.state  || '',
@@ -941,12 +951,9 @@ async function openEditModal(productId) {
     longitude: String(p.longitude || ''),
   };
 
-  const catSel = document.getElementById('modalCategory');
-  catSel.value = p.category || '';
-  catSel.dispatchEvent(new Event('change'));
-  setTimeout(() => {
-    document.getElementById('modalSubcategory').value = p.subcategory || '';
-  }, 50);
+  // Set category and subcategory via custom dropdowns
+  setCategoryValue(p.category || '', p.category || 'Select category');
+  setTimeout(() => setSubcategoryValue(p.subcategory || '', p.subcategory || 'Select subcategory'), 50);
 
   loadExistingImages(p.images);
   document.getElementById('productModalOverlay').classList.add('open');
@@ -1075,7 +1082,7 @@ document.getElementById('productForm')?.addEventListener('submit', async e => {
 
     Object.keys(data).forEach(k => data[k] === undefined && delete data[k]);
 
-    const hasNewPhotos  = photoSlots.some(s => s?.file);
+    const hasNewPhotos   = photoSlots.some(s => s?.file);
     let   hasFieldChange =
       name    !== snap.name        || desc    !== snap.description ||
       cat     !== snap.category    || sub     !== snap.subcategory ||
@@ -1107,7 +1114,6 @@ document.getElementById('productForm')?.addEventListener('submit', async e => {
 
     const res = await apiRequest(`/auth/vendor/products/${editingId}`, 'PUT', data);
 
-    // Upload new photos slot by slot
     for (let i = 0; i < 5; i++) {
       const slot = photoSlots[i];
       if (slot?.file) {
@@ -1155,9 +1161,28 @@ document.addEventListener('DOMContentLoaded', () => {
   loadConditions();
   loadProducts();
 
+  // Real-time error clearing
   ['modalName','modalSellingPrice'].forEach(id => {
     const errMap = { modalName: 'err-name', modalSellingPrice: 'err-sell-price' };
     document.getElementById(id)?.addEventListener('input', () => clearFieldError(id, errMap[id]));
+  });
+
+  // Custom dropdown toggle — category & subcategory
+  document.addEventListener('click', e => {
+    const catBtn = document.getElementById('modalCategoryBtn');
+    const catDD  = document.getElementById('modalCategoryDropdown');
+    const subBtn = document.getElementById('modalSubcategoryBtn');
+    const subDD  = document.getElementById('modalSubcategoryDropdown');
+    if (catBtn?.contains(e.target)) {
+      catDD.classList.toggle('open');
+      subDD?.classList.remove('open');
+    } else if (subBtn?.contains(e.target)) {
+      subDD.classList.toggle('open');
+      catDD?.classList.remove('open');
+    } else {
+      catDD?.classList.remove('open');
+      subDD?.classList.remove('open');
+    }
   });
 });
 
