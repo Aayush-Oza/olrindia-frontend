@@ -933,23 +933,15 @@ select.input {
   display: none;
 }
 
-.nav-browse-mobile {
+.dash-nav .nav-browse-mobile {
   display: none;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: 1.5px solid var(--c-border);
-  background: transparent;
-  color: var(--c-ink-soft);
-  cursor: pointer;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
 }
 
 @media (max-width: 860px) {
-  .nav-browse-mobile {
+  .dash-nav .nav-browse-mobile {
     display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 
