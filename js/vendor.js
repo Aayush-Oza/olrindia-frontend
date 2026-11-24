@@ -27,7 +27,7 @@ function switchTab(type) {
   currentPage = 1;
   hasMore     = false;
 
-  document.querySelectorAll('.vs-tab').forEach(t => {
+  document.querySelectorAll('.listing-tab').forEach(t => {
     t.classList.toggle('active', t.dataset.type === type);
   });
 
