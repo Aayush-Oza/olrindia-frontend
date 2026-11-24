@@ -937,7 +937,7 @@ select.input {
   display: none;
 }
 
-@media (max-width: 860px) {
+@media (max-width: 768px) {
   .dash-nav .nav-browse-mobile {
     display: flex;
     align-items: center;
@@ -1163,7 +1163,7 @@ select.input {
 }
 
 /* ── Responsive shared nav ───────────────────────────────── */
-@media (max-width: 860px) {
+@media (max-width: 768px) {
   .nav-lang-wrap {
     display: flex;
     align-items: center;
