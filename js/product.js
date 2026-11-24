@@ -645,14 +645,6 @@ function hideVendorChrome() {
     </div>`;
 }
 
-/* ── Back navigation ─────────────────────────────────────── */
-function goBack() {
-  if (isAdminView) { window.location.href = '/admin/products'; return; }
-  const cameFromSameSite = document.referrer && document.referrer.startsWith(window.location.origin);
-  if (cameFromSameSite && history.length > 1) { history.back(); }
-  else { window.location.href = '/'; }
-}
-
 window.addEventListener('pageshow', (event) => {
   if (event.persisted && currentProduct) loadWishStatus();
 });
