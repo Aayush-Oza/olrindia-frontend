@@ -349,7 +349,7 @@ function renderProducts() {
     const isAdminFlagged = p.deactivated_by === 'admin';
     const daysLeft = p.edit_days_remaining ?? 0;
     const isSell   = p.listing_type === 'sell';
-    const typeBadge = `<span class="product-type-badge ${isSell ? 'sell' : 'rent'}">${isSell ? '🏷️ For Sale' : '🔑 For Rent'}</span>`;
+    const typeBadge = `<span class="product-type-badge ${isSell ? 'sell' : 'rent'}">${isSell ? 'For Sale' : 'For Rent'}</span>`;
     const conditionBadge = isSell && p.condition
       ? `<span style="font-size:11px;background:#f0fdf4;color:#15803d;border-radius:20px;padding:2px 8px;font-weight:600;">${p.condition}</span>`
       : '';
@@ -431,14 +431,27 @@ function renderPreviewModal(productId) {
   if (!p || !body || !foot) return;
 
   const images = p.images && p.images.length ? p.images : [];
-  const imagesHtml = images.length
-    ? `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-bottom:16px;">
-        ${images.map(url => `<img src="${url}" alt="${p.name}" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--r-md);border:1px solid var(--c-border-soft);">`).join('')}
-       </div>`
-    : `<div class="product-img-placeholder" style="border-radius:var(--r-md);margin-bottom:16px;">📦</div>`;
+
+  // Main image large + small strip for extra images
+  let imagesHtml = '';
+  if (images.length) {
+    const mainImg = `<img src="${images[0]}" alt="${p.name}"
+      style="width:100%;height:260px;object-fit:cover;border-radius:var(--r-md);display:block;border:1px solid var(--c-border-soft);">`;
+    const extraImgs = images.length > 1
+      ? `<div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
+          ${images.slice(1).map(url =>
+            `<img src="${url}" alt="${p.name}"
+              style="width:72px;height:72px;object-fit:cover;border-radius:var(--r-md);border:1px solid var(--c-border-soft);">`
+          ).join('')}
+         </div>`
+      : '';
+    imagesHtml = `<div style="margin-bottom:16px;">${mainImg}${extraImgs}</div>`;
+  } else {
+    imagesHtml = `<div style="width:100%;height:200px;background:var(--c-bg);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:16px;border:1px solid var(--c-border-soft);">📦</div>`;
+  }
 
   const isSell        = p.listing_type === 'sell';
-  const typeBadgeHtml = `<span class="product-type-badge ${isSell ? 'sell' : 'rent'}" style="position:static;">${isSell ? '🏷️ For Sale' : '🔑 For Rent'}</span>`;
+  const typeBadgeHtml = `<span class="product-type-badge ${isSell ? 'sell' : 'rent'}" style="position:static;">${isSell ? 'For Sale' : 'For Rent'}</span>`;
 
   let priceHtml = '';
   if (isSell) {
@@ -563,6 +576,8 @@ function firstEmptySlot() {
 }
 
 // Re-render the thumb strip from photoSlots state
+let dragSrcIdx = null; // drag-to-reorder state
+
 function renderPhotoThumbs() {
   const thumbsEl    = document.getElementById('photoThumbs');
   const uploadInner = document.getElementById('photoUploadInner');
@@ -572,31 +587,60 @@ function renderPhotoThumbs() {
   const used = usedSlotCount();
 
   if (used === 0) {
-    thumbsEl.style.display   = 'none';
+    thumbsEl.style.display    = 'none';
     uploadInner.style.display = '';
     return;
   }
 
-  // Show thumbs, hide the big drop zone prompt
   uploadInner.style.display = 'none';
   thumbsEl.style.display    = '';
-  thumbsEl.innerHTML = '';
+  thumbsEl.innerHTML        = '';
 
   photoSlots.forEach((slot, idx) => {
     if (!slot) return;
+
     const thumb = document.createElement('div');
-    thumb.className = 'photo-thumb' + (idx === 0 ? ' photo-thumb-main' : '');
+    thumb.className   = 'photo-thumb' + (idx === 0 ? ' photo-thumb-main' : '');
+    thumb.draggable   = true;
+    thumb.dataset.idx = idx;
+
+    // Drag events
+    thumb.addEventListener('dragstart', e => {
+      dragSrcIdx = idx;
+      thumb.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    thumb.addEventListener('dragend', () => {
+      thumb.classList.remove('dragging');
+      thumbsEl.querySelectorAll('.photo-thumb').forEach(t => t.classList.remove('drag-over'));
+    });
+    thumb.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      thumbsEl.querySelectorAll('.photo-thumb').forEach(t => t.classList.remove('drag-over'));
+      thumb.classList.add('drag-over');
+    });
+    thumb.addEventListener('drop', e => {
+      e.preventDefault();
+      if (dragSrcIdx === null || dragSrcIdx === idx) return;
+      // Swap slots
+      const tmp           = photoSlots[dragSrcIdx];
+      photoSlots[dragSrcIdx] = photoSlots[idx];
+      photoSlots[idx]        = tmp;
+      dragSrcIdx = null;
+      renderPhotoThumbs();
+    });
 
     const imgEl = document.createElement('img');
-    imgEl.src = slot.preview || slot.url || '';
-    imgEl.alt = `Photo ${idx + 1}`;
+    imgEl.src   = slot.preview || slot.url || '';
+    imgEl.alt   = `Photo ${idx + 1}`;
     thumb.appendChild(imgEl);
 
-    const delBtn = document.createElement('button');
-    delBtn.type      = 'button';
-    delBtn.className = 'photo-thumb-del';
-    delBtn.title     = 'Remove photo';
-    delBtn.innerHTML = '✕';
+    const delBtn       = document.createElement('button');
+    delBtn.type        = 'button';
+    delBtn.className   = 'photo-thumb-del';
+    delBtn.title       = 'Remove photo';
+    delBtn.innerHTML   = '✕';
     delBtn.addEventListener('click', e => {
       e.stopPropagation();
       removePhotoSlot(idx);
@@ -607,7 +651,7 @@ function renderPhotoThumbs() {
 
   // Add "+" button if there's room
   if (used < 5) {
-    const addBtn = document.createElement('button');
+    const addBtn     = document.createElement('button');
     addBtn.type      = 'button';
     addBtn.className = 'photo-add-btn';
     addBtn.title     = 'Add more photos';

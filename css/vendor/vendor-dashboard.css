@@ -613,6 +613,25 @@
   display: block;
 }
 
+/* Drag reorder */
+.photo-thumb[draggable="true"] {
+  cursor: grab;
+}
+
+.photo-thumb[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+.photo-thumb.dragging {
+  opacity: 0.4;
+  transform: scale(0.95);
+}
+
+.photo-thumb.drag-over {
+  outline: 2px solid var(--c-blue);
+  outline-offset: 2px;
+}
+
 /* ── Field error (inline and block) ────────────────────────── */
 .field-error {
   display: none;
