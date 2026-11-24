@@ -233,12 +233,12 @@ function renderPricing(p) {
   let ph = '';
   if (p.listing_type === 'sell') {
     if (p.selling_price) ph += priceRow('Selling price', `₹${p.selling_price}`);
-    if (p.condition)     ph += priceRow('Condition', p.condition);
+    if (p.condition) ph += priceRow('Condition', p.condition);
   } else {
-    if (p.rent_per_hour)    ph += priceRow('Per hour',         `₹${p.rent_per_hour}`);
-    if (p.rent_per_km)      ph += priceRow('Per km',           `₹${p.rent_per_km}`);
-    if (p.rent_per_day)     ph += priceRow('Per day',          `₹${p.rent_per_day}`);
-    if (p.rent_per_month)   ph += priceRow('Per month',        `₹${p.rent_per_month}`);
+    if (p.rent_per_hour) ph += priceRow('Per hour', `₹${p.rent_per_hour}`);
+    if (p.rent_per_km) ph += priceRow('Per km', `₹${p.rent_per_km}`);
+    if (p.rent_per_day) ph += priceRow('Per day', `₹${p.rent_per_day}`);
+    if (p.rent_per_month) ph += priceRow('Per month', `₹${p.rent_per_month}`);
     if (p.security_deposit) ph += priceRow('Security deposit', `₹${p.security_deposit}`, true);
   }
   document.getElementById('priceRows').innerHTML = ph;
@@ -335,8 +335,8 @@ function buildRelatedCard(p, listingType) {
     const rentVal = p.rent_per_day || p.rent_per_hour || p.rent_per_month || p.rent_per_km;
     const rentLabel = p.rent_per_day ? '/day'
       : p.rent_per_hour ? '/hr'
-      : p.rent_per_month ? '/mo'
-      : p.rent_per_km ? '/km' : '';
+        : p.rent_per_month ? '/mo'
+          : p.rent_per_km ? '/km' : '';
     priceHtml = rentVal
       ? `<div class="product-price">₹${rentVal}<span>${rentLabel}</span></div>`
       : '';
@@ -420,37 +420,37 @@ async function loadProduct() {
     // ── Schema ──
     const schemaOffers = listingType === 'sell'
       ? {
-          "@type": "Offer",
-          "priceCurrency": "INR",
-          "price": p.selling_price || 0,
-          "availability": "https://schema.org/InStock",
-          "itemCondition": p.condition === 'New'
-            ? "https://schema.org/NewCondition"
-            : "https://schema.org/UsedCondition",
-          "areaServed": { "@type": "City", "name": cityText },
-          "seller": {
-            "@type": "Organization",
-            "name": p.vendor_name || "OLR India Vendor",
-            "member": { "@id": "https://olrindia.com/#organization" }
-          }
+        "@type": "Offer",
+        "priceCurrency": "INR",
+        "price": p.selling_price || 0,
+        "availability": "https://schema.org/InStock",
+        "itemCondition": p.condition === 'New'
+          ? "https://schema.org/NewCondition"
+          : "https://schema.org/UsedCondition",
+        "areaServed": { "@type": "City", "name": cityText },
+        "seller": {
+          "@type": "Organization",
+          "name": p.vendor_name || "OLR India Vendor",
+          "member": { "@id": "https://olrindia.com/#organization" }
         }
+      }
       : {
-          "@type": "Offer",
-          "priceCurrency": "INR",
-          "price": p.rent_per_day || p.rent_per_hour || p.rent_per_month || 0,
-          "priceSpecification": [
-            p.rent_per_hour  && { "@type": "UnitPriceSpecification", "price": p.rent_per_hour,  "priceCurrency": "INR", "unitText": "per hour" },
-            p.rent_per_day   && { "@type": "UnitPriceSpecification", "price": p.rent_per_day,   "priceCurrency": "INR", "unitText": "per day" },
-            p.rent_per_month && { "@type": "UnitPriceSpecification", "price": p.rent_per_month, "priceCurrency": "INR", "unitText": "per month" }
-          ].filter(Boolean),
-          "availability": "https://schema.org/InStock",
-          "areaServed": { "@type": "City", "name": cityText },
-          "seller": {
-            "@type": "Organization",
-            "name": p.vendor_name || "OLR India Vendor",
-            "member": { "@id": "https://olrindia.com/#organization" }
-          }
-        };
+        "@type": "Offer",
+        "priceCurrency": "INR",
+        "price": p.rent_per_day || p.rent_per_hour || p.rent_per_month || 0,
+        "priceSpecification": [
+          p.rent_per_hour && { "@type": "UnitPriceSpecification", "price": p.rent_per_hour, "priceCurrency": "INR", "unitText": "per hour" },
+          p.rent_per_day && { "@type": "UnitPriceSpecification", "price": p.rent_per_day, "priceCurrency": "INR", "unitText": "per day" },
+          p.rent_per_month && { "@type": "UnitPriceSpecification", "price": p.rent_per_month, "priceCurrency": "INR", "unitText": "per month" }
+        ].filter(Boolean),
+        "availability": "https://schema.org/InStock",
+        "areaServed": { "@type": "City", "name": cityText },
+        "seller": {
+          "@type": "Organization",
+          "name": p.vendor_name || "OLR India Vendor",
+          "member": { "@id": "https://olrindia.com/#organization" }
+        }
+      };
 
     document.getElementById('productSchema').textContent = JSON.stringify({
       "@context": "https://schema.org",
@@ -528,7 +528,21 @@ async function loadProduct() {
       loadWishStatus();
     }
 
-    apiRequest(`/auth/vendor/products/${p.id}/click`, 'POST').catch(() => { });
+    const isVendorSession = !!sessionStorage.getItem('olr_vendor');
+    const sessionVendor = JSON.parse(sessionStorage.getItem('olr_vendor') || 'null');
+    const isOwner = sessionVendor?.id === currentVendor?.id;
+    const viewKey = `olr_view_${p.id}`;
+    const lastViewed = localStorage.getItem(viewKey);
+    const cooldown = 24 * 60 * 60 * 1000;
+
+    if (
+      !isVendorSession &&
+      !isOwner &&
+      (!lastViewed || Date.now() - parseInt(lastViewed) > cooldown)
+    ) {
+      apiRequest(`/auth/vendor/products/${p.id}/click`, 'POST').catch(() => { });
+      localStorage.setItem(viewKey, Date.now().toString());
+    }
 
     document.getElementById('pageLoader').style.display = 'none';
     document.getElementById('pageContent').style.display = 'block';
