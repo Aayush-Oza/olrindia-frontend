@@ -87,7 +87,15 @@
       item.setAttribute('translate', 'no');
       item.textContent = LANG_LABELS[opt.value] || opt.textContent;
 
-      item.addEventListener('mousedown', (e) => {
+      let touchStartY = 0;  // ← track where the finger landed
+
+      item.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+      }, { passive: true });
+
+      item.addEventListener('touchend', (e) => {
+        const delta = Math.abs(e.changedTouches[0].clientY - touchStartY);
+        if (delta > 8) return;  // ← finger moved = scroll, not a tap, ignore it
         e.preventDefault();
         menu.querySelectorAll('.nav-lang-item').forEach(i => i.classList.remove('active'));
         item.classList.add('active');
@@ -95,7 +103,7 @@
         applyLang(opt.value);
       });
 
-      item.addEventListener('touchend', (e) => {
+      item.addEventListener('mousedown', (e) => {
         e.preventDefault();
         menu.querySelectorAll('.nav-lang-item').forEach(i => i.classList.remove('active'));
         item.classList.add('active');
