@@ -933,6 +933,10 @@ select.input {
   display: none;
 }
 
+.nav-browse-mobile {
+  display: none;
+}
+
 @media (max-width: 860px) {
   .nav-browse-mobile {
     display: flex;
