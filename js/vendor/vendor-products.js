@@ -1,5 +1,5 @@
 /* ============================================================
-   OLR INDIA – VENDOR PRODUCTS JS  (my-products.html)  v6
+   OLR INDIA – VENDOR PRODUCTS JS  v7
    Requires: vendor-nav.js, vendor-upgrade.js
    ============================================================ */
 
@@ -9,8 +9,10 @@ let CATEGORIES = {};
 let CONDITIONS = [];
 let editingId = null;
 let currentListingType = 'rent';
-const slotFiles = {};
-const slotUrls = {};
+
+// New unified photo state: array of { slotNum, file|null, url|null }
+// slotNum 1–5, file = new File to upload, url = existing URL from server
+const photoSlots = [null, null, null, null, null]; // index 0 = slot 1
 let previewProductId = null;
 let originalProductSnapshot = null;
 
@@ -24,29 +26,33 @@ function renderSuspendedBanner() {
     document.querySelectorAll('#addProductBtn, #planUsageUpgradeBtn').forEach(btn => {
       btn.disabled = true; btn.style.opacity = '0.4'; btn.style.cursor = 'not-allowed';
     });
-  } else { banner.style.display = 'none'; }
+  } else {
+    banner.style.display = 'none';
+  }
 }
 
 // ── Plan usage strip ──────────────────────────────────────────
 function renderPlanUsageStrip() {
   if (!vendorProfile) return;
   const v = vendorProfile;
-  const strip = document.getElementById('planUsageStrip');
-  const badgeEl = document.getElementById('planUsageBadge');
-  const textEl = document.getElementById('planUsageText');
-  const fillEl = document.getElementById('planUsageBarFill');
-  if (!strip || !badgeEl || !textEl || !fillEl) return;
+  const strip  = document.getElementById('planUsageStrip');
+  const badge  = document.getElementById('planUsageBadge');
+  const text   = document.getElementById('planUsageText');
+  const fill   = document.getElementById('planUsageBarFill');
+  if (!strip) return;
   strip.style.display = '';
-  badgeEl.textContent = PLAN_LABELS[v.subscription_plan] || v.subscription_plan;
-  const used = v.active_product_count ?? 0;
+  badge.textContent = PLAN_LABELS[v.subscription_plan] || v.subscription_plan;
+  const used  = v.active_product_count ?? 0;
   const limit = v.max_active_posts;
   if (limit === null || limit === undefined) {
-    textEl.textContent = `${used} active listings - unlimited on your plan`;
-    fillEl.style.width = '8%'; fillEl.classList.remove('danger');
+    text.textContent = `${used} active listing${used !== 1 ? 's' : ''} — unlimited on your plan`;
+    fill.style.width = '8%';
+    fill.classList.remove('danger');
   } else {
-    textEl.textContent = `${used} of ${limit} active listings used`;
+    text.textContent = `${used} of ${limit} active listing${limit !== 1 ? 's' : ''} used`;
     const pct = limit > 0 ? Math.min(100, (used / limit) * 100) : 100;
-    fillEl.style.width = pct + '%'; fillEl.classList.toggle('danger', pct >= 90);
+    fill.style.width = pct + '%';
+    fill.classList.toggle('danger', pct >= 90);
   }
 }
 
@@ -80,9 +86,7 @@ async function loadCategories() {
 async function loadConditions() {
   try {
     const res = await apiRequest('/auth/vendor/conditions', 'GET');
-    if (res.success && Array.isArray(res.conditions)) {
-      CONDITIONS = res.conditions;
-    }
+    if (res.success && Array.isArray(res.conditions)) CONDITIONS = res.conditions;
   } catch (_) {
     CONDITIONS = ['Brand New', 'Like New', 'Good', 'Fair', 'For Parts'];
   }
@@ -104,17 +108,21 @@ function selectCondition(val) {
     chip.classList.toggle('selected', chip.textContent === val);
   });
   document.getElementById('modalCondition').value = val;
+  // Clear error
+  const errEl = document.getElementById('err-condition');
+  if (errEl) errEl.classList.remove('visible');
 }
 
 document.getElementById('modalCategory')?.addEventListener('change', function () {
   const subSel = document.getElementById('modalSubcategory');
-  subSel.innerHTML = '<option value="">Select subcategory (optional)</option>';
+  subSel.innerHTML = '<option value="">Select subcategory</option>';
   ((CATEGORIES[this.value] || {}).subcategories || []).forEach(s => {
     const o = document.createElement('option');
     o.value = s; o.textContent = s;
     subSel.appendChild(o);
   });
   updateRentFields();
+  clearFieldError('modalCategory', 'err-category');
 });
 
 // ── Listing type toggle ───────────────────────────────────────
@@ -122,48 +130,69 @@ function setListingType(type) {
   currentListingType = type;
   const rentBtn = document.getElementById('toggleRent');
   const sellBtn = document.getElementById('toggleSell');
-  if (rentBtn) {
-    rentBtn.classList.toggle('active', type === 'rent');
-    rentBtn.classList.remove('sell-active');
-  }
-  if (sellBtn) {
-    sellBtn.classList.toggle('active', type === 'sell');
-    if (type === 'sell') sellBtn.classList.add('sell-active');
-  }
+  rentBtn?.classList.toggle('active', type === 'rent');
+  sellBtn?.classList.toggle('active', type === 'sell');
+
   document.getElementById('rentFieldsSection').style.display = type === 'rent' ? '' : 'none';
   document.getElementById('sellFieldsSection').style.display = type === 'sell' ? '' : 'none';
+
+  // Clear values for the hidden side
   if (type === 'sell') {
     ['rent_per_hour','rent_per_km','rent_per_day','rent_per_month','security_deposit'].forEach(n => {
       const el = document.querySelector(`[name="${n}"]`);
       if (el) el.value = '';
     });
+    clearAllRentErrors();
   } else {
     const sp = document.getElementById('modalSellingPrice');
     if (sp) sp.value = '';
     renderConditionChips('');
+    clearAllSellErrors();
   }
+}
+
+function clearAllRentErrors() {
+  const errEl = document.getElementById('err-rent-price');
+  if (errEl) errEl.classList.remove('visible');
+}
+
+function clearAllSellErrors() {
+  clearFieldError('modalSellingPrice', 'err-sell-price');
+  const errEl = document.getElementById('err-condition');
+  if (errEl) errEl.classList.remove('visible');
 }
 
 // ── Rent field visibility ─────────────────────────────────────
 const RENT_FIELDS_BY_CATEGORY = {
-  "Passenger Vehicles": ["hour","km","day","month"], "Bikes & Scooters": ["hour","km","day","month"],
-  "Commercial Vehicles": ["hour","km","day","month"], "Cargo & Shipping": ["hour","km","day","month"],
-  "Construction Equipment": ["hour","day","month"], "Furniture & Home Appliances": ["day","month"],
-  "Photography & Content Creator Gear": ["hour","day"], "Events & Weddings": ["hour","day"],
-  "Fashion & Designer Wear": ["day"], "Agricultural Equipment": ["hour","day","month"],
-  "Medical Equipment": ["hour","day","month"], "Baby & Kids Gear": ["day","month"],
-  "Adventure & Trekking Gear": ["day","month"], "Sports & Fitness Equipment": ["hour","day","month"],
-  "Electrical & Power Tools": ["hour","day","month"], "Tools & Tackles": ["hour","day","month"],
-  "Properties": ["day","month"], "Industrial Equipment": ["hour","day","month"],
-  "Warehouse & Storage": ["day","month"], "Machineries": ["hour","day","month"],
-  "Musical Instruments": ["day","month"], "Office & Business Essentials": ["day","month"],
+  "Passenger Vehicles":               ["hour","km","day","month"],
+  "Bikes & Scooters":                 ["hour","km","day","month"],
+  "Commercial Vehicles":              ["hour","km","day","month"],
+  "Cargo & Shipping":                 ["hour","km","day","month"],
+  "Construction Equipment":           ["hour","day","month"],
+  "Furniture & Home Appliances":      ["day","month"],
+  "Photography & Content Creator Gear": ["hour","day"],
+  "Events & Weddings":                ["hour","day"],
+  "Fashion & Designer Wear":          ["day"],
+  "Agricultural Equipment":           ["hour","day","month"],
+  "Medical Equipment":                ["hour","day","month"],
+  "Baby & Kids Gear":                 ["day","month"],
+  "Adventure & Trekking Gear":        ["day","month"],
+  "Sports & Fitness Equipment":       ["hour","day","month"],
+  "Electrical & Power Tools":         ["hour","day","month"],
+  "Tools & Tackles":                  ["hour","day","month"],
+  "Properties":                       ["day","month"],
+  "Industrial Equipment":             ["hour","day","month"],
+  "Warehouse & Storage":              ["day","month"],
+  "Machineries":                      ["hour","day","month"],
+  "Musical Instruments":              ["day","month"],
+  "Office & Business Essentials":     ["day","month"],
 };
 
 function updateRentFields() {
-  const cat = document.getElementById('modalCategory').value;
+  const cat     = document.getElementById('modalCategory').value;
   const allowed = RENT_FIELDS_BY_CATEGORY[cat] || ["day","month"];
   ["hour","km","day","month"].forEach(field => {
-    const wrap = document.getElementById(`rentWrap_${field}`);
+    const wrap  = document.getElementById(`rentWrap_${field}`);
     const input = document.querySelector(`[name="rent_per_${field}"]`);
     if (!wrap || !input) return;
     const show = allowed.includes(field);
@@ -181,43 +210,52 @@ function clearLocationHiddens() {
 }
 
 function initDetectLocationBtn() {
-  document.getElementById('detectLocationBtn')?.addEventListener('click', async () => {
-    const btn = document.getElementById('detectLocationBtn');
+  const btn = document.getElementById('detectLocationBtn');
+  if (!btn) return;
+
+  btn.addEventListener('click', async () => {
     if (!navigator.geolocation) { toastError('Geolocation not supported by your browser.'); return; }
-    btn.disabled = true;
-    btn.textContent = '⏳ Detecting...';
+
+    btn.classList.add('detecting');
     navigator.geolocation.getCurrentPosition(async pos => {
       try {
         const { latitude, longitude } = pos.coords;
         document.getElementById('modalLat').value = latitude;
         document.getElementById('modalLng').value = longitude;
-        const res = await fetch(
+
+        const res  = await fetch(
           `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
           { headers: { 'Accept-Language': 'en' } }
         );
         const data = await res.json();
         const addr = data.address || {};
+
         const pincode = addr.postcode || '';
         const area    = addr.suburb || addr.neighbourhood || addr.village || '';
-        const city    = addr.city || addr.town || addr.county || '';
-        const state   = addr.state || '';
+        const city    = addr.city   || addr.town || addr.county || '';
+        const state   = addr.state  || '';
+
         if (pincode) document.getElementById('modalPincode').value = pincode;
         if (area)    document.getElementById('modalArea').value    = area;
         if (city)    document.getElementById('modalCity').value    = city;
         if (state)   document.getElementById('modalState').value   = state;
+
         const statusEl = document.getElementById('modalPincodeStatus');
-        if (statusEl) statusEl.textContent = '✅ Location detected successfully!';
+        if (statusEl) statusEl.textContent = '✅ Location detected';
+
+        // Clear location error if present
+        const errEl = document.getElementById('err-location');
+        if (errEl) errEl.classList.remove('visible');
+
         toastSuccess('Location detected!');
       } catch {
         toastError('Could not detect location. Please enter your pincode manually.');
       }
-      btn.disabled = false;
-      btn.textContent = '📍 Detect';
+      btn.classList.remove('detecting');
     }, err => {
       const msgs = { 1: 'Location permission denied.', 2: 'Location unavailable.', 3: 'Request timed out.' };
       toastError((msgs[err.code] || 'Could not get location.') + ' Please enter pincode manually.');
-      btn.disabled = false;
-      btn.textContent = '📍 Detect';
+      btn.classList.remove('detecting');
     });
   });
 }
@@ -231,10 +269,14 @@ function initModalPincodeAutofill() {
     stateInput:   document.getElementById('modalState'),
     statusEl:     document.getElementById('modalPincodeStatus'),
     onSuccess: (lat, lng) => {
-      // If pincode API returns lat/lng, save them
       if (lat) document.getElementById('modalLat').value = lat;
       if (lng) document.getElementById('modalLng').value = lng;
+      const errEl = document.getElementById('err-location');
+      if (errEl) errEl.classList.remove('visible');
     }
+  });
+  document.getElementById('modalPincode')?.addEventListener('input', () => {
+    clearFieldError('modalPincode', 'err-location');
   });
 }
 
@@ -306,7 +348,7 @@ function renderProducts() {
       : 'Not viewed yet';
     const isAdminFlagged = p.deactivated_by === 'admin';
     const daysLeft = p.edit_days_remaining ?? 0;
-    const isSell = p.listing_type === 'sell';
+    const isSell   = p.listing_type === 'sell';
     const typeBadge = `<span class="product-type-badge ${isSell ? 'sell' : 'rent'}">${isSell ? '🏷️ For Sale' : '🔑 For Rent'}</span>`;
     const conditionBadge = isSell && p.condition
       ? `<span style="font-size:11px;background:#f0fdf4;color:#15803d;border-radius:20px;padding:2px 8px;font-weight:600;">${p.condition}</span>`
@@ -320,7 +362,7 @@ function renderProducts() {
       </div>` : '';
     const expiredBanner = p.deactivated_by === 'plan_expired' ? `
       <div style="background:#fff7ed;border:1px solid #f97316;color:#9a3412;padding:10px 12px;border-radius:6px;margin:8px 0;font-size:13px;">
-        ⏸️ <strong>Hidden - Plan Expired</strong><br>
+        ⏸️ <strong>Hidden – Plan Expired</strong><br>
         Renew your plan to bring this listing back live.
         <button onclick="event.stopPropagation();openUpgradeModal()" style="margin-top:6px;display:block;background:#f97316;color:#fff;border:none;padding:5px 12px;border-radius:4px;cursor:pointer;font-size:12px;">Renew Plan</button>
       </div>` : '';
@@ -383,7 +425,7 @@ function closePreviewModal() {
 }
 
 function renderPreviewModal(productId) {
-  const p = allProducts.find(x => x.id === productId);
+  const p    = allProducts.find(x => x.id === productId);
   const body = document.getElementById('previewModalBody');
   const foot = document.getElementById('previewModalFoot');
   if (!p || !body || !foot) return;
@@ -395,7 +437,7 @@ function renderPreviewModal(productId) {
        </div>`
     : `<div class="product-img-placeholder" style="border-radius:var(--r-md);margin-bottom:16px;">📦</div>`;
 
-  const isSell = p.listing_type === 'sell';
+  const isSell        = p.listing_type === 'sell';
   const typeBadgeHtml = `<span class="product-type-badge ${isSell ? 'sell' : 'rent'}" style="position:static;">${isSell ? '🏷️ For Sale' : '🔑 For Rent'}</span>`;
 
   let priceHtml = '';
@@ -403,9 +445,8 @@ function renderPreviewModal(productId) {
     priceHtml = p.selling_price
       ? `<div style="font-size:15px;font-weight:700;color:#15803d;margin-bottom:4px;">₹${Number(p.selling_price).toLocaleString('en-IN')} <span style="font-size:13px;font-weight:500;">selling price</span></div>`
       : '<div style="font-size:13px;color:var(--c-ink-faint);margin-bottom:4px;">Price not set</div>';
-    if (p.condition) {
+    if (p.condition)
       priceHtml += `<div style="font-size:13px;margin-bottom:6px;">Condition: <span style="font-weight:600;color:#15803d;">${p.condition}</span></div>`;
-    }
   } else {
     const rows = [
       p.rent_per_hour  ? `₹${p.rent_per_hour} / hour`   : null,
@@ -414,9 +455,8 @@ function renderPreviewModal(productId) {
       p.rent_per_month ? `₹${p.rent_per_month} / month` : null,
     ].filter(Boolean).join(' &nbsp;•&nbsp; ');
     priceHtml = `<div style="font-size:15px;font-weight:700;color:var(--c-blue-deep);margin-bottom:4px;">${rows || 'Price not set'}</div>`;
-    if (p.security_deposit) {
+    if (p.security_deposit)
       priceHtml += `<div style="font-size:13px;color:var(--c-ink-faint);margin-bottom:6px;">Security deposit: ₹${p.security_deposit}</div>`;
-    }
   }
 
   body.innerHTML = `
@@ -424,7 +464,7 @@ function renderPreviewModal(productId) {
     <div style="background:#fff7ed;border:1px solid #f97316;color:#9a3412;padding:12px 14px;border-radius:6px;margin-bottom:12px;font-size:13px;">
       ⚠️ <strong>Removed by Admin</strong><br>
       Reason: ${p.strike_reason || 'Policy violation'}<br>
-      <strong>${p.edit_days_remaining ?? 0} day(s) left</strong> - edit to bring it back live, or it will be permanently deleted.
+      <strong>${p.edit_days_remaining ?? 0} day(s) left</strong> — edit to bring it back live, or it will be permanently deleted.
     </div>` : ''}
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
       <span class="product-status-badge ${p.is_active ? '' : 'inactive'}" style="position:static;">${p.is_active ? 'Live' : 'Inactive'}</span>
@@ -441,7 +481,7 @@ function renderPreviewModal(productId) {
     </div>`;
 
   const deactivateLabel = isSell ? 'Mark as Sold' : 'Deactivate';
-  const reactivateLabel = isSell ? 'Relist' : 'Reactivate';
+  const reactivateLabel = isSell ? 'Relist'       : 'Reactivate';
 
   foot.innerHTML = `
     <button class="btn btn-secondary" style="width:auto;padding:10px 16px;" onclick="openShareModal(${p.id})">Share</button>
@@ -467,38 +507,28 @@ function openShareModal(productId) {
   document.getElementById('shareNativeBtn').style.display = 'none';
   document.getElementById('shareModalOverlay').classList.add('open');
 }
-document.getElementById('shareModalClose')?.addEventListener('click', () => document.getElementById('shareModalOverlay').classList.remove('open'));
+
+document.getElementById('shareModalClose')?.addEventListener('click', () =>
+  document.getElementById('shareModalOverlay').classList.remove('open')
+);
+
 document.getElementById('shareLinkCopyBtn')?.addEventListener('click', async () => {
   const val = document.getElementById('shareLinkInput').value;
-  try { await navigator.clipboard.writeText(val); } catch { document.getElementById('shareLinkInput').select(); document.execCommand('copy'); }
+  try { await navigator.clipboard.writeText(val); } catch {
+    document.getElementById('shareLinkInput').select();
+    document.execCommand('copy');
+  }
   toastSuccess('Link copied!');
 });
 
-// ── Image slots ───────────────────────────────────────────────
-function setSlotImage(i, src) {
-  const slot = document.getElementById(`slot${i}`);
-  if (!slot) return;
-  let img = slot.querySelector('img');
-  if (!img) { img = document.createElement('img'); slot.appendChild(img); }
-  img.src = src;
-  slot.classList.add('has-image');
-}
-
-function clearSlotImage(i) {
-  delete slotFiles[i];
-  const slot = document.getElementById(`slot${i}`);
-  if (!slot) return;
-  const img = slot.querySelector('img');
-  if (img) img.remove();
-  slot.classList.remove('has-image');
-  const input = slot.querySelector('input[type="file"]');
-  if (input) input.value = '';
-}
+// ══════════════════════════════════════════════════════════════
+//  PHOTO UPLOAD – unified zone with thumbnail strip
+// ══════════════════════════════════════════════════════════════
 
 function readFileAsDataUrl(file) {
   return new Promise((resolve, reject) => {
     const r = new FileReader();
-    r.onload = e => resolve(e.target.result);
+    r.onload  = e => resolve(e.target.result);
     r.onerror = reject;
     r.readAsDataURL(file);
   });
@@ -522,60 +552,294 @@ function compressImage(file, maxWidthPx = 1920, qualityJpeg = 0.82) {
   });
 }
 
-function initImageSlots() {
-  if (window.__slotsReady) return;
-  window.__slotsReady = true;
-  for (let i = 1; i <= 5; i++) {
-    const slot = document.getElementById(`slot${i}`);
-    if (!slot) continue;
-    slot.addEventListener('click', () => { if (!slot.classList.contains('has-image')) slot.querySelector('input[type="file"]').click(); });
-    slot.querySelector('input[type="file"]').addEventListener('change', async function () {
-      if (!this.files[0]) return;
-      slotFiles[i] = this.files[0];
-      try { setSlotImage(i, await readFileAsDataUrl(this.files[0])); }
-      catch { toastError('Could not read that image.'); delete slotFiles[i]; }
-    });
-    slot.querySelector('.img-slot-del')?.addEventListener('click', e => {
+// Count how many slots are occupied
+function usedSlotCount() {
+  return photoSlots.filter(s => s !== null).length;
+}
+
+// Find first empty slot index (0-based)
+function firstEmptySlot() {
+  return photoSlots.indexOf(null);
+}
+
+// Re-render the thumb strip from photoSlots state
+function renderPhotoThumbs() {
+  const thumbsEl    = document.getElementById('photoThumbs');
+  const uploadInner = document.getElementById('photoUploadInner');
+  const errEl       = document.querySelector('.photo-upload-err');
+  if (!thumbsEl) return;
+
+  const used = usedSlotCount();
+
+  if (used === 0) {
+    thumbsEl.style.display   = 'none';
+    uploadInner.style.display = '';
+    return;
+  }
+
+  // Show thumbs, hide the big drop zone prompt
+  uploadInner.style.display = 'none';
+  thumbsEl.style.display    = '';
+  thumbsEl.innerHTML = '';
+
+  photoSlots.forEach((slot, idx) => {
+    if (!slot) return;
+    const thumb = document.createElement('div');
+    thumb.className = 'photo-thumb' + (idx === 0 ? ' photo-thumb-main' : '');
+
+    const imgEl = document.createElement('img');
+    imgEl.src = slot.preview || slot.url || '';
+    imgEl.alt = `Photo ${idx + 1}`;
+    thumb.appendChild(imgEl);
+
+    const delBtn = document.createElement('button');
+    delBtn.type      = 'button';
+    delBtn.className = 'photo-thumb-del';
+    delBtn.title     = 'Remove photo';
+    delBtn.innerHTML = '✕';
+    delBtn.addEventListener('click', e => {
       e.stopPropagation();
-      if (editingId && slotUrls[i]) deleteImageSlot(editingId, i); else clearSlotImage(i);
+      removePhotoSlot(idx);
     });
+    thumb.appendChild(delBtn);
+    thumbsEl.appendChild(thumb);
+  });
+
+  // Add "+" button if there's room
+  if (used < 5) {
+    const addBtn = document.createElement('button');
+    addBtn.type      = 'button';
+    addBtn.className = 'photo-add-btn';
+    addBtn.title     = 'Add more photos';
+    addBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Add</span>`;
+    addBtn.addEventListener('click', () => document.getElementById('bulkImageInput').click());
+    thumbsEl.appendChild(addBtn);
   }
-  const bulkInput = document.getElementById('bulkImageInput');
-  if (bulkInput) {
-    bulkInput.addEventListener('change', async function () {
-      const files = Array.from(this.files || []);
-      if (!files.length) return;
-      const empty = [];
-      for (let i = 1; i <= 5; i++) { if (!document.getElementById(`slot${i}`)?.classList.contains('has-image')) empty.push(i); }
-      const targets = empty.length ? empty : [1,2,3,4,5];
-      const toAdd = files.slice(0, targets.length);
-      if (files.length > targets.length) toastError(`Only ${targets.length} slot(s) free - extra photos skipped.`);
-      for (let idx = 0; idx < toAdd.length; idx++) {
-        const file = toAdd[idx], slotNum = targets[idx];
-        if (!file.type.startsWith('image/')) continue;
-        slotFiles[slotNum] = file;
-        try { setSlotImage(slotNum, await readFileAsDataUrl(file)); } catch { delete slotFiles[slotNum]; }
-      }
-      this.value = '';
-      toastSuccess(`${toAdd.length} photo(s) added.`);
-    });
+
+  if (errEl) errEl.classList.remove('visible');
+}
+
+// Remove a photo from a slot, compact remaining slots
+function removePhotoSlot(idx) {
+  const slot = photoSlots[idx];
+  if (!slot) return;
+
+  // If this was an existing server image on an edit, delete it
+  if (editingId && slot.url && !slot.file) {
+    deleteImageFromServer(editingId, idx + 1);
   }
+
+  photoSlots[idx] = null;
+
+  // Compact: shift remaining up to remove gaps
+  compactPhotoSlots();
+  renderPhotoThumbs();
+}
+
+// Compact photoSlots array – no gaps (nulls only at the end)
+function compactPhotoSlots() {
+  const filled = photoSlots.filter(s => s !== null);
+  for (let i = 0; i < 5; i++) {
+    photoSlots[i] = filled[i] || null;
+  }
+}
+
+// Add files to slots
+async function addPhotos(files) {
+  const toAdd = Array.from(files).filter(f => f.type.startsWith('image/'));
+  if (!toAdd.length) return;
+
+  const available = 5 - usedSlotCount();
+  if (available <= 0) { toastError('You already have 5 photos. Remove one to add more.'); return; }
+
+  const batch = toAdd.slice(0, available);
+  if (toAdd.length > available) toastError(`Only ${available} slot${available > 1 ? 's' : ''} remaining — extra photos skipped.`);
+
+  for (const file of batch) {
+    const slotIdx = firstEmptySlot();
+    if (slotIdx === -1) break;
+    try {
+      const preview    = await readFileAsDataUrl(file);
+      photoSlots[slotIdx] = { file, preview, url: null };
+    } catch {
+      toastError('Could not read one of the images.');
+    }
+  }
+  renderPhotoThumbs();
+}
+
+// Reset all photo state
+function clearAllPhotos() {
+  for (let i = 0; i < 5; i++) photoSlots[i] = null;
+  renderPhotoThumbs();
+  const uploadInner = document.getElementById('photoUploadInner');
+  if (uploadInner) uploadInner.style.display = '';
+}
+
+// Load existing images from a product into slots
+function loadExistingImages(images) {
+  clearAllPhotos();
+  (images || []).slice(0, 5).forEach((url, i) => {
+    if (url) photoSlots[i] = { file: null, preview: url, url };
+  });
+  renderPhotoThumbs();
+}
+
+function initPhotoUpload() {
+  if (window.__photoUploadReady) return;
+  window.__photoUploadReady = true;
+
+  const bulkInput  = document.getElementById('bulkImageInput');
+  const zone       = document.getElementById('photoUploadZone');
+  const uploadInner = document.getElementById('photoUploadInner');
+
+  bulkInput?.addEventListener('change', async function () {
+    if (!this.files?.length) return;
+    await addPhotos(this.files);
+    this.value = '';
+  });
+
+  // Drag and drop
+  zone?.addEventListener('dragover', e => {
+    e.preventDefault();
+    zone.classList.add('drag-over');
+  });
+  zone?.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone?.addEventListener('drop', async e => {
+    e.preventDefault();
+    zone.classList.remove('drag-over');
+    if (e.dataTransfer?.files?.length) await addPhotos(e.dataTransfer.files);
+  });
+}
+
+// Legacy slot compat – map old slotFiles/slotUrls to new system for any
+// code that still checks them (vendor-upgrade.js etc.)
+function legacySlotFiles() {
+  const out = {};
+  photoSlots.forEach((slot, i) => { if (slot?.file) out[i + 1] = slot.file; });
+  return out;
+}
+
+function legacySlotUrls() {
+  const out = {};
+  photoSlots.forEach((slot, i) => { if (slot?.url) out[i + 1] = slot.url; });
+  return out;
+}
+
+// ── Delete image from server ──────────────────────────────────
+async function deleteImageFromServer(productId, slot) {
+  const confirmed = await showConfirm({
+    title:        'Delete image?',
+    text:         'This image will be permanently removed.',
+    confirmLabel: 'Delete',
+    cancelLabel:  'Cancel',
+  });
+  if (!confirmed) return;
+  const res = await apiRequest(`/auth/vendor/products/${productId}/image/${slot}`, 'DELETE');
+  if (res.success) toastSuccess('Image deleted.');
+  else toastError(res.message || 'Failed to delete image.');
+}
+
+// ── Field error helpers ───────────────────────────────────────
+function setFieldError(inputId, errorId) {
+  const input = document.getElementById(inputId);
+  const err   = document.getElementById(errorId);
+  if (input) input.closest('.field')?.classList.add('has-error');
+  if (err)   err.classList.add('visible');
+}
+
+function clearFieldError(inputId, errorId) {
+  const input = document.getElementById(inputId);
+  const err   = document.getElementById(errorId);
+  if (input) input.closest('.field')?.classList.remove('has-error');
+  if (err)   err.classList.remove('visible');
+}
+
+function clearAllFieldErrors() {
+  document.querySelectorAll('.field.has-error').forEach(f => f.classList.remove('has-error'));
+  document.querySelectorAll('.field-error.visible, .field-error-block.visible').forEach(e => e.classList.remove('visible'));
+}
+
+// ── Validate the form ─────────────────────────────────────────
+function validateProductForm(form, isAdd) {
+  clearAllFieldErrors();
+  let valid   = true;
+  const lt    = currentListingType;
+  const name  = form.querySelector('[name="name"]').value.trim();
+  const cat   = document.getElementById('modalCategory').value;
+  const pincode = form.querySelector('[name="pincode"]').value.trim();
+  const lat   = document.getElementById('modalLat').value;
+
+  if (!name)  { setFieldError('modalName',     'err-name');     valid = false; }
+  if (!cat)   { setFieldError('modalCategory', 'err-category'); valid = false; }
+
+  if (isAdd && usedSlotCount() === 0) {
+    const errEl = document.querySelector('.photo-upload-err');
+    if (errEl) errEl.classList.add('visible');
+    valid = false;
+  }
+
+  if (!pincode && !lat) {
+    const errEl = document.getElementById('err-location');
+    if (errEl) errEl.classList.add('visible');
+    valid = false;
+  }
+
+  if (lt === 'rent') {
+    const rh = form.querySelector('[name="rent_per_hour"]').value.trim();
+    const rk = form.querySelector('[name="rent_per_km"]').value.trim();
+    const rd = form.querySelector('[name="rent_per_day"]').value.trim();
+    const rm = form.querySelector('[name="rent_per_month"]').value.trim();
+    if (!(rh || rk || rd || rm)) {
+      const errEl = document.getElementById('err-rent-price');
+      if (errEl) errEl.classList.add('visible');
+      valid = false;
+    }
+  } else {
+    const sp   = document.getElementById('modalSellingPrice').value.trim();
+    const cond = document.getElementById('modalCondition').value;
+    if (!sp)   { setFieldError('modalSellingPrice', 'err-sell-price'); valid = false; }
+    if (!cond) {
+      const errEl = document.getElementById('err-condition');
+      if (errEl) errEl.classList.add('visible');
+      valid = false;
+    }
+  }
+
+  // Scroll to first error
+  if (!valid) {
+    const firstErr = document.querySelector(
+      '.field.has-error, .field-error-block.visible, .photo-upload-err.visible'
+    );
+    firstErr?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  return valid;
 }
 
 // ── Open ADD modal ────────────────────────────────────────────
 function openAddModal() {
-  if (vendorProfile && !vendorProfile.is_active) { toastError('Your account is suspended. Contact support.'); return; }
-  if (vendorProfile && vendorProfile.max_active_posts !== null && vendorProfile.active_product_count >= vendorProfile.max_active_posts) {
-    openUpgradeModal(`You've reached your plan's limit of ${vendorProfile.max_active_posts} active posts. Upgrade to list more.`); return;
+  if (vendorProfile && !vendorProfile.is_active) {
+    toastError('Your account is suspended. Contact support.'); return;
   }
+  if (vendorProfile && vendorProfile.max_active_posts !== null
+      && vendorProfile.active_product_count >= vendorProfile.max_active_posts) {
+    openUpgradeModal(`You've reached your plan limit of ${vendorProfile.max_active_posts} active posts. Upgrade to list more.`);
+    return;
+  }
+
   editingId = null;
-  document.getElementById('modalTitle').textContent = 'Add new product';
+  document.getElementById('modalTitle').textContent    = 'Add new product';
+  document.getElementById('modalSubtitle').textContent = 'Fill in the details below to list your item.';
   document.getElementById('productForm').reset();
   document.getElementById('listingTypeToggle').style.display = '';
   document.getElementById('listingTypeLocked').style.display = 'none';
+  clearAllFieldErrors();
+  clearAllPhotos();
   setListingType('rent');
   renderConditionChips('');
   clearLocationHiddens();
+  updateRentFields();
 
   const account = getSessionAccount('vendor');
   if (account) {
@@ -585,8 +849,8 @@ function openAddModal() {
     f.querySelector('[name="city"]').value    = account.city    || '';
     f.querySelector('[name="state"]').value   = account.state   || '';
   }
-  for (let i = 1; i <= 5; i++) clearSlotImage(i);
-  document.getElementById('modalSubcategory').innerHTML = '<option value="">Select subcategory (optional)</option>';
+
+  document.getElementById('modalSubcategory').innerHTML = '<option value="">Select subcategory</option>';
   document.getElementById('productModalOverlay').classList.add('open');
 }
 
@@ -595,15 +859,27 @@ async function openEditModal(productId) {
   editingId = productId;
   const p = allProducts.find(x => x.id === productId);
   if (!p) return;
-  document.getElementById('modalTitle').textContent = 'Edit product';
+
+  document.getElementById('modalTitle').textContent    = 'Edit product';
+  document.getElementById('modalSubtitle').textContent = 'Note: listing type (Rent / Sell) cannot be changed.';
   const form = document.getElementById('productForm');
   form.reset();
   clearLocationHiddens();
+  clearAllFieldErrors();
 
   const lt = p.listing_type || 'rent';
-  document.getElementById('listingTypeToggle').style.display = '';
-  document.getElementById('listingTypeLocked').style.display = 'none';
-  setListingType(lt);
+
+  // Lock the listing type — no toggle on edit
+  document.getElementById('listingTypeToggle').style.display = 'none';
+  document.getElementById('listingTypeLocked').style.display = '';
+  const pill = document.getElementById('listingTypeLockedPill');
+  if (pill) {
+    pill.textContent = lt === 'sell' ? 'For Sale' : 'For Rent';
+    pill.className   = 'lt-locked-pill' + (lt === 'sell' ? ' sell' : '');
+  }
+
+  // Set internal state to match locked type
+  currentListingType = lt;
   document.getElementById('rentFieldsSection').style.display = lt === 'rent' ? '' : 'none';
   document.getElementById('sellFieldsSection').style.display = lt === 'sell' ? '' : 'none';
 
@@ -613,10 +889,8 @@ async function openEditModal(productId) {
   form.querySelector('[name="area"]').value        = p.area        || '';
   form.querySelector('[name="city"]').value        = p.city        || '';
   form.querySelector('[name="state"]').value       = p.state       || '';
-
-  // Pre-fill lat/lng if product already has them
-  document.getElementById('modalLat').value = p.latitude  || '';
-  document.getElementById('modalLng').value = p.longitude || '';
+  document.getElementById('modalLat').value        = p.latitude    || '';
+  document.getElementById('modalLng').value        = p.longitude   || '';
 
   if (lt === 'rent') {
     form.querySelector('[name="rent_per_hour"]').value    = p.rent_per_hour    || '';
@@ -632,32 +906,36 @@ async function openEditModal(productId) {
   originalProductSnapshot = {
     name: p.name || '', description: p.description || '',
     listing_type: lt,
-    rent_per_hour: String(p.rent_per_hour || ''), rent_per_km: String(p.rent_per_km || ''),
-    rent_per_day: String(p.rent_per_day || ''), rent_per_month: String(p.rent_per_month || ''),
+    rent_per_hour:    String(p.rent_per_hour    || ''),
+    rent_per_km:      String(p.rent_per_km      || ''),
+    rent_per_day:     String(p.rent_per_day     || ''),
+    rent_per_month:   String(p.rent_per_month   || ''),
     security_deposit: String(p.security_deposit || ''),
-    selling_price: String(p.selling_price || ''), condition: p.condition || '',
-    category: p.category || '', subcategory: p.subcategory || '',
-    pincode: p.pincode || '', area: p.area || '', city: p.city || '', state: p.state || '',
-    latitude: String(p.latitude || ''), longitude: String(p.longitude || ''),
+    selling_price:    String(p.selling_price    || ''),
+    condition: p.condition || '',
+    category:  p.category  || '',
+    subcategory: p.subcategory || '',
+    pincode: p.pincode || '', area: p.area  || '',
+    city:    p.city    || '', state: p.state || '',
+    latitude:  String(p.latitude  || ''),
+    longitude: String(p.longitude || ''),
   };
 
   const catSel = document.getElementById('modalCategory');
   catSel.value = p.category || '';
   catSel.dispatchEvent(new Event('change'));
-  setTimeout(() => { document.getElementById('modalSubcategory').value = p.subcategory || ''; }, 50);
+  setTimeout(() => {
+    document.getElementById('modalSubcategory').value = p.subcategory || '';
+  }, 50);
 
-  for (let i = 1; i <= 5; i++) {
-    delete slotFiles[i];
-    const url = p.images && p.images[i - 1] ? p.images[i - 1] : null;
-    slotUrls[i] = url;
-    if (url) setSlotImage(i, url); else clearSlotImage(i);
-  }
+  loadExistingImages(p.images);
   document.getElementById('productModalOverlay').classList.add('open');
 }
 
 function closeProductModal() {
   document.getElementById('productModalOverlay').classList.remove('open');
   editingId = null;
+  clearAllFieldErrors();
 }
 
 // ── Save product ──────────────────────────────────────────────
@@ -665,50 +943,30 @@ document.getElementById('productForm')?.addEventListener('submit', async e => {
   e.preventDefault();
   const form    = e.target;
   const saveBtn = document.getElementById('modalSaveBtn');
+
+  if (!validateProductForm(form, editingId === null)) return;
+
+  const lt      = currentListingType;
   const name    = form.querySelector('[name="name"]').value.trim();
-  const category = document.getElementById('modalCategory').value;
-  const lt       = currentListingType;
-  const pincode  = form.querySelector('[name="pincode"]').value.trim();
-  const lat      = document.getElementById('modalLat').value;
-  const lng      = document.getElementById('modalLng').value;
+  const cat     = document.getElementById('modalCategory').value;
+  const pincode = form.querySelector('[name="pincode"]').value.trim();
+  const lat     = document.getElementById('modalLat').value;
+  const lng     = document.getElementById('modalLng').value;
 
   if (editingId === null) {
-    // ── ADD ──
-    if (!name)     { toastError('Please enter a product name.'); return; }
-    if (!category) { toastError('Please select a category.');    return; }
-    if (Object.keys(slotFiles).length === 0) { toastError('Please upload at least one photo.'); return; }
-
-    // Location validation - must have pincode OR detected lat/lng
-    if (!pincode && !lat) {
-      toastError('Please enter your pincode or use the 📍 Detect button to set your location.');
-      return;
-    }
-
-    if (lt === 'rent') {
-      const rh = form.querySelector('[name="rent_per_hour"]').value.trim();
-      const rk = form.querySelector('[name="rent_per_km"]').value.trim();
-      const rd = form.querySelector('[name="rent_per_day"]').value.trim();
-      const rm = form.querySelector('[name="rent_per_month"]').value.trim();
-      if (!(rh || rk || rd || rm)) { toastError('Please enter at least one rent price.'); return; }
-    } else {
-      const sp   = document.getElementById('modalSellingPrice').value.trim();
-      const cond = document.getElementById('modalCondition').value;
-      if (!sp)   { toastError('Please enter a selling price.');      return; }
-      if (!cond) { toastError('Please select the item condition.');  return; }
-    }
-
+    // ══ ADD ══
     const fd = new FormData();
-    fd.append('name',        name);
-    fd.append('description', form.querySelector('[name="description"]').value.trim());
-    fd.append('category',    category);
-    fd.append('subcategory', document.getElementById('modalSubcategory').value);
+    fd.append('name',         name);
+    fd.append('description',  form.querySelector('[name="description"]').value.trim());
+    fd.append('category',     cat);
+    fd.append('subcategory',  document.getElementById('modalSubcategory').value);
     fd.append('listing_type', lt);
-    fd.append('pincode',     pincode);
-    fd.append('area',        form.querySelector('[name="area"]').value.trim());
-    fd.append('city',        form.querySelector('[name="city"]').value.trim());
-    fd.append('state',       form.querySelector('[name="state"]').value.trim());
-    fd.append('latitude',    lat  || '');
-    fd.append('longitude',   lng  || '');
+    fd.append('pincode',      pincode);
+    fd.append('area',         form.querySelector('[name="area"]').value.trim());
+    fd.append('city',         form.querySelector('[name="city"]').value.trim());
+    fd.append('state',        form.querySelector('[name="state"]').value.trim());
+    fd.append('latitude',     lat || '');
+    fd.append('longitude',    lng || '');
 
     if (lt === 'rent') {
       fd.append('rent_per_hour',    form.querySelector('[name="rent_per_hour"]').value.trim());
@@ -721,48 +979,58 @@ document.getElementById('productForm')?.addEventListener('submit', async e => {
       fd.append('condition',     document.getElementById('modalCondition').value);
     }
 
-    for (let i = 1; i <= 5; i++) {
-      if (slotFiles[i]) { const c = await compressImage(slotFiles[i]); fd.append(`image${i}`, c); }
+    // Attach photos from unified slots
+    for (let i = 0; i < 5; i++) {
+      const slot = photoSlots[i];
+      if (slot?.file) {
+        const compressed = await compressImage(slot.file);
+        fd.append(`image${i + 1}`, compressed);
+      }
     }
 
     setButtonLoading(saveBtn, true);
-    const resp = await fetch(API_BASE + '/auth/vendor/products', { method: 'POST', body: fd, credentials: 'include' });
+    const resp = await fetch(API_BASE + '/auth/vendor/products', {
+      method: 'POST', body: fd, credentials: 'include'
+    });
     let res;
-    try { res = await resp.json(); } catch { toastError(`Upload failed (${resp.status}).`); setButtonLoading(saveBtn, false); return; }
-    setButtonLoading(saveBtn, false);
-    if (res.success) { toastSuccess('Product listed!'); closeProductModal(); await loadProducts(); }
-    else if (res.message?.toLowerCase().includes('limit')) { closeProductModal(); openUpgradeModal(res.message); }
-    else toastError(res.message || 'Failed to add product.');
-
-  } else {
-    // ── EDIT ──
-    const snap    = originalProductSnapshot;
-    const lt      = snap.listing_type;
-    const desc    = form.querySelector('[name="description"]').value.trim();
-    const cat     = category;
-    const sub     = document.getElementById('modalSubcategory').value;
-    const area    = form.querySelector('[name="area"]').value.trim();
-    const city    = form.querySelector('[name="city"]').value.trim();
-    const state   = form.querySelector('[name="state"]').value.trim();
-
-    // Location validation for edit too
-    if (!pincode && !lat) {
-      toastError('Please enter your pincode or use the 📍 Detect button to set your location.');
+    try { res = await resp.json(); } catch {
+      toastError(`Upload failed (${resp.status}).`);
+      setButtonLoading(saveBtn, false);
       return;
     }
+    setButtonLoading(saveBtn, false);
+    if (res.success) {
+      toastSuccess('Product listed!');
+      closeProductModal();
+      await loadProducts();
+    } else if (res.message?.toLowerCase().includes('limit')) {
+      closeProductModal();
+      openUpgradeModal(res.message);
+    } else {
+      toastError(res.message || 'Failed to add product.');
+    }
+
+  } else {
+    // ══ EDIT ══
+    const snap  = originalProductSnapshot;
+    const desc  = form.querySelector('[name="description"]').value.trim();
+    const sub   = document.getElementById('modalSubcategory').value;
+    const area  = form.querySelector('[name="area"]').value.trim();
+    const city  = form.querySelector('[name="city"]').value.trim();
+    const state = form.querySelector('[name="state"]').value.trim();
 
     const data = {
-      listing_type: currentListingType,
-      name:         name     || undefined,
-      category:     cat      || undefined,
-      description:  desc     === '' ? null : desc,
-      subcategory:  sub      === '' ? null : sub,
-      pincode:      pincode  === '' ? null : pincode,
-      area:         area     === '' ? null : area,
-      city:         city     === '' ? null : city,
-      state:        state    === '' ? null : state,
-      latitude:     lat      || null,
-      longitude:    lng      || null,
+      listing_type: lt,
+      name:        name     || undefined,
+      category:    cat      || undefined,
+      description: desc     === '' ? null : desc,
+      subcategory: sub      === '' ? null : sub,
+      pincode:     pincode  === '' ? null : pincode,
+      area:        area     === '' ? null : area,
+      city:        city     === '' ? null : city,
+      state:       state    === '' ? null : state,
+      latitude:    lat      || null,
+      longitude:   lng      || null,
     };
 
     if (lt === 'rent') {
@@ -785,13 +1053,14 @@ document.getElementById('productForm')?.addEventListener('submit', async e => {
 
     Object.keys(data).forEach(k => data[k] === undefined && delete data[k]);
 
-    const hasImageChange = Object.keys(slotFiles).length > 0;
+    // Check if anything actually changed
+    const hasNewPhotos = photoSlots.some(s => s?.file);
     let hasFieldChange =
-      name    !== snap.name    || desc  !== snap.description ||
-      cat     !== snap.category || sub  !== snap.subcategory ||
-      pincode !== snap.pincode  || area !== snap.area ||
-      city    !== snap.city     || state !== snap.state ||
-      lat     !== snap.latitude || lng  !== snap.longitude;
+      name    !== snap.name        || desc    !== snap.description ||
+      cat     !== snap.category    || sub     !== snap.subcategory ||
+      pincode !== snap.pincode     || area    !== snap.area        ||
+      city    !== snap.city        || state   !== snap.state       ||
+      lat     !== snap.latitude    || lng     !== snap.longitude;
 
     if (lt === 'rent') {
       const rh = form.querySelector('[name="rent_per_hour"]').value.trim();
@@ -808,36 +1077,47 @@ document.getElementById('productForm')?.addEventListener('submit', async e => {
       hasFieldChange = hasFieldChange || sp !== snap.selling_price || cond !== snap.condition;
     }
 
-    if (!hasFieldChange && !hasImageChange) { toastError('No changes detected.'); return; }
+    if (!hasFieldChange && !hasNewPhotos) {
+      toastError('No changes detected.');
+      return;
+    }
 
     setButtonLoading(saveBtn, true);
+
     const res = await apiRequest(`/auth/vendor/products/${editingId}`, 'PUT', data);
-    for (let i = 1; i <= 5; i++) {
-      if (slotFiles[i]) {
+
+    // Upload any new photos slot by slot
+    for (let i = 0; i < 5; i++) {
+      const slot = photoSlots[i];
+      if (slot?.file) {
         const fd = new FormData();
-        fd.append('image', await compressImage(slotFiles[i]));
-        await fetch(`${API_BASE}/auth/vendor/products/${editingId}/image/${i}`, { method: 'PUT', body: fd, credentials: 'include' });
+        fd.append('image', await compressImage(slot.file));
+        await fetch(`${API_BASE}/auth/vendor/products/${editingId}/image/${i + 1}`, {
+          method: 'PUT', body: fd, credentials: 'include'
+        });
       }
     }
+
     setButtonLoading(saveBtn, false);
-    if (res.success) { toastSuccess('Product updated!'); closeProductModal(); await loadProducts(); }
-    else toastError(res.message || 'Update failed.');
+    if (res.success) {
+      toastSuccess('Product updated!');
+      closeProductModal();
+      await loadProducts();
+    } else {
+      toastError(res.message || 'Update failed.');
+    }
   }
 });
-
-// ── Delete image slot ─────────────────────────────────────────
-async function deleteImageSlot(productId, slot) {
-  const confirmed = await showConfirm({ title: 'Delete image?', text: 'This image will be permanently removed.', confirmLabel: 'Delete', cancelLabel: 'Cancel' });
-  if (!confirmed) return;
-  const res = await apiRequest(`/auth/vendor/products/${productId}/image/${slot}`, 'DELETE');
-  if (res.success) { toastSuccess('Image deleted.'); slotUrls[slot] = null; clearSlotImage(slot); }
-  else toastError(res.message || 'Failed to delete image.');
-}
 
 // ── Delete product ────────────────────────────────────────────
 async function confirmDelete(productId) {
   const p = allProducts.find(x => x.id === productId);
-  const confirmed = await showConfirm({ title: 'Delete product?', text: `"${p?.name}" and all its images will be permanently deleted.`, confirmLabel: 'Delete', cancelLabel: 'Cancel' });
+  const confirmed = await showConfirm({
+    title:        'Delete product?',
+    text:         `"${p?.name}" and all its images will be permanently deleted.`,
+    confirmLabel: 'Delete',
+    cancelLabel:  'Cancel',
+  });
   if (!confirmed) return;
   const res = await apiRequest(`/auth/vendor/products/${productId}`, 'DELETE');
   if (res.success) { toastSuccess('Product deleted.'); await loadProducts(); }
@@ -847,12 +1127,20 @@ async function confirmDelete(productId) {
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('addProductBtn')?.addEventListener('click', openAddModal);
-  initImageSlots();
+  initPhotoUpload();
   initModalPincodeAutofill();
   initDetectLocationBtn();
   loadCategories();
   loadConditions();
   loadProducts();
+
+  // Real-time error clearing on inputs
+  ['modalName','modalSellingPrice'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', () => {
+      const errMap = { modalName: 'err-name', modalSellingPrice: 'err-sell-price' };
+      clearFieldError(id, errMap[id]);
+    });
+  });
 });
 
 document.addEventListener('keydown', e => {
