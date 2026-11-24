@@ -1,19 +1,19 @@
 /* ============================================================
-   OLR INDIA – VENDOR PRODUCTS JS  v7
+   OLR INDIA – VENDOR PRODUCTS JS  v8
    Requires: vendor-nav.js, vendor-upgrade.js
    ============================================================ */
 
 // ── State ─────────────────────────────────────────────────────
 let allProducts = [];
-let CATEGORIES = {};
-let CONDITIONS = [];
-let editingId = null;
+let CATEGORIES  = {};
+let CONDITIONS  = [];
+let editingId   = null;
 let currentListingType = 'rent';
 
-// New unified photo state: array of { slotNum, file|null, url|null }
-// slotNum 1–5, file = new File to upload, url = existing URL from server
-const photoSlots = [null, null, null, null, null]; // index 0 = slot 1
-let previewProductId = null;
+// Unified photo slots: index 0–4 → slot 1–5
+// Each entry: { file: File|null, preview: string, url: string|null }
+const photoSlots = [null, null, null, null, null];
+let previewProductId       = null;
 let originalProductSnapshot = null;
 
 // ── Suspended banner ──────────────────────────────────────────
@@ -24,7 +24,9 @@ function renderSuspendedBanner() {
   if (!vendorProfile.is_active) {
     banner.style.display = 'block';
     document.querySelectorAll('#addProductBtn, #planUsageUpgradeBtn').forEach(btn => {
-      btn.disabled = true; btn.style.opacity = '0.4'; btn.style.cursor = 'not-allowed';
+      btn.disabled = true;
+      btn.style.opacity = '0.4';
+      btn.style.cursor  = 'not-allowed';
     });
   } else {
     banner.style.display = 'none';
@@ -34,14 +36,14 @@ function renderSuspendedBanner() {
 // ── Plan usage strip ──────────────────────────────────────────
 function renderPlanUsageStrip() {
   if (!vendorProfile) return;
-  const v = vendorProfile;
-  const strip  = document.getElementById('planUsageStrip');
-  const badge  = document.getElementById('planUsageBadge');
-  const text   = document.getElementById('planUsageText');
-  const fill   = document.getElementById('planUsageBarFill');
+  const v     = vendorProfile;
+  const strip = document.getElementById('planUsageStrip');
+  const badge = document.getElementById('planUsageBadge');
+  const text  = document.getElementById('planUsageText');
+  const fill  = document.getElementById('planUsageBarFill');
   if (!strip) return;
   strip.style.display = '';
-  badge.textContent = PLAN_LABELS[v.subscription_plan] || v.subscription_plan;
+  badge.textContent   = PLAN_LABELS[v.subscription_plan] || v.subscription_plan;
   const used  = v.active_product_count ?? 0;
   const limit = v.max_active_posts;
   if (limit === null || limit === undefined) {
@@ -77,7 +79,8 @@ async function loadCategories() {
   sel.innerHTML = '<option value="">Select category</option>';
   Object.keys(CATEGORIES).forEach(cat => {
     const o = document.createElement('option');
-    o.value = cat; o.textContent = cat;
+    o.value       = cat;
+    o.textContent = cat;
     sel.appendChild(o);
   });
 }
@@ -108,7 +111,6 @@ function selectCondition(val) {
     chip.classList.toggle('selected', chip.textContent === val);
   });
   document.getElementById('modalCondition').value = val;
-  // Clear error
   const errEl = document.getElementById('err-condition');
   if (errEl) errEl.classList.remove('visible');
 }
@@ -128,41 +130,26 @@ document.getElementById('modalCategory')?.addEventListener('change', function ()
 // ── Listing type toggle ───────────────────────────────────────
 function setListingType(type) {
   currentListingType = type;
-  const rentBtn = document.getElementById('toggleRent');
-  const sellBtn = document.getElementById('toggleSell');
-  rentBtn?.classList.toggle('active', type === 'rent');
-  sellBtn?.classList.toggle('active', type === 'sell');
-
+  document.getElementById('toggleRent')?.classList.toggle('active', type === 'rent');
+  document.getElementById('toggleSell')?.classList.toggle('active', type === 'sell');
   document.getElementById('rentFieldsSection').style.display = type === 'rent' ? '' : 'none';
   document.getElementById('sellFieldsSection').style.display = type === 'sell' ? '' : 'none';
-
-  // Clear values for the hidden side
   if (type === 'sell') {
     ['rent_per_hour','rent_per_km','rent_per_day','rent_per_month','security_deposit'].forEach(n => {
       const el = document.querySelector(`[name="${n}"]`);
       if (el) el.value = '';
     });
-    clearAllRentErrors();
+    document.getElementById('err-rent-price')?.classList.remove('visible');
   } else {
     const sp = document.getElementById('modalSellingPrice');
     if (sp) sp.value = '';
     renderConditionChips('');
-    clearAllSellErrors();
+    clearFieldError('modalSellingPrice', 'err-sell-price');
+    document.getElementById('err-condition')?.classList.remove('visible');
   }
 }
 
-function clearAllRentErrors() {
-  const errEl = document.getElementById('err-rent-price');
-  if (errEl) errEl.classList.remove('visible');
-}
-
-function clearAllSellErrors() {
-  clearFieldError('modalSellingPrice', 'err-sell-price');
-  const errEl = document.getElementById('err-condition');
-  if (errEl) errEl.classList.remove('visible');
-}
-
-// ── Rent field visibility ─────────────────────────────────────
+// ── Rent field visibility by category ────────────────────────
 const RENT_FIELDS_BY_CATEGORY = {
   "Passenger Vehicles":               ["hour","km","day","month"],
   "Bikes & Scooters":                 ["hour","km","day","month"],
@@ -212,41 +199,31 @@ function clearLocationHiddens() {
 function initDetectLocationBtn() {
   const btn = document.getElementById('detectLocationBtn');
   if (!btn) return;
-
   btn.addEventListener('click', async () => {
     if (!navigator.geolocation) { toastError('Geolocation not supported by your browser.'); return; }
-
     btn.classList.add('detecting');
     navigator.geolocation.getCurrentPosition(async pos => {
       try {
         const { latitude, longitude } = pos.coords;
         document.getElementById('modalLat').value = latitude;
         document.getElementById('modalLng').value = longitude;
-
         const res  = await fetch(
           `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
           { headers: { 'Accept-Language': 'en' } }
         );
         const data = await res.json();
         const addr = data.address || {};
-
         const pincode = addr.postcode || '';
         const area    = addr.suburb || addr.neighbourhood || addr.village || '';
         const city    = addr.city   || addr.town || addr.county || '';
         const state   = addr.state  || '';
-
         if (pincode) document.getElementById('modalPincode').value = pincode;
         if (area)    document.getElementById('modalArea').value    = area;
         if (city)    document.getElementById('modalCity').value    = city;
         if (state)   document.getElementById('modalState').value   = state;
-
         const statusEl = document.getElementById('modalPincodeStatus');
         if (statusEl) statusEl.textContent = '✅ Location detected';
-
-        // Clear location error if present
-        const errEl = document.getElementById('err-location');
-        if (errEl) errEl.classList.remove('visible');
-
+        document.getElementById('err-location')?.classList.remove('visible');
         toastSuccess('Location detected!');
       } catch {
         toastError('Could not detect location. Please enter your pincode manually.');
@@ -260,7 +237,6 @@ function initDetectLocationBtn() {
   });
 }
 
-// ── Pincode autofill ──────────────────────────────────────────
 function initModalPincodeAutofill() {
   wirePincodeAutofill({
     pincodeInput: document.getElementById('modalPincode'),
@@ -271,8 +247,7 @@ function initModalPincodeAutofill() {
     onSuccess: (lat, lng) => {
       if (lat) document.getElementById('modalLat').value = lat;
       if (lng) document.getElementById('modalLng').value = lng;
-      const errEl = document.getElementById('err-location');
-      if (errEl) errEl.classList.remove('visible');
+      document.getElementById('err-location')?.classList.remove('visible');
     }
   });
   document.getElementById('modalPincode')?.addEventListener('input', () => {
@@ -282,6 +257,13 @@ function initModalPincodeAutofill() {
 
 // ── Load products ─────────────────────────────────────────────
 async function loadProducts() {
+  const grid = document.getElementById('productGrid');
+  if (grid) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+      <div class="empty-state-icon">📦</div>
+      <h3>Loading your products…</h3>
+    </div>`;
+  }
   const res = await apiRequest('/auth/vendor/products', 'GET');
   if (!res.success) return;
   allProducts = res.products;
@@ -339,43 +321,57 @@ function renderProducts() {
       </div>`;
     return;
   }
+
   grid.innerHTML = allProducts.map(p => {
     const img = p.images && p.images[0]
       ? `<img class="product-img" src="${p.images[0]}" alt="${p.name}" loading="lazy">`
       : `<div class="product-img-placeholder">📦</div>`;
+
     const interestText = (p.click_count || 0) > 0
-      ? `🔥 ${p.click_count} ${p.click_count === 1 ? 'person has' : 'people have'} viewed this`
+      ? `${p.click_count} ${p.click_count === 1 ? 'person' : 'people'} viewed this`
       : 'Not viewed yet';
+
     const isAdminFlagged = p.deactivated_by === 'admin';
-    const daysLeft = p.edit_days_remaining ?? 0;
-    const isSell   = p.listing_type === 'sell';
+    const daysLeft       = p.edit_days_remaining ?? 0;
+    const isSell         = p.listing_type === 'sell';
+
+    // Plain text badge — no emojis
     const typeBadge = `<span class="product-type-badge ${isSell ? 'sell' : 'rent'}">${isSell ? 'For Sale' : 'For Rent'}</span>`;
+
     const conditionBadge = isSell && p.condition
       ? `<span style="font-size:11px;background:#f0fdf4;color:#15803d;border-radius:20px;padding:2px 8px;font-weight:600;">${p.condition}</span>`
       : '';
+
     const strikeBanner = isAdminFlagged ? `
       <div style="background:#fff7ed;border:1px solid #f97316;color:#9a3412;padding:10px 12px;border-radius:6px;margin:8px 0;font-size:13px;">
-        ⚠️ <strong>Removed by Admin</strong><br>
-        <span>Reason: ${p.strike_reason || 'Policy violation'}</span><br>
+        <strong>Removed by Admin</strong><br>
+        Reason: ${p.strike_reason || 'Policy violation'}<br>
         Edit this product to bring it back live.
         <strong style="display:block;margin-top:4px;">${daysLeft} day${daysLeft === 1 ? '' : 's'} left before permanent deletion.</strong>
       </div>` : '';
+
     const expiredBanner = p.deactivated_by === 'plan_expired' ? `
       <div style="background:#fff7ed;border:1px solid #f97316;color:#9a3412;padding:10px 12px;border-radius:6px;margin:8px 0;font-size:13px;">
-        ⏸️ <strong>Hidden – Plan Expired</strong><br>
+        <strong>Hidden — Plan Expired</strong><br>
         Renew your plan to bring this listing back live.
         <button onclick="event.stopPropagation();openUpgradeModal()" style="margin-top:6px;display:block;background:#f97316;color:#fff;border:none;padding:5px 12px;border-radius:4px;cursor:pointer;font-size:12px;">Renew Plan</button>
       </div>` : '';
+
     return `
       <div class="product-card" onclick="handleCardClick(event,${p.id})">
         ${img}
         <span class="product-status-badge ${p.is_active ? '' : 'inactive'}">${p.is_active ? 'Live' : 'Inactive'}</span>
         <button class="product-share-btn" onclick="event.stopPropagation();openShareModal(${p.id})" title="Share">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="1.8"/><circle cx="6" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="19" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" stroke="currentColor" stroke-width="1.8"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="1.8"/>
+            <circle cx="6" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/>
+            <circle cx="18" cy="19" r="3" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" stroke="currentColor" stroke-width="1.8"/>
+          </svg>
         </button>
         <div class="product-body">
           ${strikeBanner}${expiredBanner}
-          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
             <div class="product-cat">${p.category || ''}</div>
             ${typeBadge}
             ${conditionBadge}
@@ -430,82 +426,89 @@ function renderPreviewModal(productId) {
   const foot = document.getElementById('previewModalFoot');
   if (!p || !body || !foot) return;
 
-  const images = p.images && p.images.length ? p.images : [];
+  const images = Array.isArray(p.images) ? p.images : [];
+  const isSell = p.listing_type === 'sell';
 
-  // Main image large + small strip for extra images
+  // Images
   let imagesHtml = '';
   if (images.length) {
     const mainImg = `<img src="${images[0]}" alt="${p.name}"
-      style="width:100%;height:260px;object-fit:cover;border-radius:var(--r-md);display:block;border:1px solid var(--c-border-soft);">`;
+      style="width:100%;height:240px;object-fit:cover;border-radius:8px;display:block;border:1px solid var(--c-border-soft);">`;
     const extraImgs = images.length > 1
-      ? `<div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
+      ? `<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
           ${images.slice(1).map(url =>
             `<img src="${url}" alt="${p.name}"
-              style="width:72px;height:72px;object-fit:cover;border-radius:var(--r-md);border:1px solid var(--c-border-soft);">`
+              style="width:76px;height:76px;object-fit:cover;border-radius:6px;border:1px solid var(--c-border-soft);">`
           ).join('')}
          </div>`
       : '';
-    imagesHtml = `<div style="margin-bottom:16px;">${mainImg}${extraImgs}</div>`;
+    imagesHtml = `<div style="margin:16px 0 12px;">${mainImg}${extraImgs}</div>`;
   } else {
-    imagesHtml = `<div style="width:100%;height:200px;background:var(--c-bg);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:16px;border:1px solid var(--c-border-soft);">📦</div>`;
+    imagesHtml = `<div style="width:100%;height:180px;background:var(--c-bg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:40px;margin:16px 0 12px;border:1px solid var(--c-border-soft);">📦</div>`;
   }
 
-  const isSell        = p.listing_type === 'sell';
+  // Type badge — plain text
   const typeBadgeHtml = `<span class="product-type-badge ${isSell ? 'sell' : 'rent'}" style="position:static;">${isSell ? 'For Sale' : 'For Rent'}</span>`;
 
+  // Status badge
+  const statusBadgeHtml = `<span class="product-status-badge ${p.is_active ? '' : 'inactive'}" style="position:static;">${p.is_active ? 'Live' : 'Inactive'}</span>`;
+
+  // Price
   let priceHtml = '';
   if (isSell) {
     priceHtml = p.selling_price
-      ? `<div style="font-size:15px;font-weight:700;color:#15803d;margin-bottom:4px;">₹${Number(p.selling_price).toLocaleString('en-IN')} <span style="font-size:13px;font-weight:500;">selling price</span></div>`
-      : '<div style="font-size:13px;color:var(--c-ink-faint);margin-bottom:4px;">Price not set</div>';
+      ? `<div style="font-size:16px;font-weight:700;color:#15803d;margin:10px 0 4px;">₹${Number(p.selling_price).toLocaleString('en-IN')} <span style="font-size:13px;font-weight:500;color:var(--c-ink-soft);">selling price</span></div>`
+      : '<div style="font-size:13px;color:var(--c-ink-faint);margin:10px 0 4px;">Price not set</div>';
     if (p.condition)
-      priceHtml += `<div style="font-size:13px;margin-bottom:6px;">Condition: <span style="font-weight:600;color:#15803d;">${p.condition}</span></div>`;
+      priceHtml += `<div style="font-size:13px;margin-bottom:8px;">Condition: <span style="font-weight:600;color:#15803d;">${p.condition}</span></div>`;
   } else {
     const rows = [
       p.rent_per_hour  ? `₹${p.rent_per_hour} / hour`   : null,
       p.rent_per_km    ? `₹${p.rent_per_km} / km`       : null,
       p.rent_per_day   ? `₹${p.rent_per_day} / day`     : null,
       p.rent_per_month ? `₹${p.rent_per_month} / month` : null,
-    ].filter(Boolean).join(' &nbsp;•&nbsp; ');
-    priceHtml = `<div style="font-size:15px;font-weight:700;color:var(--c-blue-deep);margin-bottom:4px;">${rows || 'Price not set'}</div>`;
+    ].filter(Boolean).join('  •  ');
+    priceHtml = `<div style="font-size:16px;font-weight:700;color:var(--c-blue-deep);margin:10px 0 4px;">${rows || 'Price not set'}</div>`;
     if (p.security_deposit)
-      priceHtml += `<div style="font-size:13px;color:var(--c-ink-faint);margin-bottom:6px;">Security deposit: ₹${p.security_deposit}</div>`;
+      priceHtml += `<div style="font-size:13px;color:var(--c-ink-faint);margin-bottom:8px;">Security deposit: ₹${Number(p.security_deposit).toLocaleString('en-IN')}</div>`;
   }
 
-  body.innerHTML = `
-    ${p.deactivated_by === 'admin' ? `
-    <div style="background:#fff7ed;border:1px solid #f97316;color:#9a3412;padding:12px 14px;border-radius:6px;margin-bottom:12px;font-size:13px;">
-      ⚠️ <strong>Removed by Admin</strong><br>
+  // Location
+  const locationStr = [p.area, p.city, p.state, p.pincode].filter(Boolean).join(', ');
+
+  // Admin flag banner
+  const adminBanner = p.deactivated_by === 'admin' ? `
+    <div style="background:#fff7ed;border:1px solid #f97316;color:#9a3412;padding:12px 14px;border-radius:6px;margin:14px 0 0;font-size:13px;">
+      <strong>Removed by Admin</strong><br>
       Reason: ${p.strike_reason || 'Policy violation'}<br>
       <strong>${p.edit_days_remaining ?? 0} day(s) left</strong> — edit to bring it back live, or it will be permanently deleted.
-    </div>` : ''}
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
-      <span class="product-status-badge ${p.is_active ? '' : 'inactive'}" style="position:static;">${p.is_active ? 'Live' : 'Inactive'}</span>
-      ${typeBadgeHtml}
-      <span class="product-cat" style="margin:0;">${p.category || ''}${p.subcategory ? ' · ' + p.subcategory : ''}</span>
-    </div>
+    </div>` : '';
+
+  body.innerHTML = `
+    ${adminBanner}
     ${imagesHtml}
-    <h3 style="margin:0 0 6px;font-size:18px;">${p.name}</h3>
-    <p style="font-size:13.5px;color:var(--c-ink-soft);line-height:1.5;margin-bottom:12px;">${p.description || 'No description.'}</p>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+      ${statusBadgeHtml}
+      ${typeBadgeHtml}
+      <span class="product-cat" style="margin:0;font-size:12px;">${p.category || ''}${p.subcategory ? ' · ' + p.subcategory : ''}</span>
+    </div>
+    <h3 style="margin:0 0 6px;font-size:17px;font-weight:700;color:var(--c-ink);">${p.name}</h3>
+    <p style="font-size:13.5px;color:var(--c-ink-soft);line-height:1.55;margin:0 0 4px;">${p.description || 'No description.'}</p>
     ${priceHtml}
-    <div style="font-size:13px;color:var(--c-ink-faint);margin-bottom:6px;">${[p.area,p.city,p.state,p.pincode].filter(Boolean).join(', ')}</div>
-    <div style="font-size:13px;color:#B5790A;font-weight:600;">
-      ${(p.click_count || 0) > 0 ? `🔥 ${p.click_count} ${p.click_count === 1 ? 'person has' : 'people have'} viewed this` : 'Not viewed yet'}
+    ${locationStr ? `<div style="font-size:12.5px;color:var(--c-ink-faint);margin-bottom:6px;">${locationStr}</div>` : ''}
+    <div style="font-size:12.5px;color:#B5790A;font-weight:600;margin-bottom:4px;">
+      ${(p.click_count || 0) > 0 ? `${p.click_count} ${p.click_count === 1 ? 'person' : 'people'} viewed this` : 'Not viewed yet'}
     </div>`;
 
   const deactivateLabel = isSell ? 'Mark as Sold' : 'Deactivate';
   const reactivateLabel = isSell ? 'Relist'       : 'Reactivate';
+  const canToggle = p.deactivated_by !== 'admin' && p.deactivated_by !== 'plan_expired';
 
   foot.innerHTML = `
-    <button class="btn btn-secondary" style="width:auto;padding:10px 16px;" onclick="openShareModal(${p.id})">Share</button>
-    ${p.deactivated_by !== 'admin' && p.deactivated_by !== 'plan_expired' ? `
-      <button class="btn btn-secondary" style="width:auto;padding:10px 16px;" onclick="toggleProductStatus(${p.id},${!p.is_active})">
-        ${p.is_active ? deactivateLabel : reactivateLabel}
-      </button>` : ''}
-    <button class="btn btn-secondary" style="width:auto;padding:10px 16px;" onclick="closePreviewModal();openEditModal(${p.id})">
-      ${p.deactivated_by === 'admin' ? '✏️ Edit to go live' : 'Edit'}
-    </button>
-    <button class="btn btn-primary" style="width:auto;padding:10px 16px;background:var(--c-error);" onclick="closePreviewModal();confirmDelete(${p.id})">Delete</button>`;
+    <button class="btn btn-secondary" onclick="openShareModal(${p.id})">Share</button>
+    ${canToggle ? `<button class="btn btn-secondary" onclick="toggleProductStatus(${p.id},${!p.is_active})">${p.is_active ? deactivateLabel : reactivateLabel}</button>` : ''}
+    <button class="btn btn-secondary" onclick="closePreviewModal();openEditModal(${p.id})">${p.deactivated_by === 'admin' ? 'Edit to go live' : 'Edit'}</button>
+    <button class="btn btn-primary" style="background:var(--c-error);" onclick="closePreviewModal();confirmDelete(${p.id})">Delete</button>`;
 }
 
 // ── Share ─────────────────────────────────────────────────────
@@ -536,6 +539,8 @@ document.getElementById('shareLinkCopyBtn')?.addEventListener('click', async () 
 
 // ══════════════════════════════════════════════════════════════
 //  PHOTO UPLOAD – unified zone with thumbnail strip
+//  Touch-friendly reorder: tap a thumb to select, tap another
+//  to swap. Desktop keeps mouse-drag reorder.
 // ══════════════════════════════════════════════════════════════
 
 function readFileAsDataUrl(file) {
@@ -565,22 +570,18 @@ function compressImage(file, maxWidthPx = 1920, qualityJpeg = 0.82) {
   });
 }
 
-// Count how many slots are occupied
-function usedSlotCount() {
-  return photoSlots.filter(s => s !== null).length;
-}
+function usedSlotCount()  { return photoSlots.filter(s => s !== null).length; }
+function firstEmptySlot() { return photoSlots.indexOf(null); }
 
-// Find first empty slot index (0-based)
-function firstEmptySlot() {
-  return photoSlots.indexOf(null);
-}
-
-// Re-render the thumb strip from photoSlots state
-let dragSrcIdx = null; // drag-to-reorder state
+// touch-reorder state
+let touchSelectedIdx = null;
+// mouse drag-reorder state
+let dragSrcIdx = null;
 
 function renderPhotoThumbs() {
   const thumbsEl    = document.getElementById('photoThumbs');
   const uploadInner = document.getElementById('photoUploadInner');
+  const zone        = document.getElementById('photoUploadZone');
   const errEl       = document.querySelector('.photo-upload-err');
   if (!thumbsEl) return;
 
@@ -589,22 +590,25 @@ function renderPhotoThumbs() {
   if (used === 0) {
     thumbsEl.style.display    = 'none';
     uploadInner.style.display = '';
+    zone?.classList.remove('has-photos');
+    touchSelectedIdx = null;
     return;
   }
 
   uploadInner.style.display = 'none';
   thumbsEl.style.display    = '';
-  thumbsEl.innerHTML        = '';
+  zone?.classList.add('has-photos');
+  thumbsEl.innerHTML = '';
 
   photoSlots.forEach((slot, idx) => {
     if (!slot) return;
 
-    const thumb = document.createElement('div');
+    const thumb       = document.createElement('div');
     thumb.className   = 'photo-thumb' + (idx === 0 ? ' photo-thumb-main' : '');
-    thumb.draggable   = true;
     thumb.dataset.idx = idx;
 
-    // Drag events
+    // ── Desktop drag-to-reorder ──
+    thumb.draggable = true;
     thumb.addEventListener('dragstart', e => {
       dragSrcIdx = idx;
       thumb.classList.add('dragging');
@@ -613,6 +617,7 @@ function renderPhotoThumbs() {
     thumb.addEventListener('dragend', () => {
       thumb.classList.remove('dragging');
       thumbsEl.querySelectorAll('.photo-thumb').forEach(t => t.classList.remove('drag-over'));
+      dragSrcIdx = null;
     });
     thumb.addEventListener('dragover', e => {
       e.preventDefault();
@@ -623,12 +628,29 @@ function renderPhotoThumbs() {
     thumb.addEventListener('drop', e => {
       e.preventDefault();
       if (dragSrcIdx === null || dragSrcIdx === idx) return;
-      // Swap slots
-      const tmp           = photoSlots[dragSrcIdx];
-      photoSlots[dragSrcIdx] = photoSlots[idx];
-      photoSlots[idx]        = tmp;
+      swapSlots(dragSrcIdx, idx);
       dragSrcIdx = null;
-      renderPhotoThumbs();
+    });
+
+    // ── Touch tap-to-reorder ──
+    thumb.addEventListener('click', e => {
+      // Don't trigger if the delete button was tapped
+      if (e.target.closest('.photo-thumb-del')) return;
+
+      if (touchSelectedIdx === null) {
+        // Select this thumb
+        touchSelectedIdx = idx;
+        thumb.classList.add('touch-selected');
+      } else if (touchSelectedIdx === idx) {
+        // Deselect
+        touchSelectedIdx = null;
+        thumb.classList.remove('touch-selected');
+      } else {
+        // Swap with previously selected
+        swapSlots(touchSelectedIdx, idx);
+        touchSelectedIdx = null;
+        // renderPhotoThumbs re-renders so no need to remove class
+      }
     });
 
     const imgEl = document.createElement('img');
@@ -636,26 +658,30 @@ function renderPhotoThumbs() {
     imgEl.alt   = `Photo ${idx + 1}`;
     thumb.appendChild(imgEl);
 
-    const delBtn       = document.createElement('button');
-    delBtn.type        = 'button';
-    delBtn.className   = 'photo-thumb-del';
-    delBtn.title       = 'Remove photo';
-    delBtn.innerHTML   = '✕';
+    const delBtn     = document.createElement('button');
+    delBtn.type      = 'button';
+    delBtn.className = 'photo-thumb-del';
+    delBtn.title     = 'Remove photo';
+    delBtn.innerHTML = '✕';
     delBtn.addEventListener('click', e => {
       e.stopPropagation();
       removePhotoSlot(idx);
     });
     thumb.appendChild(delBtn);
+
+    // Restore touch-selected highlight if idx matches
+    if (touchSelectedIdx === idx) thumb.classList.add('touch-selected');
+
     thumbsEl.appendChild(thumb);
   });
 
-  // Add "+" button if there's room
+  // Add "+" button if room remains
   if (used < 5) {
     const addBtn     = document.createElement('button');
     addBtn.type      = 'button';
     addBtn.className = 'photo-add-btn';
     addBtn.title     = 'Add more photos';
-    addBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Add</span>`;
+    addBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Add</span>`;
     addBtn.addEventListener('click', () => document.getElementById('bulkImageInput').click());
     thumbsEl.appendChild(addBtn);
   }
@@ -663,48 +689,45 @@ function renderPhotoThumbs() {
   if (errEl) errEl.classList.remove('visible');
 }
 
-// Remove a photo from a slot, compact remaining slots
+function swapSlots(a, b) {
+  const tmp      = photoSlots[a];
+  photoSlots[a]  = photoSlots[b];
+  photoSlots[b]  = tmp;
+  renderPhotoThumbs(); // no toast — just a reorder
+}
+
 function removePhotoSlot(idx) {
   const slot = photoSlots[idx];
   if (!slot) return;
-
-  // If this was an existing server image on an edit, delete it
+  // If existing server image on edit, queue server deletion (no confirm needed here — user chose ✕)
   if (editingId && slot.url && !slot.file) {
-    deleteImageFromServer(editingId, idx + 1);
+    apiRequest(`/auth/vendor/products/${editingId}/image/${idx + 1}`, 'DELETE').catch(() => {});
   }
-
   photoSlots[idx] = null;
-
-  // Compact: shift remaining up to remove gaps
   compactPhotoSlots();
+  if (touchSelectedIdx !== null) touchSelectedIdx = null; // reset selection on removal
   renderPhotoThumbs();
 }
 
-// Compact photoSlots array – no gaps (nulls only at the end)
 function compactPhotoSlots() {
   const filled = photoSlots.filter(s => s !== null);
-  for (let i = 0; i < 5; i++) {
-    photoSlots[i] = filled[i] || null;
-  }
+  for (let i = 0; i < 5; i++) photoSlots[i] = filled[i] || null;
 }
 
-// Add files to slots
 async function addPhotos(files) {
   const toAdd = Array.from(files).filter(f => f.type.startsWith('image/'));
   if (!toAdd.length) return;
-
   const available = 5 - usedSlotCount();
   if (available <= 0) { toastError('You already have 5 photos. Remove one to add more.'); return; }
-
   const batch = toAdd.slice(0, available);
-  if (toAdd.length > available) toastError(`Only ${available} slot${available > 1 ? 's' : ''} remaining — extra photos skipped.`);
-
+  if (toAdd.length > available)
+    toastError(`Only ${available} slot${available > 1 ? 's' : ''} remaining — extra photos skipped.`);
   for (const file of batch) {
     const slotIdx = firstEmptySlot();
     if (slotIdx === -1) break;
     try {
-      const preview    = await readFileAsDataUrl(file);
-      photoSlots[slotIdx] = { file, preview, url: null };
+      const preview        = await readFileAsDataUrl(file);
+      photoSlots[slotIdx]  = { file, preview, url: null };
     } catch {
       toastError('Could not read one of the images.');
     }
@@ -712,15 +735,14 @@ async function addPhotos(files) {
   renderPhotoThumbs();
 }
 
-// Reset all photo state
 function clearAllPhotos() {
   for (let i = 0; i < 5; i++) photoSlots[i] = null;
+  touchSelectedIdx = null;
   renderPhotoThumbs();
   const uploadInner = document.getElementById('photoUploadInner');
   if (uploadInner) uploadInner.style.display = '';
 }
 
-// Load existing images from a product into slots
 function loadExistingImages(images) {
   clearAllPhotos();
   (images || []).slice(0, 5).forEach((url, i) => {
@@ -733,9 +755,8 @@ function initPhotoUpload() {
   if (window.__photoUploadReady) return;
   window.__photoUploadReady = true;
 
-  const bulkInput  = document.getElementById('bulkImageInput');
-  const zone       = document.getElementById('photoUploadZone');
-  const uploadInner = document.getElementById('photoUploadInner');
+  const bulkInput = document.getElementById('bulkImageInput');
+  const zone      = document.getElementById('photoUploadZone');
 
   bulkInput?.addEventListener('change', async function () {
     if (!this.files?.length) return;
@@ -743,11 +764,7 @@ function initPhotoUpload() {
     this.value = '';
   });
 
-  // Drag and drop
-  zone?.addEventListener('dragover', e => {
-    e.preventDefault();
-    zone.classList.add('drag-over');
-  });
+  zone?.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
   zone?.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
   zone?.addEventListener('drop', async e => {
     e.preventDefault();
@@ -756,47 +773,15 @@ function initPhotoUpload() {
   });
 }
 
-// Legacy slot compat – map old slotFiles/slotUrls to new system for any
-// code that still checks them (vendor-upgrade.js etc.)
-function legacySlotFiles() {
-  const out = {};
-  photoSlots.forEach((slot, i) => { if (slot?.file) out[i + 1] = slot.file; });
-  return out;
-}
-
-function legacySlotUrls() {
-  const out = {};
-  photoSlots.forEach((slot, i) => { if (slot?.url) out[i + 1] = slot.url; });
-  return out;
-}
-
-// ── Delete image from server ──────────────────────────────────
-async function deleteImageFromServer(productId, slot) {
-  const confirmed = await showConfirm({
-    title:        'Delete image?',
-    text:         'This image will be permanently removed.',
-    confirmLabel: 'Delete',
-    cancelLabel:  'Cancel',
-  });
-  if (!confirmed) return;
-  const res = await apiRequest(`/auth/vendor/products/${productId}/image/${slot}`, 'DELETE');
-  if (res.success) toastSuccess('Image deleted.');
-  else toastError(res.message || 'Failed to delete image.');
-}
-
 // ── Field error helpers ───────────────────────────────────────
 function setFieldError(inputId, errorId) {
-  const input = document.getElementById(inputId);
-  const err   = document.getElementById(errorId);
-  if (input) input.closest('.field')?.classList.add('has-error');
-  if (err)   err.classList.add('visible');
+  document.getElementById(inputId)?.closest('.field')?.classList.add('has-error');
+  document.getElementById(errorId)?.classList.add('visible');
 }
 
 function clearFieldError(inputId, errorId) {
-  const input = document.getElementById(inputId);
-  const err   = document.getElementById(errorId);
-  if (input) input.closest('.field')?.classList.remove('has-error');
-  if (err)   err.classList.remove('visible');
+  document.getElementById(inputId)?.closest('.field')?.classList.remove('has-error');
+  document.getElementById(errorId)?.classList.remove('visible');
 }
 
 function clearAllFieldErrors() {
@@ -804,7 +789,7 @@ function clearAllFieldErrors() {
   document.querySelectorAll('.field-error.visible, .field-error-block.visible').forEach(e => e.classList.remove('visible'));
 }
 
-// ── Validate the form ─────────────────────────────────────────
+// ── Validate form ─────────────────────────────────────────────
 function validateProductForm(form, isAdd) {
   clearAllFieldErrors();
   let valid   = true;
@@ -814,18 +799,16 @@ function validateProductForm(form, isAdd) {
   const pincode = form.querySelector('[name="pincode"]').value.trim();
   const lat   = document.getElementById('modalLat').value;
 
-  if (!name)  { setFieldError('modalName',     'err-name');     valid = false; }
-  if (!cat)   { setFieldError('modalCategory', 'err-category'); valid = false; }
+  if (!name) { setFieldError('modalName',     'err-name');     valid = false; }
+  if (!cat)  { setFieldError('modalCategory', 'err-category'); valid = false; }
 
   if (isAdd && usedSlotCount() === 0) {
-    const errEl = document.querySelector('.photo-upload-err');
-    if (errEl) errEl.classList.add('visible');
+    document.querySelector('.photo-upload-err')?.classList.add('visible');
     valid = false;
   }
 
   if (!pincode && !lat) {
-    const errEl = document.getElementById('err-location');
-    if (errEl) errEl.classList.add('visible');
+    document.getElementById('err-location')?.classList.add('visible');
     valid = false;
   }
 
@@ -835,22 +818,16 @@ function validateProductForm(form, isAdd) {
     const rd = form.querySelector('[name="rent_per_day"]').value.trim();
     const rm = form.querySelector('[name="rent_per_month"]').value.trim();
     if (!(rh || rk || rd || rm)) {
-      const errEl = document.getElementById('err-rent-price');
-      if (errEl) errEl.classList.add('visible');
+      document.getElementById('err-rent-price')?.classList.add('visible');
       valid = false;
     }
   } else {
     const sp   = document.getElementById('modalSellingPrice').value.trim();
     const cond = document.getElementById('modalCondition').value;
     if (!sp)   { setFieldError('modalSellingPrice', 'err-sell-price'); valid = false; }
-    if (!cond) {
-      const errEl = document.getElementById('err-condition');
-      if (errEl) errEl.classList.add('visible');
-      valid = false;
-    }
+    if (!cond) { document.getElementById('err-condition')?.classList.add('visible'); valid = false; }
   }
 
-  // Scroll to first error
   if (!valid) {
     const firstErr = document.querySelector(
       '.field.has-error, .field-error-block.visible, .photo-upload-err.visible'
@@ -905,7 +882,7 @@ async function openEditModal(productId) {
   if (!p) return;
 
   document.getElementById('modalTitle').textContent    = 'Edit product';
-  document.getElementById('modalSubtitle').textContent = 'Note: listing type (Rent / Sell) cannot be changed.';
+  document.getElementById('modalSubtitle').textContent = 'Listing type (Rent / Sell) cannot be changed.';
   const form = document.getElementById('productForm');
   form.reset();
   clearLocationHiddens();
@@ -913,7 +890,7 @@ async function openEditModal(productId) {
 
   const lt = p.listing_type || 'rent';
 
-  // Lock the listing type — no toggle on edit
+  // Lock listing type on edit
   document.getElementById('listingTypeToggle').style.display = 'none';
   document.getElementById('listingTypeLocked').style.display = '';
   const pill = document.getElementById('listingTypeLockedPill');
@@ -922,7 +899,6 @@ async function openEditModal(productId) {
     pill.className   = 'lt-locked-pill' + (lt === 'sell' ? ' sell' : '');
   }
 
-  // Set internal state to match locked type
   currentListingType = lt;
   document.getElementById('rentFieldsSection').style.display = lt === 'rent' ? '' : 'none';
   document.getElementById('sellFieldsSection').style.display = lt === 'sell' ? '' : 'none';
@@ -956,11 +932,11 @@ async function openEditModal(productId) {
     rent_per_month:   String(p.rent_per_month   || ''),
     security_deposit: String(p.security_deposit || ''),
     selling_price:    String(p.selling_price    || ''),
-    condition: p.condition || '',
-    category:  p.category  || '',
+    condition:  p.condition   || '',
+    category:   p.category    || '',
     subcategory: p.subcategory || '',
-    pincode: p.pincode || '', area: p.area  || '',
-    city:    p.city    || '', state: p.state || '',
+    pincode: p.pincode || '', area: p.area   || '',
+    city:    p.city    || '', state: p.state  || '',
     latitude:  String(p.latitude  || ''),
     longitude: String(p.longitude || ''),
   };
@@ -1023,7 +999,6 @@ document.getElementById('productForm')?.addEventListener('submit', async e => {
       fd.append('condition',     document.getElementById('modalCondition').value);
     }
 
-    // Attach photos from unified slots
     for (let i = 0; i < 5; i++) {
       const slot = photoSlots[i];
       if (slot?.file) {
@@ -1033,16 +1008,19 @@ document.getElementById('productForm')?.addEventListener('submit', async e => {
     }
 
     setButtonLoading(saveBtn, true);
-    const resp = await fetch(API_BASE + '/auth/vendor/products', {
-      method: 'POST', body: fd, credentials: 'include'
-    });
     let res;
-    try { res = await resp.json(); } catch {
-      toastError(`Upload failed (${resp.status}).`);
+    try {
+      const resp = await fetch(API_BASE + '/auth/vendor/products', {
+        method: 'POST', body: fd, credentials: 'include'
+      });
+      res = await resp.json();
+    } catch {
+      toastError('Upload failed. Please try again.');
       setButtonLoading(saveBtn, false);
       return;
     }
     setButtonLoading(saveBtn, false);
+
     if (res.success) {
       toastSuccess('Product listed!');
       closeProductModal();
@@ -1097,9 +1075,8 @@ document.getElementById('productForm')?.addEventListener('submit', async e => {
 
     Object.keys(data).forEach(k => data[k] === undefined && delete data[k]);
 
-    // Check if anything actually changed
-    const hasNewPhotos = photoSlots.some(s => s?.file);
-    let hasFieldChange =
+    const hasNewPhotos  = photoSlots.some(s => s?.file);
+    let   hasFieldChange =
       name    !== snap.name        || desc    !== snap.description ||
       cat     !== snap.category    || sub     !== snap.subcategory ||
       pincode !== snap.pincode     || area    !== snap.area        ||
@@ -1130,7 +1107,7 @@ document.getElementById('productForm')?.addEventListener('submit', async e => {
 
     const res = await apiRequest(`/auth/vendor/products/${editingId}`, 'PUT', data);
 
-    // Upload any new photos slot by slot
+    // Upload new photos slot by slot
     for (let i = 0; i < 5; i++) {
       const slot = photoSlots[i];
       if (slot?.file) {
@@ -1178,12 +1155,9 @@ document.addEventListener('DOMContentLoaded', () => {
   loadConditions();
   loadProducts();
 
-  // Real-time error clearing on inputs
   ['modalName','modalSellingPrice'].forEach(id => {
-    document.getElementById(id)?.addEventListener('input', () => {
-      const errMap = { modalName: 'err-name', modalSellingPrice: 'err-sell-price' };
-      clearFieldError(id, errMap[id]);
-    });
+    const errMap = { modalName: 'err-name', modalSellingPrice: 'err-sell-price' };
+    document.getElementById(id)?.addEventListener('input', () => clearFieldError(id, errMap[id]));
   });
 });
 
