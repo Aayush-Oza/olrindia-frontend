@@ -933,6 +933,14 @@ select.input {
   display: none;
 }
 
+@media (max-width: 860px) {
+  .nav-browse-mobile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
 .nav-lang-select-btn {
   display: inline-flex;
   align-items: center;
