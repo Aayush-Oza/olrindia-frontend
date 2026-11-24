@@ -108,28 +108,15 @@
       gap: 14px;
     }
 
-    .vs-back-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: none;
-      background: none;
-      cursor: pointer;
-      color: var(--c-ink);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: background 0.15s;
-    }
-
-    .vs-back-btn:hover {
-      background: var(--c-bg-soft);
-    }
-
     .vs-nav-logo img {
       height: 52px;
       display: block;
+    }
+
+    .vs-nav-right {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
     }
 
     /* Hero */
@@ -370,15 +357,19 @@
   <!-- ── NAV ── -->
   <nav class="vs-nav">
     <div class="vs-nav-inner">
-      <button class="vs-back-btn" onclick="goBack()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-            stroke-linejoin="round" />
-        </svg>
-      </button>
       <a class="vs-nav-logo" href="/">
         <img src="assets/logo.png?v=18" alt="OLR India">
       </a>
+      <div class="vs-nav-right">
+        <button class="nav-wish-btn nav-share-btn" onclick="shareStore()" title="Share">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="1.8" />
+            <circle cx="6" cy="12" r="3" stroke="currentColor" stroke-width="1.8" />
+            <circle cx="18" cy="19" r="3" stroke="currentColor" stroke-width="1.8" />
+            <path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" stroke="currentColor" stroke-width="1.8" />
+          </svg>
+        </button>
+      </div>
     </div>
   </nav>
 
@@ -445,13 +436,14 @@
   <div class="product-modal-overlay" id="suspendModal">
     <div class="product-modal-box">
       <h3 class="product-modal-title">Suspend this vendor?</h3>
-      <p class="product-modal-text">Their account will be locked immediately and all listings hidden. Enter a reason — this will be emailed to them.</p>
+      <p class="product-modal-text">Their account will be locked immediately and all listings hidden. Enter a reason —
+        this will be emailed to them.</p>
       <textarea class="input" id="suspendReasonInput" rows="4"
-        placeholder="e.g. Multiple complaints received about fraudulent listings."
-        style="margin:12px 0;"></textarea>
+        placeholder="e.g. Multiple complaints received about fraudulent listings." style="margin:12px 0;"></textarea>
       <div class="product-modal-actions">
         <button class="btn btn-secondary" id="suspendCancel">Cancel</button>
-        <button class="btn btn-primary" id="suspendConfirm" style="background:var(--c-error);">Suspend &amp; notify vendor</button>
+        <button class="btn btn-primary" id="suspendConfirm" style="background:var(--c-error);">Suspend &amp; notify
+          vendor</button>
       </div>
     </div>
   </div>
@@ -489,8 +481,8 @@
         <div class="footer-col-title">Contact</div>
         <a href="mailto:support@olrindia.com" class="footer-contact-item">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-              stroke="currentColor" stroke-width="1.8" />
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor"
+              stroke-width="1.8" />
             <path d="m22 6-10 7L2 6" stroke="currentColor" stroke-width="1.8" />
           </svg>
           support@olrindia.com

@@ -333,6 +333,23 @@ function updateSEO(v) {
   });
 }
 
+function shareStore() {
+  const url = window.location.href;
+  const name = currentVendor?.name || 'this vendor';
+  const title = `${name}'s Store – OLR India`;
+  if (navigator.share) {
+    navigator.share({ title, text: title, url }).catch(() => {});
+    return;
+  }
+  navigator.clipboard.writeText(url).then(() => toastSuccess('Link copied!')).catch(() => {
+    const inp = document.createElement('input');
+    inp.value = url; document.body.appendChild(inp);
+    inp.select(); document.execCommand('copy');
+    document.body.removeChild(inp);
+    toastSuccess('Link copied!');
+  });
+}
+
 /* ── Error state ─────────────────────────────────────────── */
 function showError(msg) {
   document.getElementById('vsLoader').innerHTML = `
@@ -344,14 +361,6 @@ function showError(msg) {
       font-weight:600;text-decoration:none;font-family:var(--font-display);">
       ${isAdminView ? 'Back to Vendors' : 'Back to home'}
     </a>`;
-}
-
-/* ── Back navigation ─────────────────────────────────────── */
-function goBack() {
-  if (isAdminView) { window.location.href = '/admin/vendors'; return; }
-  const cameFromSameSite = document.referrer && document.referrer.startsWith(window.location.origin);
-  if (cameFromSameSite && history.length > 1) { history.back(); }
-  else { window.location.href = '/'; }
 }
 
 /* ── Init ────────────────────────────────────────────────── */
