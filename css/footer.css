@@ -7,17 +7,11 @@
 .goog-te-gadget,
 #goog-gt-tt,
 .goog-te-balloon-frame,
-body>.skiptranslate {
+body > .skiptranslate {
   display: none !important;
 }
-
-body {
-  top: 0 !important;
-}
-
-.VIpgJd-ZVi9od-aZ2wEe-wOHMyf {
-  display: none !important;
-}
+body { top: 0 !important; }
+.VIpgJd-ZVi9od-aZ2wEe-wOHMyf { display: none !important; }
 
 /* ── FOOTER BASE ── */
 .site-footer {
@@ -66,7 +60,7 @@ body {
 .footer-col-link:hover,
 .footer-social-item:hover,
 .footer-contact-item:hover {
-  opacity: 1;
+  opacity:1;
   text-decoration: none !important;
 }
 
@@ -103,7 +97,7 @@ body {
   background: #fff;
   border-radius: 14px;
   padding: 8px 18px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
   text-decoration: none !important;
 }
 
@@ -156,8 +150,7 @@ body {
 
 /* ── APP DOWNLOAD (hidden until app ready) ── */
 .footer-app-section {
-  display: none;
-  /* remove this line when app is ready */
+  display: none; /* remove this line when app is ready */
   max-width: 1100px;
   margin: 0 auto;
   padding: 32px 24px;
@@ -165,23 +158,20 @@ body {
   align-items: center;
   justify-content: center;
   gap: 32px;
-  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  border-top: 1px solid rgba(255,255,255,0.3);
   flex-wrap: wrap;
 }
-
 .footer-app-title {
   font-size: 15px;
   font-weight: 700;
   color: #fff;
   margin-bottom: 12px;
 }
-
 .footer-app-sub {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255,255,255,0.8);
   margin-bottom: 16px;
 }
-
 .footer-app-btn {
   display: inline-flex;
   align-items: center;
@@ -195,11 +185,7 @@ body {
   text-decoration: none !important;
   transition: opacity 0.2s;
 }
-
-.footer-app-btn:hover {
-  opacity: 0.9;
-}
-
+.footer-app-btn:hover { opacity: 0.9; }
 .footer-app-qr {
   background: #fff;
   border-radius: 12px;
@@ -210,88 +196,59 @@ body {
   align-items: center;
   justify-content: center;
 }
-
 .footer-app-qr img {
   width: 80px;
   height: 80px;
   object-fit: contain;
 }
 
-/* ── APP DOWNLOAD (hidden until app ready) ── */
+/* ── APP DOWNLOAD beside logo (hidden until app ready) ── */
 .footer-app-section {
-  display: none;
-  /* remove when app ready */
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 28px 24px;
-  display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 40px;
-  flex-wrap: wrap;
+  gap: 16px;
 }
-
-.footer-app-text {
-  text-align: center;
-}
-
-.footer-app-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 6px;
-}
-
-.footer-app-sub {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.75);
-  margin-bottom: 16px;
-}
-
 .footer-app-btn {
   display: inline-block;
   text-decoration: none !important;
   transition: opacity 0.2s;
 }
-
-.footer-app-btn:hover {
-  opacity: 0.85;
-}
-
+.footer-app-btn:hover { opacity: 0.85; }
 .footer-app-btn img {
-  height: 48px;
+  height: 40px;
   width: auto;
   display: block;
 }
-
 .footer-app-qr {
   background: #fff;
-  border-radius: 12px;
-  padding: 8px;
+  border-radius: 10px;
+  padding: 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
 }
-
 .footer-app-qr img {
-  width: 80px;
-  height: 80px;
+  width: 64px;
+  height: 64px;
   display: block;
 }
-
 .footer-app-qr span {
-  font-size: 10px;
+  font-size: 9px;
   color: #555;
-  font-weight: 600;
-  letter-spacing: 0.03em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 640px) {
+  .footer-app-section {
+    flex-direction: column;
+    align-items: center;
+  }
 }
 
 /* ══ MOBILE ══ */
 @media (max-width: 640px) {
-  .site-footer {
-    margin-top: 40px;
-  }
+  .site-footer { margin-top: 40px; }
 
   .footer-cols {
     grid-template-columns: 1fr;
@@ -315,11 +272,9 @@ body {
   .footer-bottom-top {
     justify-content: flex-start;
   }
-
   .footer-logo img {
     height: 48px;
   }
-
   .footer-copyright {
     width: 100%;
     text-align: center;
