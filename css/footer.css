@@ -7,11 +7,17 @@
 .goog-te-gadget,
 #goog-gt-tt,
 .goog-te-balloon-frame,
-body > .skiptranslate {
+body>.skiptranslate {
   display: none !important;
 }
-body { top: 0 !important; }
-.VIpgJd-ZVi9od-aZ2wEe-wOHMyf { display: none !important; }
+
+body {
+  top: 0 !important;
+}
+
+.VIpgJd-ZVi9od-aZ2wEe-wOHMyf {
+  display: none !important;
+}
 
 /* ── FOOTER BASE ── */
 .site-footer {
@@ -60,7 +66,7 @@ body { top: 0 !important; }
 .footer-col-link:hover,
 .footer-social-item:hover,
 .footer-contact-item:hover {
-  opacity:1;
+  opacity: 1;
   text-decoration: none !important;
 }
 
@@ -97,7 +103,7 @@ body { top: 0 !important; }
   background: #fff;
   border-radius: 14px;
   padding: 8px 18px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
   text-decoration: none !important;
 }
 
@@ -148,9 +154,73 @@ body { top: 0 !important; }
   opacity: 0.85;
 }
 
+/* ── APP DOWNLOAD (hidden until app ready) ── */
+.footer-app-section {
+  /* remove this line when app is ready */
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  flex-wrap: wrap;
+}
+
+.footer-app-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.footer-app-sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 16px;
+}
+
+.footer-app-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  color: #000;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 999px;
+  text-decoration: none !important;
+  transition: opacity 0.2s;
+}
+
+.footer-app-btn:hover {
+  opacity: 0.9;
+}
+
+.footer-app-qr {
+  background: #fff;
+  border-radius: 12px;
+  padding: 8px;
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer-app-qr img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
 /* ══ MOBILE ══ */
 @media (max-width: 640px) {
-  .site-footer { margin-top: 40px; }
+  .site-footer {
+    margin-top: 40px;
+  }
 
   .footer-cols {
     grid-template-columns: 1fr;
@@ -174,9 +244,11 @@ body { top: 0 !important; }
   .footer-bottom-top {
     justify-content: flex-start;
   }
+
   .footer-logo img {
     height: 48px;
   }
+
   .footer-copyright {
     width: 100%;
     text-align: center;

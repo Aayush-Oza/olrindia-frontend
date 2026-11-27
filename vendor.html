@@ -41,6 +41,9 @@
   <meta name="twitter:image" id="twImage" content="https://olrindia.com/assets/og-banner.jpg">
   <meta name="twitter:image:alt" id="twImageAlt" content="OLR India Vendor Store">
 
+  <!-- ── APP SEO ── -->
+  <meta name="google-play-app" content="app-id=com.olrindia.app">
+  <link rel="alternate" href="android-app://com.olrindia.app/https/olrindia.com">
   <!-- ── SCHEMA: Organization ── -->
   <script type="application/ld+json">
   {
@@ -71,7 +74,9 @@
   <link rel="icon" href="assets/favicon.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet">
 
   <!-- ── CSS ── -->
   <link rel="stylesheet" href="css/variables.css?v=18">
@@ -89,6 +94,7 @@
       border-bottom: 1px solid var(--c-border-soft);
       padding: 32px 20px 28px;
     }
+
     .vs-hero-inner {
       max-width: 1180px;
       margin: 0 auto;
@@ -96,29 +102,78 @@
       align-items: flex-start;
       gap: 20px;
     }
+
     .vs-avatar {
-      width: 72px; height: 72px;
+      width: 72px;
+      height: 72px;
       border-radius: 50%;
       background: var(--grad-brand);
       color: #fff;
-      font-size: 26px; font-weight: 700;
+      font-size: 26px;
+      font-weight: 700;
       font-family: var(--font-display);
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
     }
-    .vs-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .vs-hero-info { flex: 1; min-width: 0; }
+
+    .vs-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .vs-hero-info {
+      flex: 1;
+      min-width: 0;
+    }
+
     .vs-vendor-name {
-      font-size: 22px; font-weight: 700;
+      font-size: 22px;
+      font-weight: 700;
       color: var(--c-ink);
       font-family: var(--font-display);
-      line-height: 1.2; margin-bottom: 6px;
+      line-height: 1.2;
+      margin-bottom: 6px;
     }
-    .vs-vendor-meta { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 10px; }
-    .vs-meta-item { display: flex; align-items: center; gap: 5px; font-size: 13px; color: var(--c-ink-soft); }
-    .vs-stats { display: flex; gap: 20px; margin-top: 14px; flex-wrap: wrap; }
-    .vs-stat-val { font-size: 18px; font-weight: 700; color: var(--c-ink); font-family: var(--font-display); }
-    .vs-stat-label { font-size: 11.5px; color: var(--c-ink-soft); text-transform: uppercase; letter-spacing: .04em; }
+
+    .vs-vendor-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      margin-bottom: 10px;
+    }
+
+    .vs-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      color: var(--c-ink-soft);
+    }
+
+    .vs-stats {
+      display: flex;
+      gap: 20px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .vs-stat-val {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--c-ink);
+      font-family: var(--font-display);
+    }
+
+    .vs-stat-label {
+      font-size: 11.5px;
+      color: var(--c-ink-soft);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
 
     /* Search row */
     .vs-search-row {
@@ -129,6 +184,7 @@
       top: 64px;
       z-index: 150;
     }
+
     .vs-search-row-inner {
       max-width: 1180px;
       margin: 0 auto;
@@ -147,6 +203,7 @@
       top: 112px;
       z-index: 149;
     }
+
     .vs-filters-inner {
       max-width: 1180px;
       margin: 0 auto;
@@ -156,9 +213,24 @@
     }
 
     /* Listings */
-    .vs-listings { max-width: 1180px; margin: 0 auto; padding: 28px 20px 60px; }
-    .vs-listings-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
-    .vs-listings-count { font-size: 13px; color: var(--c-ink-faint); font-weight: 500; }
+    .vs-listings {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 20px 60px;
+    }
+
+    .vs-listings-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .vs-listings-count {
+      font-size: 13px;
+      color: var(--c-ink-faint);
+      font-weight: 500;
+    }
 
     /* Empty state */
     .vs-empty {
@@ -170,54 +242,123 @@
       align-items: center;
       justify-content: center;
     }
-    .vs-empty-icon { font-size: 48px; margin-bottom: 12px; }
-    .vs-empty h3 { margin: 0 0 8px; font-family: var(--font-display); color: var(--c-ink); }
-    .vs-empty p { margin: 0; color: var(--c-ink-soft); font-size: 14px; }
+
+    .vs-empty-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .vs-empty h3 {
+      margin: 0 0 8px;
+      font-family: var(--font-display);
+      color: var(--c-ink);
+    }
+
+    .vs-empty p {
+      margin: 0;
+      color: var(--c-ink-soft);
+      font-size: 14px;
+    }
 
     /* Admin */
-    .vs-admin-wrap { max-width: 1180px; margin: 0 auto; padding: 28px 20px 0; }
+    .vs-admin-wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 20px 0;
+    }
+
     .vs-admin-section-title {
-      font-size: 15px; font-weight: 700; color: var(--c-ink);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--c-ink);
       font-family: var(--font-display);
-      margin: 28px 0 12px; padding-bottom: 8px;
+      margin: 28px 0 12px;
+      padding-bottom: 8px;
       border-bottom: 1px solid var(--c-border-soft);
     }
 
     /* Loader */
     #vsLoader {
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      min-height: 60vh; gap: 12px;
-      color: var(--c-ink-soft); font-size: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      gap: 12px;
+      color: var(--c-ink-soft);
+      font-size: 14px;
     }
+
     .loader-spinner {
-      width: 28px; height: 28px;
+      width: 28px;
+      height: 28px;
       border: 3px solid var(--c-border-soft);
       border-top-color: var(--c-blue);
       border-radius: 50%;
       animation: spin .7s linear infinite;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    #vsContent { display: none; }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    #vsContent {
+      display: none;
+    }
 
     /* Load more */
-    .vs-load-more { display: flex; justify-content: center; margin-top: 28px; }
-    .vs-load-more-btn {
-      padding: 11px 28px; border-radius: 999px;
-      border: 1.5px solid var(--c-border);
-      background: transparent; font-size: 13.5px; font-weight: 600;
-      font-family: var(--font-display); color: var(--c-ink);
-      cursor: pointer; transition: all .15s;
+    .vs-load-more {
+      display: flex;
+      justify-content: center;
+      margin-top: 28px;
     }
-    .vs-load-more-btn:hover { border-color: var(--c-blue); color: var(--c-blue); }
+
+    .vs-load-more-btn {
+      padding: 11px 28px;
+      border-radius: 999px;
+      border: 1.5px solid var(--c-border);
+      background: transparent;
+      font-size: 13.5px;
+      font-weight: 600;
+      font-family: var(--font-display);
+      color: var(--c-ink);
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .vs-load-more-btn:hover {
+      border-color: var(--c-blue);
+      color: var(--c-blue);
+    }
 
     @media (max-width: 480px) {
-      .vs-hero { padding: 20px 16px; }
-      .vs-avatar { width: 56px; height: 56px; font-size: 20px; }
-      .vs-vendor-name { font-size: 18px; }
-      .vs-listings { padding: 20px 12px 40px; }
-      .vs-search-row { top: 58px; }
-      .vs-filters { top: 106px; }
+      .vs-hero {
+        padding: 20px 16px;
+      }
+
+      .vs-avatar {
+        width: 56px;
+        height: 56px;
+        font-size: 20px;
+      }
+
+      .vs-vendor-name {
+        font-size: 18px;
+      }
+
+      .vs-listings {
+        padding: 20px 12px 40px;
+      }
+
+      .vs-search-row {
+        top: 58px;
+      }
+
+      .vs-filters {
+        top: 106px;
+      }
     }
   </style>
 </head>
@@ -235,9 +376,9 @@
         <div class="nav-action nav-lang-wrap" id="navLangWrap">
           <button class="nav-wish-btn" id="navLangBtn" title="Language">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
+              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8" />
               <path d="M3 12h18M12 3c2.4 2.6 3.8 5.9 3.8 9s-1.4 6.4-3.8 9c-2.4-2.6-3.8-5.9-3.8-9S9.6 5.6 12 3Z"
-                stroke="currentColor" stroke-width="1.8"/>
+                stroke="currentColor" stroke-width="1.8" />
             </svg>
           </button>
           <span>Language</span>
@@ -247,10 +388,10 @@
         <div class="nav-action">
           <button class="nav-wish-btn" onclick="shareStore()" title="Share">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="1.8"/>
-              <circle cx="6" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/>
-              <circle cx="18" cy="19" r="3" stroke="currentColor" stroke-width="1.8"/>
-              <path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" stroke="currentColor" stroke-width="1.8"/>
+              <circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="1.8" />
+              <circle cx="6" cy="12" r="3" stroke="currentColor" stroke-width="1.8" />
+              <circle cx="18" cy="19" r="3" stroke="currentColor" stroke-width="1.8" />
+              <path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" stroke="currentColor" stroke-width="1.8" />
             </svg>
           </button>
           <span>Share</span>
@@ -296,8 +437,8 @@
       <div class="vs-search-row-inner">
         <div class="nav-search" style="flex:1;">
           <svg class="nav-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/>
-            <path d="m16.5 16.5 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8" />
+            <path d="m16.5 16.5 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
           </svg>
           <input type="text" id="vsSearchInput" placeholder="Search this store…" autocomplete="off">
         </div>
@@ -332,11 +473,14 @@
   <div class="product-modal-overlay" id="suspendModal">
     <div class="product-modal-box">
       <h3 class="product-modal-title">Suspend this vendor?</h3>
-      <p class="product-modal-text">Their account will be locked immediately and all listings hidden. Enter a reason — this will be emailed to them.</p>
-      <textarea class="input" id="suspendReasonInput" rows="4" placeholder="e.g. Multiple complaints received about fraudulent listings." style="margin:12px 0;"></textarea>
+      <p class="product-modal-text">Their account will be locked immediately and all listings hidden. Enter a reason —
+        this will be emailed to them.</p>
+      <textarea class="input" id="suspendReasonInput" rows="4"
+        placeholder="e.g. Multiple complaints received about fraudulent listings." style="margin:12px 0;"></textarea>
       <div class="product-modal-actions">
         <button class="btn btn-secondary" id="suspendCancel">Cancel</button>
-        <button class="btn btn-primary" id="suspendConfirm" style="background:var(--c-error);">Suspend &amp; notify vendor</button>
+        <button class="btn btn-primary" id="suspendConfirm" style="background:var(--c-error);">Suspend &amp; notify
+          vendor</button>
       </div>
     </div>
   </div>
@@ -356,15 +500,16 @@
         <div class="footer-col-title">Follow Us</div>
         <a href="https://www.instagram.com/olr_india" target="_blank" rel="noopener" class="footer-social-item">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-            <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.8"/>
-            <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/>
-            <circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
+            <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.8" />
+            <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8" />
+            <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
           </svg>
           Instagram
         </a>
         <a href="https://facebook.com/olrindia" target="_blank" rel="noopener" class="footer-social-item">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" stroke="currentColor"
+              stroke-width="1.8" stroke-linejoin="round" />
           </svg>
           Facebook
         </a>
@@ -373,14 +518,36 @@
         <div class="footer-col-title">Contact</div>
         <a href="mailto:support@olrindia.com" class="footer-contact-item">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="1.8"/>
-            <path d="m22 6-10 7L2 6" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor"
+              stroke-width="1.8" />
+            <path d="m22 6-10 7L2 6" stroke="currentColor" stroke-width="1.8" />
           </svg>
           support@olrindia.com
         </a>
       </div>
     </div>
     <hr class="footer-divider">
+    <!-- ── APP DOWNLOAD (display:none until app ready) ── -->
+    <div class="footer-app-section">
+      <div>
+        <div class="footer-app-title">Download OLR India App</div>
+        <div class="footer-app-sub">Rent anything, anywhere — now on Android</div>
+        <a class="footer-app-btn"
+          href="https://play.google.com/store/apps/details?id=com.olrindia.app&pcampaignid=web_share" target="_blank"
+          rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M3.18 23.76a2 2 0 0 0 2.08-.22l11.65-6.72-2.55-2.55-11.18 9.49ZM.5 1.4A2 2 0 0 0 0 2.78v18.44a2 2 0 0 0 .5 1.38l.07.07 10.33-10.33v-.24L.57 1.33.5 1.4Zm19.1 11.17-2.65-1.53-2.88 2.88 2.88 2.88 2.67-1.54a2.02 2.02 0 0 0 0-3.69Zm-5.71 4.14L2.26 27.18a2.01 2.01 0 0 0 2.08-.22l.11-.07 11.44-6.6-2.5-2.58Z" />
+          </svg>
+          Get it on Google Play
+        </a>
+      </div>
+      <div class="footer-app-qr">
+        <img
+          src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://play.google.com/store/apps/details?id=com.olrindia.app"
+          alt="Scan to download OLR India app" loading="lazy">
+      </div>
+    </div>
     <div class="footer-bottom">
       <div class="footer-bottom-top">
         <a class="footer-logo" href="/">
