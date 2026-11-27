@@ -103,7 +103,6 @@ body { top: 0 !important; }
 
 /* ── APP DOWNLOAD — sits beside logo, hidden until app ready ── */
 .footer-app-section {
-  display: none; /* change to: display: flex; when app is ready */
   align-items: center;
   gap: 10px;
 }
