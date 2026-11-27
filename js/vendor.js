@@ -9,11 +9,12 @@ function getStoreSlug() {
 let currentVendor = null;
 let currentType   = 'all';
 let currentPage   = 1;
+let currentSearch = '';
 let hasMore       = false;
 let isLoading     = false;
 let isAdminView   = false;
 
-/* ── Admin check (same pattern as product.js) ────────────── */
+/* ── Admin check ─────────────────────────────────────────── */
 async function checkAdminView() {
   const params = new URLSearchParams(window.location.search);
   if (params.get('admin') !== '1') return false;
@@ -23,9 +24,13 @@ async function checkAdminView() {
 
 /* ── Tab switching ───────────────────────────────────────── */
 function switchTab(type) {
-  currentType = type;
-  currentPage = 1;
-  hasMore     = false;
+  currentType   = type;
+  currentPage   = 1;
+  currentSearch = '';
+  hasMore       = false;
+
+  const searchInput = document.getElementById('vsSearchInput');
+  if (searchInput) searchInput.value = '';
 
   document.querySelectorAll('.listing-tab').forEach(t => {
     t.classList.toggle('active', t.dataset.type === type);
@@ -52,10 +57,11 @@ async function fetchListings(reset = false) {
   const slug = getStoreSlug();
 
   try {
-    const res = await apiRequest(
-      `/products/vendor/${slug}?page=${currentPage}&per_page=20${currentType !== 'all' ? '&listing_type=' + currentType : ''}`,
-      'GET'
-    );
+    let url = `/products/vendor/${slug}?page=${currentPage}&per_page=20`;
+    if (currentType !== 'all') url += `&listing_type=${currentType}`;
+    if (currentSearch)         url += `&search=${encodeURIComponent(currentSearch)}`;
+
+    const res = await apiRequest(url, 'GET');
 
     if (!res.success) {
       showError(res.message || 'Failed to load listings.');
@@ -70,9 +76,14 @@ async function fetchListings(reset = false) {
     if (!res.products.length && reset) {
       grid.innerHTML = `
         <div class="vs-empty" style="grid-column:1/-1;">
-          <div class="vs-empty-icon">📦</div>
-          <h3>No listings here yet</h3>
-          <p>${currentType === 'all' ? 'This vendor has no active listings.' : `No ${currentType === 'rent' ? 'rental' : 'sale'} listings right now.`}</p>
+          <div class="vs-empty-icon">${currentSearch ? '🔍' : '📦'}</div>
+          <h3>${currentSearch ? 'No results found' : 'No listings here yet'}</h3>
+          <p>${currentSearch
+            ? `No listings match "${currentSearch}". Try a different search.`
+            : currentType === 'all'
+              ? 'This vendor has no active listings.'
+              : `No ${currentType === 'rent' ? 'rental' : 'sale'} listings right now.`
+          }</p>
         </div>`;
       document.getElementById('vsListingsCount').textContent = '';
     } else {
@@ -105,14 +116,18 @@ function buildCard(p) {
       : '';
 
   const rentVal   = p.rent_per_day || p.rent_per_hour || p.rent_per_month || p.rent_per_km;
-  const rentLabel = p.rent_per_day ? '/day'
-    : p.rent_per_hour ? '/hr'
+  const rentLabel = p.rent_per_day   ? '/day'
+    : p.rent_per_hour  ? '/hr'
     : p.rent_per_month ? '/mo'
-    : p.rent_per_km ? '/km' : '';
+    : p.rent_per_km    ? '/km' : '';
 
   const price = p.listing_type === 'sell'
-    ? (p.selling_price ? `₹${p.selling_price}` : `<span style="color:var(--c-ink-faint);font-size:12px;">Price not set</span>`)
-    : (rentVal ? `₹${rentVal} <span>${rentLabel}</span>` : `<span style="color:var(--c-ink-faint);font-size:12px;">Price not available</span>`);
+    ? (p.selling_price
+        ? `₹${p.selling_price}`
+        : `<span style="color:var(--c-ink-faint);font-size:12px;">Price not set</span>`)
+    : (rentVal
+        ? `₹${rentVal} <span>${rentLabel}</span>`
+        : `<span style="color:var(--c-ink-faint);font-size:12px;">Price not available</span>`);
 
   const url = `/product/${slugify(p.category || '')}/${slugify(p.city || 'india')}/${p.share_slug}${isAdminView ? '?admin=1' : ''}`;
 
@@ -290,16 +305,16 @@ document.getElementById('suspendConfirm')?.addEventListener('click', async () =>
 
 /* ── SEO ─────────────────────────────────────────────────── */
 function updateSEO(v) {
-  const storeUrl   = `https://olrindia.com/vendor/${v.store_slug}`;
-  const title      = `${v.name}'s Store – OLR India`;
-  const cityText   = v.city || 'India';
-  const total      = v.total_listings || 0;
-  const desc       = `Browse ${total} active listing${total !== 1 ? 's' : ''} from ${v.name} in ${cityText} on OLR India. No middleman. Direct chat.`;
-  const img        = v.profile_photo || 'https://olrindia.com/assets/og-banner.jpg';
-  const keywords   = `${v.name} rentals, rent in ${cityText}, OLR India vendor, ${cityText} rentals`;
+  const storeUrl = `https://olrindia.com/vendor/${v.store_slug}`;
+  const title    = `${v.name}'s Store – OLR India`;
+  const cityText = v.city || 'India';
+  const total    = v.total_listings || 0;
+  const desc     = `Browse ${total} active listing${total !== 1 ? 's' : ''} from ${v.name} in ${cityText} on OLR India. No middleman. Direct chat.`;
+  const img      = v.profile_photo || 'https://olrindia.com/assets/og-banner.jpg';
+  const keywords = `${v.name} rentals, rent in ${cityText}, OLR India vendor, ${cityText} rentals`;
 
   document.title = title;
-  document.getElementById('pageTitle').textContent    = title;
+  document.getElementById('pageTitle').textContent          = title;
   document.getElementById('metaDesc').setAttribute('content', desc);
   document.getElementById('metaKeywords').setAttribute('content', keywords);
   document.getElementById('metaCanonical').setAttribute('href', storeUrl);
@@ -314,28 +329,27 @@ function updateSEO(v) {
   document.getElementById('twImageAlt').setAttribute('content', `${v.name}'s Store – OLR India`);
 
   document.getElementById('vendorSchema').textContent = JSON.stringify({
-    "@context": "https://schema.org",
-    "@type":    "LocalBusiness",
-    "@id":      storeUrl,
-    "name":     v.name,
+    "@context":    "https://schema.org",
+    "@type":       "LocalBusiness",
+    "@id":         storeUrl,
+    "name":        v.name,
     "description": desc,
-    "url":      storeUrl,
-    "image":    img,
+    "url":         storeUrl,
+    "image":       img,
     "address": {
       "@type":           "PostalAddress",
       "addressLocality": v.city  || '',
       "addressRegion":   v.state || '',
       "addressCountry":  "IN"
     },
-    "memberOf": {
-      "@id": "https://olrindia.com/#organization"
-    }
+    "memberOf": { "@id": "https://olrindia.com/#organization" }
   });
 }
 
+/* ── Share ───────────────────────────────────────────────── */
 function shareStore() {
-  const url = window.location.href;
-  const name = currentVendor?.name || 'this vendor';
+  const url   = window.location.href;
+  const name  = currentVendor?.name || 'this vendor';
   const title = `${name}'s Store – OLR India`;
   if (navigator.share) {
     navigator.share({ title, text: title, url }).catch(() => {});
@@ -371,9 +385,8 @@ async function loadStore() {
   try {
     isAdminView = await checkAdminView();
 
-    // Admin hits auth endpoint, public hits public endpoint
     const res = isAdminView
-      ? await await apiRequest(`/auth/admin/vendors/slug/${slug}`, 'GET')
+      ? await apiRequest(`/auth/admin/vendors/slug/${slug}`, 'GET')
       : await apiRequest(`/products/vendor/${slug}?page=1&per_page=20`, 'GET');
 
     if (!res.success) { showError(res.message || 'Store not found.'); return; }
@@ -383,18 +396,16 @@ async function loadStore() {
 
     renderVendorHero(res.vendor);
 
-    if (!isAdminView) {
-      updateSEO(res.vendor);
-    }
+    if (!isAdminView) updateSEO(res.vendor);
 
     // ── Admin mode ────────────────────────────────────────
     if (isAdminView) {
       document.getElementById('adminSections').style.display = 'block';
-      document.getElementById('vsFilters').style.display = 'none';
+      document.getElementById('vsFilters').style.display     = 'none';
+      document.getElementById('vsSearchRow').style.display   = 'none';
       renderAdminVendorInfo(res.vendor);
       renderAdminStrikes(res.strikes || []);
 
-      // Fetch public listings separately for the grid
       const listRes = await apiRequest(`/products/vendor/${slug}?page=1&per_page=20`, 'GET');
       if (listRes.success && listRes.products.length) {
         const grid = document.getElementById('vsGrid');
@@ -422,10 +433,21 @@ async function loadStore() {
           `${res.total} ${res.total === 1 ? 'listing' : 'listings'}`;
       }
       document.getElementById('vsLoadMore').style.display = hasMore ? 'flex' : 'none';
+
+      // ── Search debounce ───────────────────────────────
+      let _searchTimer = null;
+      document.getElementById('vsSearchInput')?.addEventListener('input', () => {
+        clearTimeout(_searchTimer);
+        _searchTimer = setTimeout(() => {
+          currentSearch = document.getElementById('vsSearchInput').value.trim();
+          currentPage   = 1;
+          fetchListings(true);
+        }, 400);
+      });
     }
 
-    document.getElementById('vsLoader').style.display   = 'none';
-    document.getElementById('vsContent').style.display  = 'block';
+    document.getElementById('vsLoader').style.display  = 'none';
+    document.getElementById('vsContent').style.display = 'block';
 
   } catch (e) {
     console.error('VENDOR STORE ERROR:', e);
