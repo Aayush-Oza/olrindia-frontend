@@ -1,15 +1,13 @@
 /* ══════════════════════════════════════════════════════
-   FOOTER -exact hero gradient, pure white text
+   FOOTER — exact hero gradient, pure white text
    ══════════════════════════════════════════════════════ */
 
-/* Hide Google Translate native UI */
+/* ── Hide Google Translate native UI ── */
 .goog-te-banner-frame,
 .goog-te-gadget,
 #goog-gt-tt,
 .goog-te-balloon-frame,
-body > .skiptranslate {
-  display: none !important;
-}
+body > .skiptranslate { display: none !important; }
 body { top: 0 !important; }
 .VIpgJd-ZVi9od-aZ2wEe-wOHMyf { display: none !important; }
 
@@ -36,9 +34,8 @@ body { top: 0 !important; }
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #ffffff;
+  color: #fff;
   margin-bottom: 18px;
-  opacity: 1;
 }
 
 .footer-col-link,
@@ -56,20 +53,16 @@ body { top: 0 !important; }
   line-height: 1.4;
   transition: opacity 0.2s;
 }
-
 .footer-col-link:hover,
 .footer-social-item:hover,
-.footer-contact-item:hover {
-  opacity:1;
-  text-decoration: none !important;
-}
+.footer-contact-item:hover { opacity: 0.8; }
 
-/* Divider */
+/* ── DIVIDER ── */
 .footer-divider {
   max-width: 1100px;
   margin: 0 auto;
   border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  border-top: 1px solid rgba(255,255,255,0.3);
 }
 
 /* ── BOTTOM BAR ── */
@@ -88,9 +81,10 @@ body { top: 0 !important; }
   align-items: center;
   justify-content: center;
   gap: 20px;
+  flex-wrap: wrap;
 }
 
-/* Logo -white rounded bg so colors pop */
+/* ── LOGO ── */
 .footer-logo {
   display: inline-flex;
   align-items: center;
@@ -100,20 +94,61 @@ body { top: 0 !important; }
   box-shadow: 0 2px 12px rgba(0,0,0,0.2);
   text-decoration: none !important;
 }
-
 .footer-logo img {
-  height: 64px;
+  height: 48px;
   width: auto;
   display: block;
   object-fit: contain;
 }
 
-/* Language selector */
+/* ── APP DOWNLOAD — sits beside logo, hidden until app ready ── */
+.footer-app-section {
+  display: none; /* change to: display: flex; when app is ready */
+  align-items: center;
+  gap: 10px;
+}
+.footer-app-btn {
+  display: inline-block;
+  text-decoration: none !important;
+  transition: opacity 0.2s;
+  line-height: 0;
+}
+.footer-app-btn:hover { opacity: 0.85; }
+.footer-app-btn img {
+  height: 48px;
+  width: auto;
+  display: block;
+  border-radius: 10px;
+}
+.footer-app-qr {
+  background: #fff;
+  border-radius: 10px;
+  padding: 6px 6px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.footer-app-qr img {
+  width: 36px;
+  height: 36px;
+  display: block;
+}
+.footer-app-qr span {
+  font-size: 7px;
+  color: #444;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* ── LANGUAGE SELECT ── */
 .footer-lang-select {
   padding: 9px 36px 9px 16px;
   border-radius: 999px;
-  border: 2px solid rgba(255, 255, 255, 0.8);
-  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.2);
   color: #fff;
   font-size: 13px;
   font-weight: 600;
@@ -126,124 +161,24 @@ body { top: 0 !important; }
   background-position: right 14px center;
   transition: background 0.2s, border-color 0.2s;
 }
-
 .footer-lang-select:hover,
 .footer-lang-select:focus {
   border-color: #fff;
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(255,255,255,0.3);
   outline: none;
 }
-
 .footer-lang-select option {
-  background: #ffffff;
-  color: #000000;
+  background: #fff;
+  color: #000;
 }
 
-/* Copyright */
+/* ── COPYRIGHT ── */
 .footer-copyright {
   font-size: 13px;
   font-weight: 500;
   color: #fff;
   text-align: center;
   opacity: 0.85;
-}
-
-/* ── APP DOWNLOAD (hidden until app ready) ── */
-.footer-app-section {
-  display: none; /* remove this line when app is ready */
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 32px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 32px;
-  border-top: 1px solid rgba(255,255,255,0.3);
-  flex-wrap: wrap;
-}
-.footer-app-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 12px;
-}
-.footer-app-sub {
-  font-size: 13px;
-  color: rgba(255,255,255,0.8);
-  margin-bottom: 16px;
-}
-.footer-app-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: #fff;
-  color: #000;
-  font-size: 13px;
-  font-weight: 700;
-  padding: 10px 20px;
-  border-radius: 999px;
-  text-decoration: none !important;
-  transition: opacity 0.2s;
-}
-.footer-app-btn:hover { opacity: 0.9; }
-.footer-app-qr {
-  background: #fff;
-  border-radius: 12px;
-  padding: 8px;
-  width: 96px;
-  height: 96px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.footer-app-qr img {
-  width: 80px;
-  height: 80px;
-  object-fit: contain;
-}
-
-/* ── APP DOWNLOAD beside logo (hidden until app ready) ── */
-.footer-app-section {
-  align-items: center;
-  gap: 16px;
-}
-.footer-app-btn {
-  display: inline-block;
-  text-decoration: none !important;
-  transition: opacity 0.2s;
-}
-.footer-app-btn:hover { opacity: 0.85; }
-.footer-app-btn img {
-  height: 40px;
-  width: auto;
-  display: block;
-}
-.footer-app-qr {
-  background: #fff;
-  border-radius: 10px;
-  padding: 6px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-}
-.footer-app-qr img {
-  width: 64px;
-  height: 64px;
-  display: block;
-}
-.footer-app-qr span {
-  font-size: 9px;
-  color: #555;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-}
-
-@media (max-width: 640px) {
-  .footer-app-section {
-    flex-direction: column;
-    align-items: center;
-  }
 }
 
 /* ══ MOBILE ══ */
@@ -256,25 +191,22 @@ body { top: 0 !important; }
     padding: 36px 20px 24px;
     text-align: left;
   }
-
   .footer-col-link,
   .footer-social-item,
-  .footer-contact-item {
-    justify-content: flex-start;
-  }
+  .footer-contact-item { justify-content: flex-start; }
 
   .footer-bottom {
     padding: 20px 20px 28px;
-    align-items: flex-start;
+    align-items: center;
+    gap: 14px;
+  }
+  .footer-bottom-top {
+    justify-content: center;
     gap: 12px;
   }
-
-  .footer-bottom-top {
-    justify-content: flex-start;
-  }
-  .footer-logo img {
-    height: 48px;
-  }
+  .footer-logo img { height: 40px; }
+  .footer-app-btn img { height: 40px; }
+  .footer-app-qr img { width: 30px; height: 30px; }
   .footer-copyright {
     width: 100%;
     text-align: center;
