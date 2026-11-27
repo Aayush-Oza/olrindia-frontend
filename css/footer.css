@@ -113,7 +113,7 @@ body { top: 0 !important; }
   pointer-events: none;
 }*/
 
- [visible] — uncomment this when app is ready
+ /*[visible] — uncomment this when app is ready*/
 .footer-app-section {
   display: flex;
   align-items: center;
