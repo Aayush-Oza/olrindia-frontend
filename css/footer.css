@@ -101,11 +101,25 @@ body { top: 0 !important; }
   object-fit: contain;
 }
 
-/* ── APP DOWNLOAD — sits beside logo, hidden until app ready ── */
+/* ── APP DOWNLOAD — beside logo ── */
+/* hidden: visibility hidden + width 0 so it takes no space */
+/* to show: remove the [hidden] block below, keep [visible] block */
+
+/* [hidden] — comment this out when app is ready
 .footer-app-section {
+  visibility: hidden;
+  width: 0;
+  overflow: hidden;
+  pointer-events: none;
+}*/
+
+ [visible] — uncomment this when app is ready
+.footer-app-section {
+  display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
+
 .footer-app-btn {
   display: inline-block;
   text-decoration: none !important;
@@ -117,29 +131,31 @@ body { top: 0 !important; }
   height: 48px;
   width: auto;
   display: block;
-  border-radius: 10px;
+  border-radius: 8px;
 }
+
 .footer-app-qr {
   background: #fff;
   border-radius: 10px;
-  padding: 6px 6px 4px;
+  padding: 8px 8px 5px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
+  line-height: 0;
 }
 .footer-app-qr img {
-  width: 36px;
-  height: 36px;
+  width: 48px;
+  height: 48px;
   display: block;
 }
 .footer-app-qr span {
-  font-size: 7px;
-  color: #444;
+  font-size: 7.5px;
+  color: #333;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  line-height: 1;
+  line-height: 1.2;
 }
 
 /* ── LANGUAGE SELECT ── */
@@ -205,7 +221,7 @@ body { top: 0 !important; }
   }
   .footer-logo img { height: 40px; }
   .footer-app-btn img { height: 40px; }
-  .footer-app-qr img { width: 30px; height: 30px; }
+  .footer-app-qr img { width: 40px; height: 40px; }
   .footer-copyright {
     width: 100%;
     text-align: center;
