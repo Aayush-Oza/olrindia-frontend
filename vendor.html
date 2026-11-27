@@ -83,31 +83,6 @@
   <link rel="stylesheet" href="css/admin/vendor-detail.css?v=18">
 
   <style>
-    .vs-nav {
-      position: sticky;
-      top: 0;
-      z-index: 200;
-      background: #fff;
-      border-bottom: 1px solid var(--c-border-soft);
-      box-shadow: 0 1px 8px rgba(24,26,27,0.06);
-    }
-    .vs-nav-inner {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 0 20px;
-      height: 68px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .vs-nav-logo img { height: 52px; display: block; }
-    .vs-nav-right {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
     /* Hero */
     .vs-hero {
       background: var(--c-bg);
@@ -151,7 +126,7 @@
       border-bottom: 1px solid var(--c-border-soft);
       padding: 10px 0;
       position: sticky;
-      top: 68px;
+      top: 64px;
       z-index: 150;
     }
     .vs-search-row-inner {
@@ -169,7 +144,7 @@
       border-bottom: 1px solid var(--c-border-soft);
       padding: 10px 0;
       position: sticky;
-      top: 116px;
+      top: 112px;
       z-index: 149;
     }
     .vs-filters-inner {
@@ -185,7 +160,7 @@
     .vs-listings-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
     .vs-listings-count { font-size: 13px; color: var(--c-ink-faint); font-weight: 500; }
 
-    /* Empty state - centered */
+    /* Empty state */
     .vs-empty {
       grid-column: 1/-1;
       text-align: center;
@@ -237,8 +212,6 @@
     .vs-load-more-btn:hover { border-color: var(--c-blue); color: var(--c-blue); }
 
     @media (max-width: 480px) {
-      .vs-nav-inner { height: 58px; padding: 0 12px; }
-      .vs-nav-logo img { height: 46px; }
       .vs-hero { padding: 20px 16px; }
       .vs-avatar { width: 56px; height: 56px; font-size: 20px; }
       .vs-vendor-name { font-size: 18px; }
@@ -251,33 +224,37 @@
 
 <body>
 
-  <!-- ── NAV ── -->
-  <nav class="vs-nav">
-    <div class="vs-nav-inner">
-      <a class="vs-nav-logo" href="/">
+  <!-- ── NAV (same as index) ── -->
+  <nav class="site-nav">
+    <div class="site-nav-inner">
+      <a class="nav-logo" href="/">
         <img src="assets/logo.png?v=18" alt="OLR India">
       </a>
-      <div class="vs-nav-right">
+      <div class="nav-right">
         <!-- Language -->
         <div class="nav-action nav-lang-wrap" id="navLangWrap">
           <button class="nav-wish-btn" id="navLangBtn" title="Language">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
-              <path d="M3 12h18M12 3c2.4 2.6 3.8 5.9 3.8 9s-1.4 6.4-3.8 9c-2.4-2.6-3.8-5.9-3.8-9S9.6 5.6 12 3Z" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M3 12h18M12 3c2.4 2.6 3.8 5.9 3.8 9s-1.4 6.4-3.8 9c-2.4-2.6-3.8-5.9-3.8-9S9.6 5.6 12 3Z"
+                stroke="currentColor" stroke-width="1.8"/>
             </svg>
           </button>
           <span>Language</span>
           <div class="nav-lang-menu" id="navLangMenu"></div>
         </div>
         <!-- Share -->
-        <button class="nav-wish-btn nav-share-btn" onclick="shareStore()" title="Share">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="1.8"/>
-            <circle cx="6" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/>
-            <circle cx="18" cy="19" r="3" stroke="currentColor" stroke-width="1.8"/>
-            <path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" stroke="currentColor" stroke-width="1.8"/>
-          </svg>
-        </button>
+        <div class="nav-action">
+          <button class="nav-wish-btn" onclick="shareStore()" title="Share">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="1.8"/>
+              <circle cx="6" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/>
+              <circle cx="18" cy="19" r="3" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" stroke="currentColor" stroke-width="1.8"/>
+            </svg>
+          </button>
+          <span>Share</span>
+        </div>
       </div>
     </div>
   </nav>
