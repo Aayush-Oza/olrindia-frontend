@@ -746,10 +746,11 @@
 .product-img {
   width: 100%;
   aspect-ratio: 1/1;
-  object-fit: contain;
   display: block;
-  background: #f3f4f6;
+  background-color: #f3f4f6;
+  background-size: contain;
   background-position: center;
+  background-repeat: no-repeat;
 }
 
 .product-img-placeholder {
