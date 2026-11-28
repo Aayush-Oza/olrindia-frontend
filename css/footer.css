@@ -98,7 +98,7 @@ body { top: 0 !important; }
   /* NO align-self: stretch — logo stays its natural height */
 }
 .footer-logo img {
-  height: 44px;
+  height: 58px;
   width: auto;
   display: block;
   object-fit: contain;
@@ -122,7 +122,7 @@ body { top: 0 !important; }
 .footer-app-btn:hover { opacity: 0.85; }
 .footer-app-btn img {
   width: 148px;
-  height: 24px;
+  height: 34px;
   display: block;
   border-radius: 8px;
 }
@@ -224,10 +224,10 @@ body { top: 0 !important; }
     padding: 10px 14px;
     border-radius: 12px;
   }
-  .footer-logo img { height: 38px; }
+  .footer-logo img { height: 48px; }
 
   .footer-app-section { width: 140px; gap: 6px; }
-  .footer-app-btn img { width: 140px; height: 24px; }
+  .footer-app-btn img { width: 140px; height: 34px; }
 
   .footer-app-qr {
     width: 140px;
