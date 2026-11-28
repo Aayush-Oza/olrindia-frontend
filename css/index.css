@@ -739,6 +739,7 @@
 
 .product-card:hover {
   box-shadow: var(--shadow-md);
+  text-decoration: none;
   transform: translateY(-3px);
 }
 
