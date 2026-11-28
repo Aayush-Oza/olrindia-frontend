@@ -749,7 +749,6 @@
   object-fit: contain;
   display: block;
   background: #f3f4f6;
-  background-size: cover;
   background-position: center;
 }
 
