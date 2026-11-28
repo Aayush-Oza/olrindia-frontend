@@ -132,7 +132,7 @@ function buildCard(p) {
   const url = `/product/${slugify(p.category || '')}/${slugify(p.city || 'india')}/${p.share_slug}${isAdminView ? '?admin=1' : ''}`;
 
   return `
-    <div class="product-card" onclick="window.location.href='${url}'">
+      <a class="product-card" href="${url}">
       <div style="position:relative;">
         ${img}${badge}
       </div>
@@ -152,7 +152,7 @@ function buildCard(p) {
           ${p.listing_type === 'sell' ? 'FOR SALE' : 'FOR RENT'}
         </div>
       </div>
-    </div>`;
+    </a>`;
 }
 
 /* ── Render vendor hero ──────────────────────────────────── */
