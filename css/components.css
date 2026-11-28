@@ -509,6 +509,9 @@ select.input {
 .nav-lang-wrap { display: none; }
 .dash-nav .nav-browse-mobile { display: none; }
 
+.nav-browse-mobile { color: var(--c-ink-soft); }
+.nav-browse-mobile.active { color: var(--c-blue); }
+
 @media (max-width: 768px) {
   .dash-nav .nav-browse-mobile { display: flex; align-items: center; justify-content: center; }
 }
