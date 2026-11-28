@@ -732,6 +732,9 @@
   cursor: pointer;
   position: relative;
   transition: all var(--t-fast) var(--ease);
+  text-decoration: none; 
+  color: inherit; 
+  display: block;
 }
 
 .product-card:hover {
