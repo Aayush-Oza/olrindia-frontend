@@ -80,7 +80,7 @@ body { top: 0 !important; }
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 28px;
+  gap: 24px;
   flex-wrap: wrap;
 }
 
@@ -88,68 +88,72 @@ body { top: 0 !important; }
 .footer-logo {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   background: #fff;
   border-radius: 16px;
-  padding: 12px 22px;
+  padding: 14px 20px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.18);
   text-decoration: none !important;
   flex-shrink: 0;
 }
 .footer-logo img {
-  height: 56px;
+  height: 52px;
   width: auto;
   display: block;
   object-fit: contain;
 }
 
-/* ── APP DOWNLOAD — stacked beside logo ── */
+/* ── APP SECTION — Play btn on top, QR box below, same width, stacked ── */
 .footer-app-section {
   display: flex;
-  flex-direction: column;   /* stack btn on top, QR below */
-  align-items: flex-start;
-  gap: 10px;
+  flex-direction: column;
+  align-items: stretch;   /* makes children fill the same width */
+  gap: 8px;
+  width: 180px;           /* fixed width so btn and QR box are identical width */
 }
 
-/* Google Play button */
+/* ── Google Play Button ── */
 .footer-app-btn {
-  display: inline-block;
+  display: block;
   text-decoration: none !important;
   transition: opacity 0.2s;
   line-height: 0;
+  width: 100%;
 }
 .footer-app-btn:hover { opacity: 0.85; }
 .footer-app-btn img {
-  height: 46px;
-  width: auto;
+  width: 100%;             /* fills the fixed 180px column */
+  height: auto;
   display: block;
   border-radius: 10px;
 }
 
-/* QR row — icon + label side by side */
+/* ── QR Box — QR image centered, label below ── */
 .footer-app-qr {
   background: #fff;
   border-radius: 12px;
-  padding: 10px 14px;
+  padding: 12px 14px 10px;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;  /* QR image on top, text below */
   align-items: center;
-  gap: 10px;
-  line-height: 0;
+  gap: 8px;
+  width: 100%;             /* fills the fixed 180px column */
+  box-sizing: border-box;
 }
 .footer-app-qr img {
-  width: 72px;
-  height: 72px;
+  width: 80px;
+  height: 80px;
   display: block;
   flex-shrink: 0;
 }
 .footer-app-qr span {
-  font-size: 10px;
-  color: #333;
+  font-size: 9.5px;
+  color: #444;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   line-height: 1.4;
-  white-space: nowrap;
+  text-align: center;
 }
 
 /* ── LANGUAGE SELECT ── */
@@ -212,29 +216,30 @@ body { top: 0 !important; }
 
   .footer-bottom-top {
     justify-content: center;
-    gap: 20px;
+    gap: 16px;
+    align-items: center;
   }
 
-  /* logo stays same size, just slightly smaller */
   .footer-logo {
-    padding: 10px 18px;
+    padding: 12px 18px;
     border-radius: 14px;
   }
-  .footer-logo img { height: 48px; }
+  .footer-logo img { height: 44px; }
 
-  /* app section stays stacked, just tighten up */
+  /* slightly narrower on mobile */
   .footer-app-section {
-    align-items: flex-start;
-    gap: 8px;
+    width: 158px;
+    gap: 7px;
   }
-
-  .footer-app-btn img { height: 40px; }
 
   .footer-app-qr {
-    padding: 8px 12px;
-    gap: 8px;
+    padding: 10px 12px 8px;
+    gap: 6px;
   }
-  .footer-app-qr img { width: 60px; height: 60px; }
+  .footer-app-qr img {
+    width: 68px;
+    height: 68px;
+  }
   .footer-app-qr span { font-size: 9px; }
 
   .footer-copyright {
