@@ -16,7 +16,7 @@ function vsProductCardHTML(p) {
       : '';
 
   return `
-  <div class="product-card" onclick="bsOpenProduct('${p.share_slug}','${p.category || ''}','${p.city || ''}')">
+  <a class="product-card" href="/product/${slugify(p.category || '')}/${slugify(p.city || 'india')}/${p.share_slug}">
     ${img}${badge}
     <div class="product-body">
       <div class="product-cat">${p.category || ''}</div>
@@ -34,7 +34,7 @@ function vsProductCardHTML(p) {
            </div>`
         : ''}
     </div>
-  </div>`;
+  </a>`;
 }
 
 // ── Load products (passed as callback) ────────────────────────

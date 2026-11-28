@@ -21,9 +21,9 @@ function productCardHTML(p) {
       : '';
 
   return `
-  <div class="product-card" onclick="bsOpenProduct('${p.share_slug}','${p.category || ''}','${p.city || ''}')">
+  <a class="product-card" href="/product/${slugify(p.category || '')}/${slugify(p.city || 'india')}/${p.share_slug}">
     ${img}${badge}
-    <button class="product-wish-btn" onclick="event.stopPropagation();handleWish(this,${p.id})" title="Save to wishlist">♡</button>
+    <button class="product-wish-btn" onclick="event.preventDefault();event.stopPropagation();handleWish(this,${p.id})" title="Save to wishlist">♡</button>
     <div class="product-body">
       <div class="product-cat">${p.category || ''}</div>
       <div class="product-title">${p.name}</div>
@@ -40,7 +40,7 @@ function productCardHTML(p) {
            </div>`
         : ''}
     </div>
-  </div>`;
+    </a>`;
 }
 
 // ── Load products (passed to browseSharedInit) ────────────────

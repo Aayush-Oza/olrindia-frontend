@@ -20,9 +20,9 @@ function productCardHTML(p) {
       ? `<span class="vendor-badge badge-growth">✓ Verified</span>`
       : '';
   return `
-  <div class="product-card" onclick="bsOpenProduct('${p.share_slug}','${p.category || ''}','${p.city || ''}')">
+  <a class="product-card" href="/product/${slugify(p.category || '')}/${slugify(p.city || 'india')}/${p.share_slug}">
     ${img}${badge}
-    <button class="product-wish-btn ${wished ? 'active' : ''}" onclick="event.stopPropagation();toggleWish(this,${p.id})" title="Save to wishlist">${wished ? '♥' : '♡'}</button>
+    <button class="product-wish-btn ${wished ? 'active' : ''}" onclick="event.preventDefault();event.stopPropagation();toggleWish(this,${p.id})" title="Save to wishlist">${wished ? '♥' : '♡'}</button>
     <div class="product-body">
       <div class="product-cat">${p.category || ''}</div>
       <div class="product-title">${p.name}</div>
@@ -39,7 +39,7 @@ function productCardHTML(p) {
            </div>`
       : ''}
     </div>
-  </div>`;
+  </a>`;
 }
 
 // ── Load products (passed to browseSharedInit) ────────────────
