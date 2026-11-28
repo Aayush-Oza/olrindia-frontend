@@ -12,21 +12,13 @@ body {
   color: var(--c-ink);
 }
 
-#panel-browse {
-  width: 100%;
-}
+#panel-browse { width: 100%; }
 
 /* ══════════════════════════════════════════════════════════════
    PAGE / PANELS
    ══════════════════════════════════════════════════════════════ */
-
-.panel-head {
-  padding: 24px 20px 18px;
-}
-
-.panel-head h2 {
-  font-size: 19px;
-}
+.panel-head { padding: 24px 20px 18px; }
+.panel-head h2 { font-size: 19px; }
 
 #panel-wishlist,
 #panel-profile,
@@ -38,25 +30,17 @@ body {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   PROFILE
+   PROFILE (user-only differences)
+   Shared profile styles live in components.css.
+   The Legal + Danger block sits OUTSIDE the card on this page and
+   has inline styles, so align it with the card here.
+   (Delete this rule once that block is moved inside .profile-card.)
    ══════════════════════════════════════════════════════════════ */
-.profile-card {
-  max-width: 640px;
-  margin: 0 20px 40px;
-  background: #fff;
-  border: 1px solid var(--c-border-soft);
-  border-radius: 16px;
-  padding: 24px;
-}
-
-.field-row .field {
-  flex: 1;
-}
-
-.profile-save-row {
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
+#panel-profile > div[style*="max-width:640px"] {
+  max-width: 720px !important;
+  margin: 0 auto !important;
+  padding-left: 4px !important;
+  padding-right: 4px !important;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -69,24 +53,7 @@ body {
   }
 }
 
-@media (max-width: 600px) {
-  .profile-card {
-    margin: 0 12px 30px;
-    padding: 18px;
-  }
-
-  .field-row {
-    flex-direction: column;
-    gap: 0;
-  }
-}
-
 @media (max-width: 480px) {
-  .filter-row-inner {
-    padding: 12px 12px 10px;
-  }
-
-  #panel-browse {
-    overflow-x: clip;
-  }
+  .filter-row-inner { padding: 12px 12px 10px; }
+  #panel-browse { overflow-x: clip; }
 }
