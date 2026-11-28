@@ -21,15 +21,30 @@
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <style>
     /* Plans modal extras (base plan styles live in vendor-dashboard.css) */
-    .plans-modal { max-height: 90vh; }
+    .plans-modal {
+      max-height: 90vh;
+    }
+
     .plans-modal-head,
     .plans-current-bar,
-    .plans-modal-tabs { border-bottom-color: #f3f4f6; }
+    .plans-modal-tabs {
+      border-bottom-color: #f3f4f6;
+    }
 
-    .plan-card-current { border-color: var(--c-blue-mid); background: #f0f6ff; }
-    .plan-current-tag { color: var(--c-blue-mid); }
+    .plan-card-current {
+      border-color: var(--c-blue-mid);
+      background: #f0f6ff;
+    }
 
-    .plan-card-top { display: flex; flex-direction: column; gap: 4px; }
+    .plan-current-tag {
+      color: var(--c-blue-mid);
+    }
+
+    .plan-card-top {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
 
     .plan-badge {
       font-size: 11px;
@@ -40,8 +55,19 @@
       border-radius: 20px;
     }
 
-    .plan-yearly-discount { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
-    .plan-original-price { font-size: 12px; color: var(--c-ink-faint); text-decoration: line-through; }
+    .plan-yearly-discount {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .plan-original-price {
+      font-size: 12px;
+      color: var(--c-ink-faint);
+      text-decoration: line-through;
+    }
 
     .plan-save-badge {
       background: #dcfce7;
@@ -52,10 +78,16 @@
       border-radius: 20px;
     }
 
-    .plan-saving-amount { font-size: 12px; color: #15803d; font-weight: 600; }
+    .plan-saving-amount {
+      font-size: 12px;
+      color: #15803d;
+      font-weight: 600;
+    }
 
     @media (max-width: 600px) {
-      .plans-grid-3 { grid-template-columns: 1fr; }
+      .plans-grid-3 {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -390,13 +422,15 @@
             <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.8" />
             <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8" />
             <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
-          </svg>Instagram
+          </svg>
+          Instagram
         </a>
         <a href="https://facebook.com/olrindia" target="_blank" rel="noopener" class="footer-social-item">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
             <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" stroke="currentColor"
               stroke-width="1.8" stroke-linejoin="round" />
-          </svg>Facebook
+          </svg>
+          Facebook
         </a>
       </div>
       <div>
@@ -411,25 +445,26 @@
         </a>
       </div>
     </div>
-    <div class="footer-app-section">
-      <a class="footer-app-btn"
-        href="https://play.google.com/store/apps/details?id=com.olrindia.app&pcampaignid=web_share" target="_blank"
-        rel="noopener">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
-          alt="Get it on Google Play">
-      </a>
-      <div class="footer-app-qr">
-        <img
-          src="https://api.qrserver.com/v1/create-qr-code/?size=144x144&color=000000&bgcolor=ffffff&data=https://play.google.com/store/apps/details?id=com.olrindia.app"
-          alt="Scan to download">
-        <span>SCAN TO DOWNLOAD</span>
-      </div>
-    </div>
     <hr class="footer-divider">
     <div class="footer-bottom">
       <div class="footer-bottom-top">
-        <a class="footer-logo" href="/vendor/my-products"><img src="../assets/logo.png?v=19" alt="OLR India"></a>
-
+        <a class="footer-logo" href="/user/browse">
+          <img src="../assets/logo.png?v=19" alt="OLR India">
+        </a>
+        <div class="footer-app-section">
+          <a class="footer-app-btn"
+            href="https://play.google.com/store/apps/details?id=com.olrindia.app&pcampaignid=web_share" target="_blank"
+            rel="noopener">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+              alt="Get it on Google Play">
+          </a>
+          <div class="footer-app-qr">
+            <img
+              src="https://api.qrserver.com/v1/create-qr-code/?size=144x144&color=000000&bgcolor=ffffff&data=https://play.google.com/store/apps/details?id=com.olrindia.app"
+              alt="Scan to download">
+            <span>SCAN TO DOWNLOAD</span>
+          </div>
+        </div>
         <select class="footer-lang-select notranslate" id="footerLangSelect" style="display:none" translate="no">
           <option value="en">🌐 English</option>
           <option value="hi">हिंदी (Hindi)</option>
