@@ -18,13 +18,17 @@ function showImage(idx) {
   current = idx;
 
   const main = document.getElementById('galleryMain');
-  let img = main.querySelector('img');
-  if (!img) {
-    img = document.createElement('img');
+  if (getComputedStyle(main).position === 'static') main.style.position = 'relative';
+
+  let pic = main.querySelector('.g-pic');
+  if (!pic) {
+    pic = document.createElement('div');
+    pic.className = 'g-pic';
+    pic.style.cssText = 'position:absolute;inset:0;background-size:contain;background-position:center;background-repeat:no-repeat;-webkit-touch-callout:none;user-select:none;';
     document.getElementById('galleryPlaceholder').style.display = 'none';
-    main.insertBefore(img, main.firstChild);
+    main.insertBefore(pic, main.firstChild);
   }
-  img.src = images[idx];
+  pic.style.backgroundImage = `url('${images[idx]}')`;
 
   document.getElementById('gPrev').classList.toggle('hidden', idx === 0);
   document.getElementById('gNext').classList.toggle('hidden', idx === images.length - 1);
@@ -47,9 +51,8 @@ function buildGallery(imgs) {
   const thumbsEl = document.getElementById('galleryThumbs');
   if (imgs.length > 1) {
     thumbsEl.innerHTML = imgs.map((url, i) => `
-      <div class="g-thumb${i === 0 ? ' active' : ''}" onclick="showImage(${i})">
-        <img src="${url}" alt="Photo ${i + 1}" loading="lazy">
-      </div>`).join('');
+  <div class="g-thumb${i === 0 ? ' active' : ''}" onclick="showImage(${i})"
+       style="background-image:url('${url}');background-size:cover;background-position:center;"></div>`).join('');
   }
 
   document.getElementById('gPrev').addEventListener('click', () => showImage(current - 1));
@@ -317,7 +320,7 @@ async function loadRelatedProducts(category, listingType, excludeId) {
 
 function buildRelatedCard(p, listingType) {
   const imgHtml = (p.images && p.images[0])
-    ? `<img class="product-img" src="${p.images[0]}" alt="${p.name}" loading="lazy">`
+    ? `<div class="product-img" style="background-image:url('${p.images[0]}')"></div>`
     : `<div class="product-img-placeholder">📦</div>`;
 
   const badgeHtml = p.vendor_badge === 'featured'
@@ -355,7 +358,7 @@ function buildRelatedCard(p, listingType) {
   const url = `/product/${slugify(p.category)}/${slugify(p.city || 'india')}/${p.share_slug}`;
 
   return `
-    <div class="product-card" onclick="window.location.href='${url}'">
+    <a class="product-card" href="${url}">
       <div style="position:relative;">
         ${imgHtml}
         ${badgeHtml}
@@ -368,8 +371,7 @@ function buildRelatedCard(p, listingType) {
           ${locHtml}
         </div>
       </div>
-    </div>
-  `;
+    </a>`;
 }
 
 /* ── Load product ────────────────────────────────────────── */
@@ -749,5 +751,11 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight') showImage(current + 1);
   if (e.key === 'Escape') closeLoginPopup();
 });
-
+['galleryMain', 'galleryThumbs'].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  ['contextmenu', 'dragstart', 'dblclick', 'selectstart'].forEach(ev =>
+    el.addEventListener(ev, e => e.preventDefault())
+  );
+});
 loadProduct();
