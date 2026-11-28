@@ -84,32 +84,34 @@ body { top: 0 !important; }
   flex-wrap: wrap;
 }
 
-/* ── LOGO ── */
+/* ── LOGO — height matches the full app block ── */
 .footer-logo {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background: #fff;
   border-radius: 16px;
-  padding: 14px 20px;
+  padding: 18px 24px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.18);
   text-decoration: none !important;
   flex-shrink: 0;
+  /* stretch to match app block height naturally via align-self */
+  align-self: stretch;
 }
 .footer-logo img {
-  height: 52px;
+  height: 60px;
   width: auto;
   display: block;
   object-fit: contain;
 }
 
-/* ── APP SECTION — Play btn on top, QR box below, same width, stacked ── */
+/* ── APP SECTION — Play btn on top, QR box below, same width ── */
 .footer-app-section {
   display: flex;
   flex-direction: column;
-  align-items: stretch;   /* makes children fill the same width */
+  align-items: stretch;
   gap: 8px;
-  width: 180px;           /* fixed width so btn and QR box are identical width */
+  width: 200px;
 }
 
 /* ── Google Play Button ── */
@@ -122,38 +124,39 @@ body { top: 0 !important; }
 }
 .footer-app-btn:hover { opacity: 0.85; }
 .footer-app-btn img {
-  width: 100%;             /* fills the fixed 180px column */
+  width: 100%;
   height: auto;
   display: block;
   border-radius: 10px;
 }
 
-/* ── QR Box — QR image centered, label below ── */
+/* ── QR Box — image centered, label in ONE line below ── */
 .footer-app-qr {
   background: #fff;
   border-radius: 12px;
-  padding: 12px 14px 10px;
+  padding: 14px 14px 12px;
   display: flex;
-  flex-direction: column;  /* QR image on top, text below */
+  flex-direction: column;
   align-items: center;
   gap: 8px;
-  width: 100%;             /* fills the fixed 180px column */
+  width: 100%;
   box-sizing: border-box;
 }
 .footer-app-qr img {
-  width: 80px;
-  height: 80px;
+  width: 84px;
+  height: 84px;
   display: block;
   flex-shrink: 0;
 }
 .footer-app-qr span {
-  font-size: 9.5px;
+  font-size: 10px;
   color: #444;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  line-height: 1.4;
+  line-height: 1;
   text-align: center;
+  white-space: nowrap;   /* ← keeps it on one line always */
 }
 
 /* ── LANGUAGE SELECT ── */
@@ -221,26 +224,29 @@ body { top: 0 !important; }
   }
 
   .footer-logo {
-    padding: 12px 18px;
+    padding: 14px 20px;
     border-radius: 14px;
+    align-self: stretch;
   }
-  .footer-logo img { height: 44px; }
+  .footer-logo img { height: 52px; }
 
-  /* slightly narrower on mobile */
   .footer-app-section {
-    width: 158px;
+    width: 170px;
     gap: 7px;
   }
 
   .footer-app-qr {
-    padding: 10px 12px 8px;
-    gap: 6px;
+    padding: 12px 12px 10px;
+    gap: 7px;
   }
   .footer-app-qr img {
-    width: 68px;
-    height: 68px;
+    width: 72px;
+    height: 72px;
   }
-  .footer-app-qr span { font-size: 9px; }
+  .footer-app-qr span {
+    font-size: 9.5px;
+    white-space: nowrap;
+  }
 
   .footer-copyright {
     width: 100%;
