@@ -122,7 +122,7 @@ body { top: 0 !important; }
 .footer-app-btn:hover { opacity: 0.85; }
 .footer-app-btn img {
   width: 148px;
-  height: 44px;
+  height: 24px;
   display: block;
   border-radius: 8px;
 }
@@ -227,7 +227,7 @@ body { top: 0 !important; }
   .footer-logo img { height: 38px; }
 
   .footer-app-section { width: 140px; gap: 6px; }
-  .footer-app-btn img { width: 140px; height: 44px; }
+  .footer-app-btn img { width: 140px; height: 24px; }
 
   .footer-app-qr {
     width: 140px;
