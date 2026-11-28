@@ -145,7 +145,7 @@ body { top: 0 !important; }
   display: block;
 }
 .footer-app-qr span {
-  font-size: 9px;
+  font-size: 11px;
   color: #000;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -236,7 +236,7 @@ body { top: 0 !important; }
   }
   .footer-app-qr img { width: 98px; height: 98px; }
   .footer-app-qr span {
-    font-size: 7.5px;
+    font-size: 9px;
     white-space: nowrap;
   }
 
