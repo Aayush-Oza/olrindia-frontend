@@ -78,24 +78,24 @@ body { top: 0 !important; }
 
 .footer-bottom-top {
   display: flex;
-  align-items: center;
+  align-items: center;   /* vertically centers logo with app block */
   justify-content: center;
   gap: 16px;
   flex-wrap: wrap;
 }
 
-/* ── LOGO — same height as app block ── */
+/* ── LOGO — natural size, no stretching ── */
 .footer-logo {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background: #fff;
   border-radius: 14px;
-  padding: 12px 20px;
+  padding: 12px 18px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.18);
   text-decoration: none !important;
   flex-shrink: 0;
-  align-self: stretch;
+  /* NO align-self: stretch — logo stays its natural height */
 }
 .footer-logo img {
   height: 44px;
@@ -104,12 +104,12 @@ body { top: 0 !important; }
   object-fit: contain;
 }
 
-/* ── APP SECTION ── */
+/* ── APP SECTION — compact fixed width ── */
 .footer-app-section {
   display: flex;
   flex-direction: column;
   gap: 7px;
-  width: 190px;   /* wide enough for SCAN TO DOWNLOAD in one line */
+  width: 148px;   /* compact — fits SCAN TO DOWNLOAD in one line at 9px */
 }
 
 /* ── Google Play Button ── */
@@ -121,7 +121,7 @@ body { top: 0 !important; }
 }
 .footer-app-btn:hover { opacity: 0.85; }
 .footer-app-btn img {
-  width: 190px;
+  width: 148px;
   height: auto;
   display: block;
   border-radius: 8px;
@@ -131,30 +131,29 @@ body { top: 0 !important; }
 .footer-app-qr {
   background: #fff;
   border-radius: 10px;
-  padding: 10px 14px 9px;
+  padding: 10px 10px 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 7px;
-  width: 190px;        /* explicit fixed width — no wrapping possible */
+  gap: 6px;
+  width: 148px;
   box-sizing: border-box;
 }
 .footer-app-qr img {
-  width: 72px;
-  height: 72px;
+  width: 64px;
+  height: 64px;
   display: block;
 }
 .footer-app-qr span {
-  font-size: 9.5px;
+  font-size: 8px;
   color: #444;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   line-height: 1;
   text-align: center;
-  white-space: nowrap;   /* never wraps */
+  white-space: nowrap;
   display: block;
-  width: 100%;
 }
 
 /* ── LANGUAGE SELECT ── */
@@ -222,24 +221,22 @@ body { top: 0 !important; }
   }
 
   .footer-logo {
-    padding: 10px 16px;
+    padding: 10px 14px;
     border-radius: 12px;
-    align-self: stretch;
   }
-  .footer-logo img { height: 40px; }
+  .footer-logo img { height: 38px; }
 
-  .footer-app-section { width: 180px; gap: 6px; }
-
-  .footer-app-btn img { width: 180px; }
+  .footer-app-section { width: 140px; gap: 6px; }
+  .footer-app-btn img { width: 140px; }
 
   .footer-app-qr {
-    width: 180px;
-    padding: 9px 12px 8px;
-    gap: 6px;
+    width: 140px;
+    padding: 9px 9px 7px;
+    gap: 5px;
   }
-  .footer-app-qr img { width: 64px; height: 64px; }
+  .footer-app-qr img { width: 58px; height: 58px; }
   .footer-app-qr span {
-    font-size: 9px;
+    font-size: 7.5px;
     white-space: nowrap;
   }
 
