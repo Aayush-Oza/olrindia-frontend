@@ -9,8 +9,8 @@ const PAGE_MORE    = 20;
 // ── Product card HTML ─────────────────────────────────────────
 function productCardHTML(p) {
   const img = p.images && p.images[0]
-    ? `<img class="product-img" src="${p.images[0]}" alt="${p.name}" loading="lazy">`
-    : `<div class="product-img-placeholder"></div>`;
+  ? `<div class="product-img" style="background-image:url('${p.images[0]}')"></div>`
+  : `<div class="product-img-placeholder"></div>`;
 
   const price = bsBuildPriceLabel(p);
 

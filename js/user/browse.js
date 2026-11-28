@@ -10,8 +10,8 @@ const wishedSlugs = new Map();
 function productCardHTML(p) {
   if (p.id && p.share_slug) wishedSlugs.set(p.id, p.share_slug);
   const img = p.images && p.images[0]
-    ? `<img class="product-img" src="${p.images[0]}" alt="${p.name}" loading="lazy">`
-    : `<div class="product-img-placeholder">📦</div>`;
+  ? `<div class="product-img" style="background-image:url('${p.images[0]}')"></div>`
+  : `<div class="product-img-placeholder"></div>`;
   const price = bsBuildPriceLabel(p);
   const wished = wishedIds.has(p.id);
   const badge = p.vendor_badge === 'featured'
